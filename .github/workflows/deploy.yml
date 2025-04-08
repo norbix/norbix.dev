@@ -22,7 +22,7 @@ jobs:
       - name: Build site
         run: |
           hugo --minify
-          ls -la public/*
+          ls -la ./*
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
