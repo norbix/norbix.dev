@@ -1,0 +1,4 @@
+baseURL = 'https://norbix.github.io/norbix.dev/'
+languageCode = 'en-us'
+title = 'My New Hugo Site'
+theme = 'PaperMod'
