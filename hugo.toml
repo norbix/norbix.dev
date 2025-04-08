@@ -1,4 +1,98 @@
 baseURL = 'https://norbix.dev/'
-languageCode = 'en-us'
-title = 'My New Hugo Site'
-theme = 'PaperMod'
+languageCode = "en-us"
+title = "norbix.dev - The log of my journey through code & software systems architecture"
+theme = "PaperMod"
+enableRobotsTXT = true
+defaultContentLanguage = "en"
+buildDrafts = false
+buildFuture = false
+buildExpired = false
+
+[pagination]
+pagerSize = 10
+
+[params]
+defaultTheme = "dark" # or "light" or "auto"
+
+[params.homeInfoParams]
+Title = "Hi, I'm Norbix 👋"
+Content = "Welcome to my personal blog where I share my journey through code, software systems."
+
+
+author = "Norbix"
+description = "norbix.dev - Norbix's dev blog"
+DateFormat = "2006-01-02"
+ShowReadingTime = true
+ShowShareButtons = true
+ShowCodeCopyButtons = true
+ShowPostNavLinks = true
+ShowBreadCrumbs = true
+ShowWordCount = true
+ShowToc = true
+TocOpen = false
+comments = false
+
+# Your social media
+socialIcons = [
+    { name = "github", url = "https://github.com/norbix" },
+    { name = "twitter", url = "https://x.com/norbixjakubczak" },
+    { name = "email", url = "mailto:norbert.jakubczak@gmail.com" }
+]
+
+# Custom assets
+assets = "assets"
+
+# Optional: SEO / social image
+[params.profileMode]
+enabled = true
+title = "Norbert (Mr. Norbix) Jakubczak"
+subtitle = "Software Engineer · Internal Developer Platforms · SaaS Microservices"
+imageUrl = "images/my_avatar.PNG"
+imageTitle = "Norbert (Mr. Norbix) Jakubczak"
+imageWidth = 120
+imageHeight = 120
+
+# Menus (top nav)
+[[menu.main]]
+identifier = "posts"
+name = "Posts"
+url = "/posts/"
+weight = 10
+
+[[menu.main]]
+identifier = "tags"
+name = "Tags"
+url = "/tags/"
+weight = 20
+
+[[menu.main]]
+identifier = "about"
+name = "About"
+url = "/about/"
+weight = 30
+
+# Syntax highlighting
+[markup]
+[markup.highlight]
+noClasses = false
+style = "monokai" # Other options: dracula, github-dark, etc.
+lineNos = true
+lineNumbersInTable = true
+[markup.goldmark.renderer]
+unsafe = true # Allow raw HTML in Markdown
+
+# Outputs (enable RSS and search if needed)
+[outputs]
+home = ["HTML", "RSS", "JSON"]
+
+# Deployment base (for future production)
+[deployment]
+[[deployment.targets]]
+name = "live"
+URL = "s3://your-bucket-name?region=your-region"
+
+# Sitemap settings
+[sitemap]
+changefreq = "monthly"
+filename = "sitemap.xml"
+priority = 0.5
