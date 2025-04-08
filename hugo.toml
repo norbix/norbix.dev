@@ -18,7 +18,6 @@ defaultTheme = "dark" # or "light" or "auto"
 Title = "Hi, I'm Norbix 👋"
 Content = "Welcome to my personal blog where I share my journey through code, software systems."
 
-
 author = "Norbix"
 description = "norbix.dev - Norbix's dev blog"
 DateFormat = "2006-01-02"
