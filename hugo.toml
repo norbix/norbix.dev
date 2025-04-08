@@ -13,6 +13,7 @@ pagerSize = 10
 
 [params]
 defaultTheme = "dark" # or "light" or "auto"
+ShowHomeInNavbar = true
 
 [params.homeInfoParams]
 Title = "Hi, I'm Norbix 👋"
