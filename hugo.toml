@@ -53,6 +53,12 @@ imageHeight = 120
 
 # Menus (top nav)
 [[menu.main]]
+identifier = "home"
+name = "Home"
+url = "/"
+weight = 1
+
+[[menu.main]]
 identifier = "posts"
 name = "Posts"
 url = "/posts/"
