@@ -1,6 +1,6 @@
 +++
 date = '2025-04-08T19:10:10+02:00'
-draft = true
+draft = false
 title = "Best Practices for Software Development in Go"
 tags = ["go", "golang", "best-practices", "software-engineering"]
 categories = ["backend", "golang"]
