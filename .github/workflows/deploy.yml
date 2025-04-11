@@ -15,6 +15,12 @@ jobs:
         with:
           submodules: recursive
 
+      - name: Check PaperMod version
+        run: |
+          cd themes/PaperMod
+          echo "Current PaperMod commit:"
+          git log -1
+
       - name: Setup Hugo
         uses: peaceiris/actions-hugo@v2
         with:
