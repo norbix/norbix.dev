@@ -23,8 +23,7 @@ jobs:
 
       - name: Debug confirm schema_json exists
         run: |
-          ls -al themes/PaperMod/layouts/partials/templates/;
-          hugo version
+          ls -al themes/PaperMod/layouts/partials/templates/
 
       - name: Setup Hugo
         uses: peaceiris/actions-hugo@v2
@@ -34,6 +33,7 @@ jobs:
 
       - name: Build site
         run: |
+          hugo version
           hugo --minify
 
       - name: Deploy to GitHub Pages
