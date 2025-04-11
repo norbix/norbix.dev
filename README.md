@@ -1,6 +1,17 @@
-# norbix.dev
+# SDLC Playbook
 
-This is the source code and content behind [https://norbix.dev](https://norbix.dev) — a personal website and technical blog by Norbert Jakubczak (Mr. Norbix). Built with [Hugo](https://gohugo.io/) and deployed via GitHub Pages.
+This repository contains the source code and content behind [https://norbix.dev](https://norbix.dev) — a personal knowledge base and technical playbook by Norbert Jakubczak (Mr. Norbix), focused on Software Development Lifecycle (SDLC), DevOps, and engineering practices. Built with [Hugo](https://gohugo.io/) and deployed via GitHub Pages.
+
+## Table of Contents
+- [🛠️ Tech Stack](#-tech-stack)
+- [🚀 Deployment](#-deployment)
+  - [🔗 Live URL](#-live-url)
+  - [🧾 Domain](#-domain)
+- [🧼 Local Development](#-local-development)
+- [🛠 Updating Content](#-updating-content)
+- [🔄 Maintenance & Updates](#-maintenance--updates)
+- [🤝 Contributing](#-contributing)
+- [📜 License](#-license)
 
 ---
 
