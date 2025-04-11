@@ -15,6 +15,13 @@ pagerSize = 10
 defaultTheme = "dark" # or "light" or "auto"
 ShowHomeInNavbar = true
 
+# Your social media
+social = [
+    { name = "github", url = "https://github.com/norbix" },
+    { name = "twitter", url = "https://x.com/norbixjakubczak" },
+    { name = "email", url = "mailto:norbert.jakubczak@gmail.com" }
+]
+
 [params.homeInfoParams]
 Title = "Hi, I'm Norbix 👋"
 Content = "Welcome to my personal blog where I share my journey through code, software systems."
@@ -32,12 +39,7 @@ ShowToc = true
 TocOpen = false
 comments = false
 
-# Your social media
-socialIcons = [
-    { name = "github", url = "https://github.com/norbix" },
-    { name = "twitter", url = "https://x.com/norbixjakubczak" },
-    { name = "email", url = "mailto:norbert.jakubczak@gmail.com" }
-]
+
 
 # Custom assets
 assets = "assets"
