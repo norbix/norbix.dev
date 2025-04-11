@@ -21,6 +21,11 @@ jobs:
           echo "Current PaperMod commit:"
           git log -1
 
+      - name: Debug confirm schema_json exists
+        run: |
+          ls -al themes/PaperMod/layouts/partials/templates/;
+          hugo version
+
       - name: Setup Hugo
         uses: peaceiris/actions-hugo@v2
         with:
