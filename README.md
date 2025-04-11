@@ -2,6 +2,13 @@
 
 This repository contains the source code and content behind [https://norbix.dev](https://norbix.dev) — a personal knowledge base and technical playbook by Norbert Jakubczak (Mr. Norbix), focused on Software Development Lifecycle (SDLC), DevOps, and engineering practices. Built with [Hugo](https://gohugo.io/) and deployed via GitHub Pages.
 
+## 📊 Analytics
+
+Visitor analytics are powered by [GoatCounter](https://www.goatcounter.com) — a lightweight, privacy-friendly alternative to Google Analytics.
+
+You can explore page view trends and traffic stats publicly at:  
+👉 **[https://norbix.goatcounter.com](https://norbix.goatcounter.com)**
+
 ## Table of Contents
 - [🛠️ Tech Stack](#-tech-stack)
 - [🚀 Deployment](#-deployment)
@@ -83,3 +90,4 @@ This is a personal site, but you're welcome to open issues or PRs if you spot so
 ## 📜 License
 
 MIT — see `LICENSE` for details.
+
