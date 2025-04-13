@@ -39,8 +39,6 @@ ShowToc = true
 TocOpen = false
 comments = false
 
-
-
 # Custom assets
 assets = "assets"
 
@@ -53,6 +51,10 @@ imageUrl = "images/my_avatar.PNG"
 imageTitle = "Norbert (Mr. Norbix) Jakubczak"
 imageWidth = 120
 imageHeight = 120
+
+[params.assets]
+css = ["css/custom.css"]
+
 
 # Menus (top nav)
 [[menu.main]]
