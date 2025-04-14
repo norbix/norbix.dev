@@ -13,6 +13,21 @@ After working on production systems in Go for several years — across SaaS plat
 
 ---
 
+## 🧭 0. Agree on Code Style Before You Write a Line
+
+Before starting any development, align on a shared code style with your team.
+
+This prevents unnecessary friction during code reviews, ensures consistency, and reduces the mental overhead of switching between files written by different developers.
+
+A great starting point is the **[Google Go Style Guide](https://google.github.io/styleguide/go/)** — it's clear, opinionated, and battle-tested at scale. You can automate style enforcement with:
+
+- `gofmt` / `goimports` for formatting
+- `golangci-lint` to enforce idiomatic Go practices
+
+Establishing your code style early also makes onboarding faster and simplifies collaboration — especially in cross-functional teams or open source projects.
+
+---
+
 ## ✅ 1. Keep it Simple
 
 Go is intentionally minimal — embrace it.
