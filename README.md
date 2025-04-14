@@ -17,6 +17,7 @@ You can explore page view trends and traffic stats publicly at:
 - [🧼 Local Development](#-local-development)
 - [🛠 Updating Content](#-updating-content)
 - [🔄 Maintenance & Updates](#-maintenance--updates)
+- [🔍 Uptime Monitoring](#-uptime-monitoring)
 - [🤝 Contributing](#-contributing)
 - [📜 License](#-license)
 
@@ -81,6 +82,17 @@ hugo new blog/my-new-post.md
 
 ---
 
+## 🔍 Uptime Monitoring
+
+The uptime and availability of [norbix.dev](https://norbix.dev) are monitored using [UptimeRobot](https://uptimerobot.com/) to ensure the site is consistently accessible.
+
+📈 You can view real-time uptime stats here:  
+👉 **[https://stats.uptimerobot.com/4eFg4Cd2zt](https://stats.uptimerobot.com/4eFg4Cd2zt)**
+
+Alerts are configured to notify if the site becomes unreachable, helping keep the platform reliable and always available.
+
+---
+
 ## 🤝 Contributing
 
 This is a personal site, but you're welcome to open issues or PRs if you spot something broken or want to suggest an improvement.
@@ -90,4 +102,3 @@ This is a personal site, but you're welcome to open issues or PRs if you spot so
 ## 📜 License
 
 MIT — see `LICENSE` for details.
-
