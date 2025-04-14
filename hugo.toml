@@ -53,7 +53,7 @@ reactions_enabled = "1"
 emit_metadata = "0"
 input_position = "bottom"
 theme = "dark"
-lang = "pl"
+lang = "en"
 
 # Optional: SEO / social image
 [params.profileMode]
