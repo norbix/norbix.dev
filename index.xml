@@ -2,16 +2,4 @@
 &lt;p>This is a test page for the Hugo blog. It is used to verify the setup and configuration of the Hugo site. The content here is not meant to be permanent and will be replaced with actual blog posts in the future.&lt;/p></description></item><item><title>About</title><link>https://norbix.dev/about/</link><pubDate>Sat, 05 Apr 2025 00:00:00 +0000</pubDate><guid>https://norbix.dev/about/</guid><description>&lt;p>Hi, I&amp;rsquo;m &lt;strong>Norbert Jakubczak&lt;/strong> — aka &lt;strong>Norbix&lt;/strong> 👋&lt;/p>
 &lt;p>I&amp;rsquo;m a polyglot &lt;strong>Software Engineer&lt;/strong> with a strong focus on &lt;strong>Golang&lt;/strong> and &lt;strong>Python&lt;/strong>, working across the full stack — from backend and cloud infrastructure to frontend integration and developer tooling.&lt;/p>
 &lt;p>I specialize in building &lt;strong>Internal Developer Platforms (IDPs)&lt;/strong> and architecting scalable &lt;strong>Software-as-a-Service (SaaS)&lt;/strong> systems using microservices and modern cloud-native technologies.&lt;/p>
-&lt;hr>
-&lt;h2 id="-areas-of-expertise">🛠️ Areas of Expertise&lt;/h2>
-&lt;ul>
-&lt;li>🐍 &amp;amp; 🦫 Polyglot systems in &lt;strong>Python&lt;/strong> and &lt;strong>Go&lt;/strong>&lt;/li>
-&lt;li>🧱 &lt;strong>Internal Developer Platforms (IDP)&lt;/strong>&lt;/li>
-&lt;li>🧩 &lt;strong>SaaS Microservices&lt;/strong> architecture&lt;/li>
-&lt;li>☁️ &lt;strong>Kubernetes (K8s)&lt;/strong> and cloud-native platforms&lt;/li>
-&lt;li>🔐 DevSecOps and secure CI/CD pipelines&lt;/li>
-&lt;li>⚙️ Full lifecycle delivery: from analysis &amp;amp; architecture → development → deployment → production support&lt;/li>
-&lt;/ul>
-&lt;hr>
-&lt;h2 id="-what-this-blog-is-about">✍️ What this blog is about&lt;/h2>
-&lt;p>This blog is a logbook of my journey building and maintaining resilient systems — sharing both wins and war stories from the world of platform engineering, cloud automation, and product delivery.&lt;/p></description></item></channel></rss>
+&lt;p>Before stepping fully into tech, I was a &lt;strong>professional basketball player&lt;/strong> — a path that taught me discipline, team dynamics, and what it means to perform under pressure. That mindset still drives how I build software today.&lt;/p></description></item></channel></rss>
