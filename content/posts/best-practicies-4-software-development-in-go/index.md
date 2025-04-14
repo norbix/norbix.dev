@@ -6,6 +6,8 @@ tags = ["go", "golang", "best-practices", "software-engineering"]
 categories = ["backend", "golang"]
 summary = "A collection of real-world Go best practices from years of building backend systems, APIs, and cloud-native services."
 comments = true
+ShowToc = true
+TocOpen = true
 +++
 
 > Writing Go code that works is easy. Writing Go code that lasts? That takes practice.

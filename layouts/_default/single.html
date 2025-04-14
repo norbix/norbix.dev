@@ -9,6 +9,12 @@
         </header>
 
         <div class="post-content">
+            {{ if .Params.ShowToc }}
+            <nav class="table-of-contents">
+                {{ .TableOfContents }}
+            </nav>
+            {{ end }}
+
             {{ .Content }}
         </div>
 

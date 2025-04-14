@@ -6,6 +6,8 @@ tags = ["go", "solid", "dependency-injection", "unit-testing", "interfaces"]
 categories = ["software-engineering", "golang"]
 summary = "A deep dive into the Dependency Inversion Principle, its implementation with interfaces and dependency injection, and how it unlocks clean, testable Go code."
 comments = true
+ShowToc = true
+TocOpen = true
 +++
 
 "High-level modules should not depend on low-level modules. Both should depend on abstractions."
@@ -13,14 +15,6 @@ comments = true
 Welcome to a core principle of software architecture: Dependency Inversion, the "D" in `SOLID`. In this article, we’ll explore what it means in practice, how to implement it in Go using interfaces and dependency injection, and why it’s essential for writing unit-testable code.
 
 ![banner](banner.png)
-
-# Table of Contents
-- [What Is the Dependency Inversion Principle?](#what-is-the-dependency-inversion-principle)
-- [Refactor with Dependency Inversion](#refactor-with-dependency-inversion)
-- [Enter Dependency Injection](#enter-dependency-injection)
-- [Why This Rocks for Testing](#why-this-rocks-for-testing)
-- [Summary](#summary)
-- [When to Use DIP in Go](#when-to-use-dip-in-go)
 
 ---
 
