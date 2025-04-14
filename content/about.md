@@ -11,6 +11,11 @@ I'm a polyglot **Software Engineer** with a strong focus on **Golang** and **Pyt
 
 I specialize in building **Internal Developer Platforms (IDPs)** and architecting scalable **Software-as-a-Service (SaaS)** systems using microservices and modern cloud-native technologies.
 
+Before stepping fully into tech, I was a **professional basketball player** — a path that taught me discipline, team dynamics, and what it means to perform under pressure. That mindset still drives how I build software today.
+
+> _"Never say never, because limits, like fears, are often just an illusion."_  
+> — **Michael Jordan**
+
 ---
 
 ## 🛠️ Areas of Expertise
@@ -49,4 +54,4 @@ Expect deep dives on:
 
 ---
 
-Thanks for stopping by. I hope something here helps you build better systems.
+Thanks for stopping by. Whether you're a developer, architect, or fellow ex-athlete turned engineer — I hope something here helps you build better systems.
