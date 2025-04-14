@@ -4,7 +4,8 @@ draft = false
 title = 'Keywords in Software Architecture'
 tags = ["architecture", "software-engineering", "keywords"]
 categories = ["architecture", "software-engineering"]
-summary = "A visual exploration of the core keywords and concepts in modern software architecture."
+summary = "A visual exploration of the core keywords and concepts in modern software architecture." 
+comments = true
 +++
 
 The whiteboard behind this article is more than just colorful notes — it's a map of the mental models that drive clean, scalable, and maintainable software systems. Let’s break down the core ideas and keywords captured in this visual brainstorm.

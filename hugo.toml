@@ -37,10 +37,23 @@ ShowBreadCrumbs = true
 ShowWordCount = true
 ShowToc = true
 TocOpen = false
-comments = false
+comments = true
 
 # Custom assets
 assets = "assets"
+
+[params.giscus]
+repo = "norbix/norbix.dev"
+repo_id = "R_kgDOOV_xMQ"
+category = "Announcements"
+category_id = "DIC_kwDOOV_xMc4CpF5M"
+mapping = "pathname"
+strict = "0"
+reactions_enabled = "1"
+emit_metadata = "0"
+input_position = "bottom"
+theme = "dark"
+lang = "pl"
 
 # Optional: SEO / social image
 [params.profileMode]

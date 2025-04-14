@@ -1,0 +1,24 @@
+{{ define "main" }}
+{{- $shouldShowComments := or (.Params.comments) (site.Params.comments) -}}
+
+<main id="main">
+    <article class="post-single">
+        <header class="post-header">
+            <h1 class="post-title">{{ .Title }}</h1>
+            {{ partial "post_meta.html" . }}
+        </header>
+
+        <div class="post-content">
+            {{ .Content }}
+        </div>
+
+        {{ if $shouldShowComments }}
+        <div class="post-comments">
+            {{ partial "giscus.html" . }}
+        </div>
+        {{ end }}
+
+        {{ partial "post_nav_links.html" . }}
+    </article>
+</main>
+{{ end }}
