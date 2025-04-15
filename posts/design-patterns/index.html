@@ -1,0 +1,519 @@
+<!doctype html><html lang=en dir=auto><head><meta charset=utf-8><meta http-equiv=X-UA-Compatible content="IE=edge"><meta name=viewport content="width=device-width,initial-scale=1,shrink-to-fit=no"><meta name=robots content="index, follow"><title>Design Patterns in Go: Practical Examples | norbix.dev - The log of my journey through code & software systems architecture</title>
+<meta name=keywords content="go,golang,design patterns,architecture"><meta name=description content="Explore creational, structural, and behavioral design patterns in Go with clear explanations and code snippets."><meta name=author content><link rel=canonical href=https://norbix.dev/posts/design-patterns/><link crossorigin=anonymous href=/assets/css/stylesheet.fc220c15db4aef0318bbf30adc45d33d4d7c88deff3238b23eb255afdc472ca6.css integrity="sha256-/CIMFdtK7wMYu/MK3EXTPU18iN7/MjiyPrJVr9xHLKY=" rel="preload stylesheet" as=style><link rel=icon href=https://norbix.dev/favicon.ico><link rel=icon type=image/png sizes=16x16 href=https://norbix.dev/favicon-16x16.png><link rel=icon type=image/png sizes=32x32 href=https://norbix.dev/favicon-32x32.png><link rel=apple-touch-icon href=https://norbix.dev/apple-touch-icon.png><link rel=mask-icon href=https://norbix.dev/safari-pinned-tab.svg><meta name=theme-color content="#2e2e33"><meta name=msapplication-TileColor content="#2e2e33"><link rel=alternate hreflang=en href=https://norbix.dev/posts/design-patterns/><noscript><style>#theme-toggle,.top-link{display:none}</style></noscript><script data-goatcounter=https://norbix.goatcounter.com/count async src=//gc.zgo.at/count.js></script><link rel=alternate type=application/rss+xml title="RSS Feed for norbix.dev" href=/index.xml><meta property="og:title" content="Design Patterns in Go: Practical Examples"><meta property="og:description" content="Explore creational, structural, and behavioral design patterns in Go with clear explanations and code snippets."><meta property="og:type" content="article"><meta property="og:url" content="https://norbix.dev/posts/design-patterns/"><meta property="article:section" content="posts"><meta property="article:published_time" content="2025-04-15T12:43:02+02:00"><meta property="article:modified_time" content="2025-04-15T12:43:02+02:00"><meta name=twitter:card content="summary"><meta name=twitter:title content="Design Patterns in Go: Practical Examples"><meta name=twitter:description content="Explore creational, structural, and behavioral design patterns in Go with clear explanations and code snippets."><script type=application/ld+json>{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Posts","item":"https://norbix.dev/posts/"},{"@type":"ListItem","position":2,"name":"Design Patterns in Go: Practical Examples","item":"https://norbix.dev/posts/design-patterns/"}]}</script><script type=application/ld+json>{"@context":"https://schema.org","@type":"BlogPosting","headline":"Design Patterns in Go: Practical Examples","name":"Design Patterns in Go: Practical Examples","description":"Explore creational, structural, and behavioral design patterns in Go with clear explanations and code snippets.","keywords":["go","golang","design patterns","architecture"],"articleBody":"Design patterns are reusable solutions to common problems in software design.\nThey provide a shared language for developers and encourage best practices in system architecture.\nIn this article, we’ll explore some of the most widely used design patterns in Go, grouped into three categories: creational, structural, and behavioral.\n🔧 Creational Patterns 🔂 Singleton\nEnsures a class has only one instance and provides a global point of access to it.\n1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 package singleton import ( \"sync\" ) var ( instance *singleton once sync.Once ) type singleton struct{} func GetInstance() *singleton { once.Do(func() { instance = \u0026singleton{} }) return instance } 🏭 Factory\nCreates objects without specifying the exact class.\n1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 package factory type Shape interface { Draw() string } type Circle struct{} func (c Circle) Draw() string { return \"Drawing Circle\" } type Square struct{} func (s Square) Draw() string { return \"Drawing Square\" } func GetShape(shapeType string) Shape { switch shapeType { case \"circle\": return Circle{} case \"square\": return Square{} default: return nil } } 🧱 Builder\nSeparates the construction of a complex object from its representation.\n1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 package builder type Car struct { Engine string Wheels int Color string } type CarBuilder struct { car Car } func (b *CarBuilder) SetEngine(engine string) *CarBuilder { b.car.Engine = engine return b } func (b *CarBuilder) SetWheels(wheels int) *CarBuilder { b.car.Wheels = wheels return b } func (b *CarBuilder) SetColor(color string) *CarBuilder { b.car.Color = color return b } func (b *CarBuilder) Build() Car { return b.car } 🧩 Structural Patterns 🔌 Adapter\nAllows incompatible interfaces to work together.\n1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 package adapter type Target interface { Request() string } type Adaptee struct{} func (a Adaptee) SpecificRequest() string { return \"Specific behavior\" } type Adapter struct { adaptee Adaptee } func (a Adapter) Request() string { return a.adaptee.SpecificRequest() } 🎀 Decorator\nAdds behavior to objects dynamically.\n1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 package decorator type Coffee interface { Cost() float64 } type SimpleCoffee struct{} func (s SimpleCoffee) Cost() float64 { return 2.0 } type MilkDecorator struct { Coffee } func (m MilkDecorator) Cost() float64 { return m.Coffee.Cost() + 0.5 } 🛡 Proxy\nProvides a surrogate or placeholder.\n1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 package proxy type Image interface { Display() string } type RealImage struct { filename string } func (r RealImage) Display() string { return \"Displaying \" + r.filename } type ProxyImage struct { realImage *RealImage filename string } func (p *ProxyImage) Display() string { if p.realImage == nil { p.realImage = \u0026RealImage{filename: p.filename} } return p.realImage.Display() } 🌳 Composite\nComposes objects into tree structures.\n1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 package composite type Component interface { Operation() string } type Leaf struct { name string } func (l Leaf) Operation() string { return l.name } type Composite struct { children []Component } func (c *Composite) Add(child Component) { c.children = append(c.children, child) } func (c *Composite) Operation() string { result := \"\" for _, child := range c.children { result += child.Operation() + \" \" } return result } 🧠 Behavioral Patterns 🧮 Strategy\nDefines a family of algorithms.\n1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 package strategy type Strategy interface { Execute(a, b int) int } type Add struct{} func (Add) Execute(a, b int) int { return a + b } type Multiply struct{} func (Multiply) Execute(a, b int) int { return a * b } type Context struct { strategy Strategy } func (c *Context) SetStrategy(s Strategy) { c.strategy = s } func (c Context) ExecuteStrategy(a, b int) int { return c.strategy.Execute(a, b) } 👀 Observer\nNotifies dependents of state changes.\n1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 package observer type Observer interface { Update(string) } type Subject interface { Attach(Observer) Notify() } type ConcreteSubject struct { observers []Observer state string } func (s *ConcreteSubject) Attach(o Observer) { s.observers = append(s.observers, o) } func (s *ConcreteSubject) SetState(state string) { s.state = state s.Notify() } func (s *ConcreteSubject) Notify() { for _, o := range s.observers { o.Update(s.state) } } type ConcreteObserver struct { id string } func (o ConcreteObserver) Update(state string) { println(\"Observer\", o.id, \"received new state:\", state) } 🔁 State\nAllows an object to alter its behavior when its internal state changes.\n1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 package state type State interface { Handle() string } type Context struct { state State } func (c *Context) SetState(s State) { c.state = s } func (c Context) Request() string { return c.state.Handle() } type OnState struct{} func (OnState) Handle() string { return \"State is ON\" } type OffState struct{} func (OffState) Handle() string { return \"State is OFF\" } ✅ Conclusion Design patterns are powerful tools in every Go developer’s toolkit. While Go encourages simplicity, these patterns still apply—especially in large-scale systems or when writing reusable libraries. Using patterns like Singleton, Adapter, and Strategy can lead to cleaner, more testable, and maintainable code.\nHappy Go coding! 🐹\n","wordCount":"1023","inLanguage":"en","datePublished":"2025-04-15T12:43:02+02:00","dateModified":"2025-04-15T12:43:02+02:00","mainEntityOfPage":{"@type":"WebPage","@id":"https://norbix.dev/posts/design-patterns/"},"publisher":{"@type":"Organization","name":"norbix.dev - The log of my journey through code \u0026 software systems architecture","logo":{"@type":"ImageObject","url":"https://norbix.dev/favicon.ico"}}}</script></head><body class=dark id=top><script>localStorage.getItem("pref-theme")==="light"&&document.body.classList.remove("dark")</script><header class=header><nav class=nav><div class=logo><a href=https://norbix.dev/ accesskey=h title="norbix.dev - The log of my journey through code & software systems architecture (Alt + H)">norbix.dev - The log of my journey through code & software systems architecture</a><div class=logo-switches><button id=theme-toggle accesskey=t title="(Alt + T)"><svg id="moon" width="24" height="18" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg><svg id="sun" width="24" height="18" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg></button></div></div><ul id=menu><li><a href=https://norbix.dev/ title=Home><span>Home</span></a></li><li><a href=https://norbix.dev/posts/ title=Posts><span>Posts</span></a></li><li><a href=https://norbix.dev/tags/ title=Tags><span>Tags</span></a></li><li><a href=https://norbix.dev/about/ title=About><span>About</span></a></li><li><a href=https://norbix.dev/index.xml title="📡 RSS"><span>📡 RSS</span></a></li></ul></nav></header><main class=main><main id=main><article class=post-single><header class=post-header><h1 class=post-title>Design Patterns in Go: Practical Examples</h1><span title='2025-04-15 12:43:02 +0200 +0200'>April 15, 2025</span></header><div class=post-content><nav class=table-of-contents><nav id=TableOfContents><ul><li><a href=#-creational-patterns>🔧 Creational Patterns</a></li><li><a href=#-structural-patterns>🧩 Structural Patterns</a></li><li><a href=#-behavioral-patterns>🧠 Behavioral Patterns</a></li><li><a href=#-conclusion>✅ Conclusion</a></li></ul></nav></nav><p>Design patterns are reusable solutions to common problems in software design.</p><p>They provide a shared language for developers and encourage best practices in system architecture.</p><p>In this article, we&rsquo;ll explore some of the most widely used design patterns in Go, grouped into three categories: creational, structural, and behavioral.</p><div style=display:flex;justify-content:center><img src=banner.jpg alt="Design Patterns in Go" style=max-width:100%;height:auto></div><hr><h2 id=-creational-patterns>🔧 Creational Patterns</h2><ol><li><p>🔂 Singleton</p><p>Ensures a class has only one instance and provides a global point of access to it.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-go data-lang=go><span class=line><span class=cl><span class=kn>package</span> <span class=nx>singleton</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kn>import</span> <span class=p>(</span>
+</span></span><span class=line><span class=cl>    <span class=s>&#34;sync&#34;</span>
+</span></span><span class=line><span class=cl><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kd>var</span> <span class=p>(</span>
+</span></span><span class=line><span class=cl>    <span class=nx>instance</span> <span class=o>*</span><span class=nx>singleton</span>
+</span></span><span class=line><span class=cl>    <span class=nx>once</span>     <span class=nx>sync</span><span class=p>.</span><span class=nx>Once</span>
+</span></span><span class=line><span class=cl><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kd>type</span> <span class=nx>singleton</span> <span class=kd>struct</span><span class=p>{}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kd>func</span> <span class=nf>GetInstance</span><span class=p>()</span> <span class=o>*</span><span class=nx>singleton</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=nx>once</span><span class=p>.</span><span class=nf>Do</span><span class=p>(</span><span class=kd>func</span><span class=p>()</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=nx>instance</span> <span class=p>=</span> <span class=o>&amp;</span><span class=nx>singleton</span><span class=p>{}</span>
+</span></span><span class=line><span class=cl><span class=p>})</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=k>return</span> <span class=nx>instance</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div></li><li><p>🏭 Factory</p><p>Creates objects without specifying the exact class.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-go data-lang=go><span class=line><span class=cl><span class=kn>package</span> <span class=nx>factory</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kd>type</span> <span class=nx>Shape</span> <span class=kd>interface</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl><span class=nf>Draw</span><span class=p>()</span> <span class=kt>string</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kd>type</span> <span class=nx>Circle</span> <span class=kd>struct</span><span class=p>{}</span>
+</span></span><span class=line><span class=cl><span class=kd>func</span> <span class=p>(</span><span class=nx>c</span> <span class=nx>Circle</span><span class=p>)</span> <span class=nf>Draw</span><span class=p>()</span> <span class=kt>string</span> <span class=p>{</span> <span class=k>return</span> <span class=s>&#34;Drawing Circle&#34;</span> <span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kd>type</span> <span class=nx>Square</span> <span class=kd>struct</span><span class=p>{}</span>
+</span></span><span class=line><span class=cl><span class=kd>func</span> <span class=p>(</span><span class=nx>s</span> <span class=nx>Square</span><span class=p>)</span> <span class=nf>Draw</span><span class=p>()</span> <span class=kt>string</span> <span class=p>{</span> <span class=k>return</span> <span class=s>&#34;Drawing Square&#34;</span> <span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kd>func</span> <span class=nf>GetShape</span><span class=p>(</span><span class=nx>shapeType</span> <span class=kt>string</span><span class=p>)</span> <span class=nx>Shape</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=k>switch</span> <span class=nx>shapeType</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=k>case</span> <span class=s>&#34;circle&#34;</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>        <span class=k>return</span> <span class=nx>Circle</span><span class=p>{}</span>
+</span></span><span class=line><span class=cl>    <span class=k>case</span> <span class=s>&#34;square&#34;</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>        <span class=k>return</span> <span class=nx>Square</span><span class=p>{}</span>
+</span></span><span class=line><span class=cl>    <span class=k>default</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>        <span class=k>return</span> <span class=kc>nil</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div></li><li><p>🧱 Builder</p><p>Separates the construction of a complex object from its representation.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-go data-lang=go><span class=line><span class=cl><span class=kn>package</span> <span class=nx>builder</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kd>type</span> <span class=nx>Car</span> <span class=kd>struct</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=nx>Engine</span> <span class=kt>string</span>
+</span></span><span class=line><span class=cl>    <span class=nx>Wheels</span> <span class=kt>int</span>
+</span></span><span class=line><span class=cl>    <span class=nx>Color</span>  <span class=kt>string</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kd>type</span> <span class=nx>CarBuilder</span> <span class=kd>struct</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=nx>car</span> <span class=nx>Car</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kd>func</span> <span class=p>(</span><span class=nx>b</span> <span class=o>*</span><span class=nx>CarBuilder</span><span class=p>)</span> <span class=nf>SetEngine</span><span class=p>(</span><span class=nx>engine</span> <span class=kt>string</span><span class=p>)</span> <span class=o>*</span><span class=nx>CarBuilder</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=nx>b</span><span class=p>.</span><span class=nx>car</span><span class=p>.</span><span class=nx>Engine</span> <span class=p>=</span> <span class=nx>engine</span>
+</span></span><span class=line><span class=cl>    <span class=k>return</span> <span class=nx>b</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kd>func</span> <span class=p>(</span><span class=nx>b</span> <span class=o>*</span><span class=nx>CarBuilder</span><span class=p>)</span> <span class=nf>SetWheels</span><span class=p>(</span><span class=nx>wheels</span> <span class=kt>int</span><span class=p>)</span> <span class=o>*</span><span class=nx>CarBuilder</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=nx>b</span><span class=p>.</span><span class=nx>car</span><span class=p>.</span><span class=nx>Wheels</span> <span class=p>=</span> <span class=nx>wheels</span>
+</span></span><span class=line><span class=cl>    <span class=k>return</span> <span class=nx>b</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kd>func</span> <span class=p>(</span><span class=nx>b</span> <span class=o>*</span><span class=nx>CarBuilder</span><span class=p>)</span> <span class=nf>SetColor</span><span class=p>(</span><span class=nx>color</span> <span class=kt>string</span><span class=p>)</span> <span class=o>*</span><span class=nx>CarBuilder</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=nx>b</span><span class=p>.</span><span class=nx>car</span><span class=p>.</span><span class=nx>Color</span> <span class=p>=</span> <span class=nx>color</span>
+</span></span><span class=line><span class=cl>    <span class=k>return</span> <span class=nx>b</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kd>func</span> <span class=p>(</span><span class=nx>b</span> <span class=o>*</span><span class=nx>CarBuilder</span><span class=p>)</span> <span class=nf>Build</span><span class=p>()</span> <span class=nx>Car</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=k>return</span> <span class=nx>b</span><span class=p>.</span><span class=nx>car</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div></li></ol><hr><h2 id=-structural-patterns>🧩 Structural Patterns</h2><ol><li><p>🔌 Adapter</p><p>Allows incompatible interfaces to work together.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-go data-lang=go><span class=line><span class=cl><span class=kn>package</span> <span class=nx>adapter</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kd>type</span> <span class=nx>Target</span> <span class=kd>interface</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=nf>Request</span><span class=p>()</span> <span class=kt>string</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kd>type</span> <span class=nx>Adaptee</span> <span class=kd>struct</span><span class=p>{}</span>
+</span></span><span class=line><span class=cl>    <span class=kd>func</span> <span class=p>(</span><span class=nx>a</span> <span class=nx>Adaptee</span><span class=p>)</span> <span class=nf>SpecificRequest</span><span class=p>()</span> <span class=kt>string</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=k>return</span> <span class=s>&#34;Specific behavior&#34;</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kd>type</span> <span class=nx>Adapter</span> <span class=kd>struct</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=nx>adaptee</span> <span class=nx>Adaptee</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kd>func</span> <span class=p>(</span><span class=nx>a</span> <span class=nx>Adapter</span><span class=p>)</span> <span class=nf>Request</span><span class=p>()</span> <span class=kt>string</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=k>return</span> <span class=nx>a</span><span class=p>.</span><span class=nx>adaptee</span><span class=p>.</span><span class=nf>SpecificRequest</span><span class=p>()</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div></li><li><p>🎀 Decorator</p><p>Adds behavior to objects dynamically.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-go data-lang=go><span class=line><span class=cl><span class=kn>package</span> <span class=nx>decorator</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kd>type</span> <span class=nx>Coffee</span> <span class=kd>interface</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=nf>Cost</span><span class=p>()</span> <span class=kt>float64</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kd>type</span> <span class=nx>SimpleCoffee</span> <span class=kd>struct</span><span class=p>{}</span>
+</span></span><span class=line><span class=cl>    <span class=kd>func</span> <span class=p>(</span><span class=nx>s</span> <span class=nx>SimpleCoffee</span><span class=p>)</span> <span class=nf>Cost</span><span class=p>()</span> <span class=kt>float64</span> <span class=p>{</span> 
+</span></span><span class=line><span class=cl>        <span class=k>return</span> <span class=mf>2.0</span> 
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kd>type</span> <span class=nx>MilkDecorator</span> <span class=kd>struct</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=nx>Coffee</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kd>func</span> <span class=p>(</span><span class=nx>m</span> <span class=nx>MilkDecorator</span><span class=p>)</span> <span class=nf>Cost</span><span class=p>()</span> <span class=kt>float64</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=k>return</span> <span class=nx>m</span><span class=p>.</span><span class=nx>Coffee</span><span class=p>.</span><span class=nf>Cost</span><span class=p>()</span> <span class=o>+</span> <span class=mf>0.5</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div></li><li><p>🛡 Proxy</p><p>Provides a surrogate or placeholder.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-go data-lang=go><span class=line><span class=cl> <span class=kn>package</span> <span class=nx>proxy</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl> <span class=kd>type</span> <span class=nx>Image</span> <span class=kd>interface</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>     <span class=nf>Display</span><span class=p>()</span> <span class=kt>string</span>
+</span></span><span class=line><span class=cl> <span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl> <span class=kd>type</span> <span class=nx>RealImage</span> <span class=kd>struct</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>     <span class=nx>filename</span> <span class=kt>string</span>
+</span></span><span class=line><span class=cl> <span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl> <span class=kd>func</span> <span class=p>(</span><span class=nx>r</span> <span class=nx>RealImage</span><span class=p>)</span> <span class=nf>Display</span><span class=p>()</span> <span class=kt>string</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>     <span class=k>return</span> <span class=s>&#34;Displaying &#34;</span> <span class=o>+</span> <span class=nx>r</span><span class=p>.</span><span class=nx>filename</span>
+</span></span><span class=line><span class=cl> <span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl> <span class=kd>type</span> <span class=nx>ProxyImage</span> <span class=kd>struct</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>     <span class=nx>realImage</span> <span class=o>*</span><span class=nx>RealImage</span>
+</span></span><span class=line><span class=cl>     <span class=nx>filename</span>  <span class=kt>string</span>
+</span></span><span class=line><span class=cl> <span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl> <span class=kd>func</span> <span class=p>(</span><span class=nx>p</span> <span class=o>*</span><span class=nx>ProxyImage</span><span class=p>)</span> <span class=nf>Display</span><span class=p>()</span> <span class=kt>string</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>     <span class=k>if</span> <span class=nx>p</span><span class=p>.</span><span class=nx>realImage</span> <span class=o>==</span> <span class=kc>nil</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>     <span class=nx>p</span><span class=p>.</span><span class=nx>realImage</span> <span class=p>=</span> <span class=o>&amp;</span><span class=nx>RealImage</span><span class=p>{</span><span class=nx>filename</span><span class=p>:</span> <span class=nx>p</span><span class=p>.</span><span class=nx>filename</span><span class=p>}</span>
+</span></span><span class=line><span class=cl>     <span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>     <span class=k>return</span> <span class=nx>p</span><span class=p>.</span><span class=nx>realImage</span><span class=p>.</span><span class=nf>Display</span><span class=p>()</span>
+</span></span><span class=line><span class=cl> <span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div></li><li><p>🌳 Composite</p><p>Composes objects into tree structures.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-go data-lang=go><span class=line><span class=cl><span class=kn>package</span> <span class=nx>composite</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kd>type</span> <span class=nx>Component</span> <span class=kd>interface</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=nf>Operation</span><span class=p>()</span> <span class=kt>string</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kd>type</span> <span class=nx>Leaf</span> <span class=kd>struct</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=nx>name</span> <span class=kt>string</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kd>func</span> <span class=p>(</span><span class=nx>l</span> <span class=nx>Leaf</span><span class=p>)</span> <span class=nf>Operation</span><span class=p>()</span> <span class=kt>string</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=k>return</span> <span class=nx>l</span><span class=p>.</span><span class=nx>name</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kd>type</span> <span class=nx>Composite</span> <span class=kd>struct</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=nx>children</span> <span class=p>[]</span><span class=nx>Component</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kd>func</span> <span class=p>(</span><span class=nx>c</span> <span class=o>*</span><span class=nx>Composite</span><span class=p>)</span> <span class=nf>Add</span><span class=p>(</span><span class=nx>child</span> <span class=nx>Component</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=nx>c</span><span class=p>.</span><span class=nx>children</span> <span class=p>=</span> <span class=nb>append</span><span class=p>(</span><span class=nx>c</span><span class=p>.</span><span class=nx>children</span><span class=p>,</span> <span class=nx>child</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kd>func</span> <span class=p>(</span><span class=nx>c</span> <span class=o>*</span><span class=nx>Composite</span><span class=p>)</span> <span class=nf>Operation</span><span class=p>()</span> <span class=kt>string</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=nx>result</span> <span class=o>:=</span> <span class=s>&#34;&#34;</span>
+</span></span><span class=line><span class=cl>    <span class=k>for</span> <span class=nx>_</span><span class=p>,</span> <span class=nx>child</span> <span class=o>:=</span> <span class=k>range</span> <span class=nx>c</span><span class=p>.</span><span class=nx>children</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=nx>result</span> <span class=o>+=</span> <span class=nx>child</span><span class=p>.</span><span class=nf>Operation</span><span class=p>()</span> <span class=o>+</span> <span class=s>&#34; &#34;</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=k>return</span> <span class=nx>result</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div></li></ol><hr><h2 id=-behavioral-patterns>🧠 Behavioral Patterns</h2><ol><li><p>🧮 Strategy</p><p>Defines a family of algorithms.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-go data-lang=go><span class=line><span class=cl> <span class=kn>package</span> <span class=nx>strategy</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl> <span class=kd>type</span> <span class=nx>Strategy</span> <span class=kd>interface</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>     <span class=nf>Execute</span><span class=p>(</span><span class=nx>a</span><span class=p>,</span> <span class=nx>b</span> <span class=kt>int</span><span class=p>)</span> <span class=kt>int</span>
+</span></span><span class=line><span class=cl> <span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl> <span class=kd>type</span> <span class=nx>Add</span> <span class=kd>struct</span><span class=p>{}</span>
+</span></span><span class=line><span class=cl> <span class=kd>func</span> <span class=p>(</span><span class=nx>Add</span><span class=p>)</span> <span class=nf>Execute</span><span class=p>(</span><span class=nx>a</span><span class=p>,</span> <span class=nx>b</span> <span class=kt>int</span><span class=p>)</span> <span class=kt>int</span> <span class=p>{</span> 
+</span></span><span class=line><span class=cl>     <span class=k>return</span> <span class=nx>a</span> <span class=o>+</span> <span class=nx>b</span> 
+</span></span><span class=line><span class=cl> <span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl> <span class=kd>type</span> <span class=nx>Multiply</span> <span class=kd>struct</span><span class=p>{}</span>
+</span></span><span class=line><span class=cl> <span class=kd>func</span> <span class=p>(</span><span class=nx>Multiply</span><span class=p>)</span> <span class=nf>Execute</span><span class=p>(</span><span class=nx>a</span><span class=p>,</span> <span class=nx>b</span> <span class=kt>int</span><span class=p>)</span> <span class=kt>int</span> <span class=p>{</span> 
+</span></span><span class=line><span class=cl>     <span class=k>return</span> <span class=nx>a</span> <span class=o>*</span> <span class=nx>b</span> 
+</span></span><span class=line><span class=cl> <span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl> <span class=kd>type</span> <span class=nx>Context</span> <span class=kd>struct</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>     <span class=nx>strategy</span> <span class=nx>Strategy</span>
+</span></span><span class=line><span class=cl> <span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl> <span class=kd>func</span> <span class=p>(</span><span class=nx>c</span> <span class=o>*</span><span class=nx>Context</span><span class=p>)</span> <span class=nf>SetStrategy</span><span class=p>(</span><span class=nx>s</span> <span class=nx>Strategy</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>     <span class=nx>c</span><span class=p>.</span><span class=nx>strategy</span> <span class=p>=</span> <span class=nx>s</span>
+</span></span><span class=line><span class=cl> <span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl> <span class=kd>func</span> <span class=p>(</span><span class=nx>c</span> <span class=nx>Context</span><span class=p>)</span> <span class=nf>ExecuteStrategy</span><span class=p>(</span><span class=nx>a</span><span class=p>,</span> <span class=nx>b</span> <span class=kt>int</span><span class=p>)</span> <span class=kt>int</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>     <span class=k>return</span> <span class=nx>c</span><span class=p>.</span><span class=nx>strategy</span><span class=p>.</span><span class=nf>Execute</span><span class=p>(</span><span class=nx>a</span><span class=p>,</span> <span class=nx>b</span><span class=p>)</span>
+</span></span><span class=line><span class=cl> <span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div></li><li><p>👀 Observer</p><p>Notifies dependents of state changes.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span><span class=lnt>37
+</span><span class=lnt>38
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-go data-lang=go><span class=line><span class=cl> <span class=kn>package</span> <span class=nx>observer</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl> <span class=kd>type</span> <span class=nx>Observer</span> <span class=kd>interface</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>     <span class=nf>Update</span><span class=p>(</span><span class=kt>string</span><span class=p>)</span>
+</span></span><span class=line><span class=cl> <span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl> <span class=kd>type</span> <span class=nx>Subject</span> <span class=kd>interface</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>     <span class=nf>Attach</span><span class=p>(</span><span class=nx>Observer</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>     <span class=nf>Notify</span><span class=p>()</span>
+</span></span><span class=line><span class=cl> <span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl> <span class=kd>type</span> <span class=nx>ConcreteSubject</span> <span class=kd>struct</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>     <span class=nx>observers</span> <span class=p>[]</span><span class=nx>Observer</span>
+</span></span><span class=line><span class=cl>     <span class=nx>state</span>     <span class=kt>string</span>
+</span></span><span class=line><span class=cl> <span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl> <span class=kd>func</span> <span class=p>(</span><span class=nx>s</span> <span class=o>*</span><span class=nx>ConcreteSubject</span><span class=p>)</span> <span class=nf>Attach</span><span class=p>(</span><span class=nx>o</span> <span class=nx>Observer</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>     <span class=nx>s</span><span class=p>.</span><span class=nx>observers</span> <span class=p>=</span> <span class=nb>append</span><span class=p>(</span><span class=nx>s</span><span class=p>.</span><span class=nx>observers</span><span class=p>,</span> <span class=nx>o</span><span class=p>)</span>
+</span></span><span class=line><span class=cl> <span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl> <span class=kd>func</span> <span class=p>(</span><span class=nx>s</span> <span class=o>*</span><span class=nx>ConcreteSubject</span><span class=p>)</span> <span class=nf>SetState</span><span class=p>(</span><span class=nx>state</span> <span class=kt>string</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>     <span class=nx>s</span><span class=p>.</span><span class=nx>state</span> <span class=p>=</span> <span class=nx>state</span>
+</span></span><span class=line><span class=cl>     <span class=nx>s</span><span class=p>.</span><span class=nf>Notify</span><span class=p>()</span>
+</span></span><span class=line><span class=cl> <span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl> <span class=kd>func</span> <span class=p>(</span><span class=nx>s</span> <span class=o>*</span><span class=nx>ConcreteSubject</span><span class=p>)</span> <span class=nf>Notify</span><span class=p>()</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>     <span class=k>for</span> <span class=nx>_</span><span class=p>,</span> <span class=nx>o</span> <span class=o>:=</span> <span class=k>range</span> <span class=nx>s</span><span class=p>.</span><span class=nx>observers</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>         <span class=nx>o</span><span class=p>.</span><span class=nf>Update</span><span class=p>(</span><span class=nx>s</span><span class=p>.</span><span class=nx>state</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>     <span class=p>}</span>
+</span></span><span class=line><span class=cl> <span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl> <span class=kd>type</span> <span class=nx>ConcreteObserver</span> <span class=kd>struct</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>     <span class=nx>id</span> <span class=kt>string</span>
+</span></span><span class=line><span class=cl> <span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl> <span class=kd>func</span> <span class=p>(</span><span class=nx>o</span> <span class=nx>ConcreteObserver</span><span class=p>)</span> <span class=nf>Update</span><span class=p>(</span><span class=nx>state</span> <span class=kt>string</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>     <span class=nb>println</span><span class=p>(</span><span class=s>&#34;Observer&#34;</span><span class=p>,</span> <span class=nx>o</span><span class=p>.</span><span class=nx>id</span><span class=p>,</span> <span class=s>&#34;received new state:&#34;</span><span class=p>,</span> <span class=nx>state</span><span class=p>)</span>
+</span></span><span class=line><span class=cl> <span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div></li><li><p>🔁 State</p><p>Allows an object to alter its behavior when its internal state changes.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-go data-lang=go><span class=line><span class=cl> <span class=kn>package</span> <span class=nx>state</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl> <span class=kd>type</span> <span class=nx>State</span> <span class=kd>interface</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>     <span class=nf>Handle</span><span class=p>()</span> <span class=kt>string</span>
+</span></span><span class=line><span class=cl> <span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl> <span class=kd>type</span> <span class=nx>Context</span> <span class=kd>struct</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>     <span class=nx>state</span> <span class=nx>State</span>
+</span></span><span class=line><span class=cl> <span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl> <span class=kd>func</span> <span class=p>(</span><span class=nx>c</span> <span class=o>*</span><span class=nx>Context</span><span class=p>)</span> <span class=nf>SetState</span><span class=p>(</span><span class=nx>s</span> <span class=nx>State</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>     <span class=nx>c</span><span class=p>.</span><span class=nx>state</span> <span class=p>=</span> <span class=nx>s</span>
+</span></span><span class=line><span class=cl> <span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl> <span class=kd>func</span> <span class=p>(</span><span class=nx>c</span> <span class=nx>Context</span><span class=p>)</span> <span class=nf>Request</span><span class=p>()</span> <span class=kt>string</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>     <span class=k>return</span> <span class=nx>c</span><span class=p>.</span><span class=nx>state</span><span class=p>.</span><span class=nf>Handle</span><span class=p>()</span>
+</span></span><span class=line><span class=cl> <span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl> <span class=kd>type</span> <span class=nx>OnState</span> <span class=kd>struct</span><span class=p>{}</span>
+</span></span><span class=line><span class=cl> <span class=kd>func</span> <span class=p>(</span><span class=nx>OnState</span><span class=p>)</span> <span class=nf>Handle</span><span class=p>()</span> <span class=kt>string</span> <span class=p>{</span> 
+</span></span><span class=line><span class=cl>     <span class=k>return</span> <span class=s>&#34;State is ON&#34;</span> 
+</span></span><span class=line><span class=cl> <span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl> <span class=kd>type</span> <span class=nx>OffState</span> <span class=kd>struct</span><span class=p>{}</span>
+</span></span><span class=line><span class=cl> <span class=kd>func</span> <span class=p>(</span><span class=nx>OffState</span><span class=p>)</span> <span class=nf>Handle</span><span class=p>()</span> <span class=kt>string</span> <span class=p>{</span> 
+</span></span><span class=line><span class=cl>     <span class=k>return</span> <span class=s>&#34;State is OFF&#34;</span> 
+</span></span><span class=line><span class=cl> <span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div></li></ol><hr><h2 id=-conclusion>✅ Conclusion</h2><p>Design patterns are powerful tools in every Go developer’s toolkit. While Go encourages simplicity, these patterns still apply—especially in large-scale systems or when writing reusable libraries. Using patterns like Singleton, Adapter, and Strategy can lead to cleaner, more testable, and maintainable code.</p><p>Happy Go coding! 🐹</p></div><div class=post-subscribe><style>.subscribe-form{display:flex;gap:.5rem;margin-top:1rem;align-items:center}.subscribe-form input[type=email]{padding:.5rem;border-radius:6px;border:1px solid #ccc;background-color:#1f1f1f;color:#fff}.subscribe-form input[type=submit],.subscribe-form button{padding:.5rem 1rem;border-radius:6px;background-color:#facc15;color:#000;border:none;cursor:pointer;font-weight:700}.subscribe-form input[type=submit]:hover{background-color:#fcd34d}</style><form action=https://buttondown.email/api/emails/embed-subscribe/norbix method=post target=popupwindow onsubmit='window.open("https://buttondown.email/norbix","popupwindow")' class=subscribe-form><input type=email name=email placeholder="Enter your email" required>
+<input type=submit value=Subscribe></form><p style=font-size:.875rem;opacity:.6>Powered by Buttondown.</p></div><div class=post-comments><script src=https://giscus.app/client.js data-repo=norbix/norbix.dev data-repo-id=R_kgDOOV_xMQ data-category=Announcements data-category-id=DIC_kwDOOV_xMc4CpF5M data-mapping=pathname data-strict=0 data-reactions-enabled=1 data-emit-metadata=0 data-input-position=bottom data-theme=dark data-lang=en crossorigin=anonymous async></script></div><nav class=paginav><a class=next href=https://norbix.dev/posts/dependency-inversion-principle/><span class=title>Next »</span><br><span>Breaking the Chain: Dependency Inversion, Interfaces, and Testable Go Code</span></a></nav></article></main></main><footer class=footer><span>&copy; 2025 <a href=https://norbix.dev/>norbix.dev - The log of my journey through code & software systems architecture</a></span> ·
+<span>Powered by
+<a href=https://gohugo.io/ rel="noopener noreferrer" target=_blank>Hugo</a> &
+        <a href=https://github.com/adityatelange/hugo-PaperMod/ rel=noopener target=_blank>PaperMod</a></span></footer><a href=#top aria-label="go to top" title="Go to Top (Alt + G)" class=top-link id=top-link accesskey=g><svg viewBox="0 0 12 6" fill="currentcolor"><path d="M12 6H0l6-6z"/></svg>
+</a><script>let menu=document.getElementById("menu");menu&&(menu.scrollLeft=localStorage.getItem("menu-scroll-position"),menu.onscroll=function(){localStorage.setItem("menu-scroll-position",menu.scrollLeft)}),document.querySelectorAll('a[href^="#"]').forEach(e=>{e.addEventListener("click",function(e){e.preventDefault();var t=this.getAttribute("href").substr(1);window.matchMedia("(prefers-reduced-motion: reduce)").matches?document.querySelector(`[id='${decodeURIComponent(t)}']`).scrollIntoView():document.querySelector(`[id='${decodeURIComponent(t)}']`).scrollIntoView({behavior:"smooth"}),t==="top"?history.replaceState(null,null," "):history.pushState(null,null,`#${t}`)})})</script><script>var mybutton=document.getElementById("top-link");window.onscroll=function(){document.body.scrollTop>800||document.documentElement.scrollTop>800?(mybutton.style.visibility="visible",mybutton.style.opacity="1"):(mybutton.style.visibility="hidden",mybutton.style.opacity="0")}</script><script>document.getElementById("theme-toggle").addEventListener("click",()=>{document.body.className.includes("dark")?(document.body.classList.remove("dark"),localStorage.setItem("pref-theme","light")):(document.body.classList.add("dark"),localStorage.setItem("pref-theme","dark"))})</script></body></html>
