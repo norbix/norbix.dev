@@ -94,6 +94,12 @@ name = "About"
 url = "/about/"
 weight = 30
 
+[[menu.main]]
+identifier = "rss"
+name = "📡 RSS"
+url = "/index.xml"
+weight = 40
+
 # Syntax highlighting
 [markup]
 [markup.highlight]
