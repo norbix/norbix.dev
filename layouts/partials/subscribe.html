@@ -1,0 +1,42 @@
+<style>
+    .subscribe-form {
+        display: flex;
+        gap: 0.5rem;
+        margin-top: 1rem;
+        align-items: center;
+    }
+
+    .subscribe-form input[type="email"] {
+        padding: 0.5rem;
+        border-radius: 6px;
+        border: 1px solid #ccc;
+        background-color: #1f1f1f;
+        color: #fff;
+    }
+
+    .subscribe-form input[type="submit"],
+    .subscribe-form button {
+        padding: 0.5rem 1rem;
+        border-radius: 6px;
+        background-color: #facc15; /* warm yellow */
+        color: #000;
+        border: none;
+        cursor: pointer;
+        font-weight: bold;
+    }
+
+    .subscribe-form input[type="submit"]:hover {
+        background-color: #fcd34d;
+    }
+</style>
+
+<form action="https://buttondown.email/api/emails/embed-subscribe/norbix"
+      method="post"
+      target="popupwindow"
+      onsubmit="window.open('https://buttondown.email/norbix', 'popupwindow')"
+      class="subscribe-form">
+    <input type="email" name="email" placeholder="Enter your email" required />
+    <input type="submit" value="Subscribe" />
+</form>
+
+<p style="font-size: 0.875rem; opacity: 0.6;">Powered by Buttondown.</p>

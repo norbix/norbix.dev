@@ -18,6 +18,10 @@
             {{ .Content }}
         </div>
 
+        <div class="post-subscribe">
+            {{ partial "subscribe.html" . }}
+        </div>
+
         {{ if $shouldShowComments }}
         <div class="post-comments">
             {{ partial "giscus.html" . }}

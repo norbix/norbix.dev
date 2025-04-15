@@ -9,6 +9,17 @@ Visitor analytics are powered by [GoatCounter](https://www.goatcounter.com) — 
 You can explore page view trends and traffic stats publicly at:  
 👉 **[https://norbix.goatcounter.com](https://norbix.goatcounter.com)**
 
+## 📨 Subscribers
+
+Email subscriptions are handled via [Buttondown](https://buttondown.email) — a lightweight, privacy-first newsletter engine built for indie developers.
+
+Visitors can subscribe to receive new blog posts and updates directly to their inbox.
+
+🔔 Manage subscribers and view the list here (owner-only):  
+👉 **[https://buttondown.com/subscribers](https://buttondown.com/subscribers)**
+
+The subscription form is embedded directly on individual blog posts using a custom Hugo partial.
+
 ## Table of Contents
 - [🛠️ Tech Stack](#-tech-stack)
 - [🚀 Deployment](#-deployment)
