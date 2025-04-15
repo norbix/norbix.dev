@@ -29,6 +29,20 @@ In this article, we'll explore some of the most widely used design patterns in G
 
    Ensures a class has only one instance and provides a global point of access to it.
 
+   > “When discussing which pattern to drop, we found that we still love them all. (Not really — I'm in favor of dropping Singleton. Its use is almost always a design smell.)”  
+   > — *Erich Gamma, Design Patterns: Elements of Reusable Object-Oriented Software*
+
+   While Singleton often gets a bad reputation, there are still valid use cases in Go:
+
+   - ✅ You only want **one component in the system** (e.g., database repository, object factory)
+   - ⏳ The object is **expensive to construct**, so you instantiate it only once
+   - 🚫 You want to **prevent the creation of additional instances**
+   - 💤 You want **lazy instantiation** (e.g. load config or connect to DB only when needed)
+
+   Go makes this easy and thread-safe with `sync.Once`. To stay testable and modular, follow the **Dependency Inversion Principle (DIP)** — depend on interfaces, not concrete types.
+
+   **Hint:** Singleton quite often breaks the **Dependency Inversion Principle**!
+
     ```go
     package singleton
     
@@ -55,6 +69,21 @@ In this article, we'll explore some of the most widely used design patterns in G
 1. 🏭 Factory
 
     Creates objects without specifying the exact class.
+
+    A **factory** helps simplify object creation when:
+
+    - 🌀 Object creation logic becomes **too convoluted**
+    - 🧱 A struct has **too many fields** that need to be correctly initialized
+    - 💡 You want to **delegate creation logic** away from the calling code
+
+    There are two flavors of factories in Go:
+
+    - 🔧 **Factory function** (also called a `constructor`): a helper function to initialize struct instances
+    - 🏗️ **Factory struct**: a dedicated struct responsible for managing object creation
+
+    Unlike the Builder pattern, which is *piecewise*, the Factory creates the object **wholesale** — usually in one go.
+
+    Here's a simple example using a factory function:
 
     ```go
     package factory
@@ -83,7 +112,21 @@ In this article, we'll explore some of the most widely used design patterns in G
 
 1. 🧱 Builder
 
-    Separates the construction of a complex object from its representation.
+   Separates the construction of a complex object from its representation.
+
+   Not all objects are created equal:
+
+   - ✅ Some are simple and can be created with a single constructor call
+   - ⚠️ Others require **a lot of ceremony** to set up
+   - 🧩 Factory functions with **10+ parameters** become hard to use and maintain
+
+   When you want more flexibility and readability, use the **Builder pattern**.
+
+   - 🛠️ A **Builder** is a separate component used to construct an object step-by-step
+   - 🔄 It exposes a **fluent API** — each method returns the receiver (`*Builder`) to enable chaining
+   - 🧠 In advanced designs, **different builders** can operate on **different facets** of the same object
+
+   Here's an example:
 
     ```go
     package builder

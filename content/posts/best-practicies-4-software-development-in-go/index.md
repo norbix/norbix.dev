@@ -89,12 +89,32 @@ type Storer interface {
 
 Don’t write interfaces for everything — only where mocking or substitution matters (e.g. storage, HTTP clients, etc.).
 
+---
+
 ## 🧰 6. Tooling Makes You Better
 
 - Use go vet, staticcheck, and golangci-lint
 - Automate formatting: gofmt, goimports
 - Use go mod tidy to keep your dependencies clean
-- Pin tool versions with a tools.go file
+- Pin tool versions with a `tools.go` file
+- 📊 Use **SonarQube** for static code analysis at scale
+
+SonarQube helps enforce code quality and security standards across large codebases. It can detect bugs, vulnerabilities, code smells, and even provide actionable remediation guidance. Integrate it into your CI pipeline to ensure every PR gets automatically analyzed.
+
+You can use [`sonar-scanner`](https://docs.sonarsource.com/sonarqube/latest/analyzing-source-code/scanners/sonarscanner/) or a Docker-based runner like:
+
+```text
+```bash
+docker run --rm \
+  -e SONAR_HOST_URL="https://your-sonarqube-url" \
+  -e SONAR_LOGIN="your_token" \
+  -v "$(pwd):/usr/src" \
+  sonarsource/sonar-scanner-cli
+```
+
+SonarQube works great alongside golangci-lint, giving you both quick feedback locally and deep insights via the web dashboard.
+
+---
 
 ## 🔐 7. Secure By Default
 
@@ -103,11 +123,15 @@ Don’t write interfaces for everything — only where mocking or substitution m
 - Validate all inputs — especially on the API boundary
 - Use context.Context consistently and propagate it properly
 
+---
+
 ## 🌐 8. Embrace the Go Ecosystem
 
 - Use standard library wherever possible — it's well-tested and fast
 - Prefer established, well-maintained packages
 - Read source code — Go makes it easy to learn from the best
+
+---
 
 ## 🚀 9. Performance Matters (but correctness first)
 
@@ -116,6 +140,7 @@ Don’t write interfaces for everything — only where mocking or substitution m
 - Use channels, but don’t abuse goroutines
 - Benchmark with go test -bench
 
+---
 
 ## 🧠 10. Readability > Cleverness
 
@@ -125,6 +150,7 @@ Your code will be read 10x more than it’s written.
 
 Stick to idiomatic Go — use golangci-lint to enforce consistency, and always code with your teammates in mind.
 
+---
 
 ## 🙌 Conclusion
 
