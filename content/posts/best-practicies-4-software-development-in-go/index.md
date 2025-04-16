@@ -14,6 +14,8 @@ TocOpen = true
 
 After working on production systems in Go for several years — across SaaS platforms, cloud-native backends, and developer tooling — I’ve collected a set of battle-tested best practices that have helped me write maintainable, clean, and scalable Go code.
 
+![banner](banner.jpg)
+
 ---
 
 ## 🧭 0. Agree on Code Style Before You Write a Line
