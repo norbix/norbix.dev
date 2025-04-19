@@ -8,6 +8,8 @@ summary = "A collection of real-world Go best practices from years of building b
 comments = true
 ShowToc = true
 TocOpen = true
+image = "banner.jpg"
+weight = 1
 +++
 
 > Writing Go code that works is easy. Writing Go code that lasts? That takes practice.

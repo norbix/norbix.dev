@@ -8,6 +8,8 @@ summary = "A deep dive into the Dependency Inversion Principle, its implementati
 comments = true
 ShowToc = true
 TocOpen = true
+image = "banner.jpg"
+weight = 4
 +++
 
 "High-level modules should not depend on low-level modules. Both should depend on abstractions."

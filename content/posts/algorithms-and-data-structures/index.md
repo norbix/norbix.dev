@@ -9,6 +9,7 @@ comments = true
 ShowToc = true
 TocOpen = true
 image = "banner.jpg"
+weight = 6
 +++
 
 ![banner](banner.jpg)

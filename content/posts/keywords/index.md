@@ -8,6 +8,8 @@ summary = "A visual exploration of the core keywords and concepts in modern soft
 comments = true
 ShowToc = true
 TocOpen = true
+image = "keywords_board.jpg"
+weight = 2
 +++
 
 The whiteboard behind this article is more than just colorful notes — it's a map of the mental models that drive clean, scalable, and maintainable software systems. Let’s break down the core ideas and keywords captured in this visual brainstorm.

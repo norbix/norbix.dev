@@ -8,6 +8,8 @@ summary = "A quick reference guide to using Mermaid syntax for creating various 
 comments = true
 ShowToc = true
 TocOpen = true
+image = "banner.jpg"
+weight = 3
 +++
 
 ![banner](banner.jpg)

@@ -9,6 +9,7 @@ comments = true
 ShowToc = true
 TocOpen = true
 image = 'banner.jpg'
+weight = 5
 +++
 
 Design patterns are reusable solutions to common problems in software design. 
