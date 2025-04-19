@@ -729,3 +729,7 @@ In this article, we'll explore some of the most widely used design patterns in G
 Design patterns are powerful tools in every Go developer’s toolkit. While Go encourages simplicity, these patterns still apply—especially in large-scale systems or when writing reusable libraries. Using patterns like Singleton, Adapter, and Strategy can lead to cleaner, more testable, and maintainable code.
 
 Happy Go coding! 🐹
+
+---
+
+🚀 Follow me on [norbix.dev](https://norbix.dev) for more insights on Go, system design, and engineering wisdom.

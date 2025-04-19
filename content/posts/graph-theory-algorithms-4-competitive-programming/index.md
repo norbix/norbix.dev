@@ -255,3 +255,7 @@ Whether it’s mapping networks, detecting cycles, or optimizing routes, graph t
 ## ✍️ Practice Tip:
 
 Solve 10–15 problems covering `DFS`, `BFS`, `topological sort`, and `shortest path`. Then go deeper into `Union-Find`, `Bridges`, and `Articulation Points`.
+
+---
+
+🚀 Follow me on [norbix.dev](https://norbix.dev) for more insights on Go, system design, and engineering wisdom.

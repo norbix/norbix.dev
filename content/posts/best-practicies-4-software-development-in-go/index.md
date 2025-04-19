@@ -159,3 +159,7 @@ Stick to idiomatic Go — use golangci-lint to enforce consistency, and always c
 Go is an incredible tool for building fast, reliable software — but like any tool, it shines brightest in the hands of developers who respect its philosophy: clarity, simplicity, and composability.
 
 What are your favorite Go best practices? Let me know on [Twitter](https://x.com/norbixjakubczak) or GitHub [@norbix](https://github.com/norbix)!
+
+---
+
+🚀 Follow me on [norbix.dev](https://norbix.dev) for more insights on Go, system design, and engineering wisdom.

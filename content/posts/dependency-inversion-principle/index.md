@@ -145,3 +145,7 @@ func TestOrderService_Save(t *testing.T) {
 - ✅ When writing business logic you want to test independently
 
 - ❌ Not needed for everything — Go prefers concrete, simple code unless you need indirection
+
+---
+
+🚀 Follow me on [norbix.dev](https://norbix.dev) for more insights on Go, system design, and engineering wisdom.
