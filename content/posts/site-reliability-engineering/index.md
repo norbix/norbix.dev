@@ -9,7 +9,7 @@ comments = true
 ShowToc = true
 TocOpen = true
 image = "sre-banner.jpg"
-weight = 10
+weight = 12
 +++
 
 ![banner](banner.jpg)
