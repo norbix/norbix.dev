@@ -45,6 +45,15 @@ Expect deep dives on:
 
 ---
 
+## 📣 Featured In
+
+[![Featured on PitchHut](https://img.shields.io/badge/PitchHut-Featured-blue?style=for-the-badge&logo=apachenetbeanside&logoColor=white)](https://pitchhut.com/project/golang-fullstack-demo)
+
+My fullstack Go starter was featured on PitchHut — a curated platform that showcases developer-built projects.  
+👉 [Check it out here](https://pitchhut.com/project/golang-fullstack-demo)
+
+---
+
 ## 🌍 Connect with me
 
 - GitHub: [@norbix](https://github.com/norbix)
