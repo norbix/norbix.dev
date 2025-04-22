@@ -12,6 +12,8 @@ image = "xp-banner.jpg"
 weight = 11
 +++
 
+![banner](banner.jpg)
+
 **"If it hurts, do it more often."**
 
 That provocative quote lies at the heart of `Extreme Programming (XP)` — an Agile software development methodology focused on frequent releases, tight feedback loops, and engineering excellence.
