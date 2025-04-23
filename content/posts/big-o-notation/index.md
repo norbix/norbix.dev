@@ -48,8 +48,6 @@ Understanding Big-O helps you:
 
 📈 Common Big-O Complexities
 
-# create table 
-
 Big-0 Name Example Scenario
 
 | Big-0 | Name | Example Scenario |
