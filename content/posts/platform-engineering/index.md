@@ -36,7 +36,7 @@ Think of it as building "paved roads" that teams can confidently deploy on — w
 
 Platform engineers often build and maintain:
 
-- 🏗️ Internal Developer Platforms (IDPs): Self-service interfaces and APIs for provisioning, deploying, and managing services.
+- 🏗️ Internal Developer Platforms (IDPs): Self-service interfaces and APIs for provisioning, deploying, and managing services e.g. [container8.io](https://container8.io).
 
 - 🔁 CI/CD Pipelines: Standardized, reusable workflows for testing and deploying code.
 
