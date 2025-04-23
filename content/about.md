@@ -54,6 +54,16 @@ My fullstack Go starter was featured on PitchHut — a curated platform that sho
 
 ---
 
+## ⭐ Reviews
+
+Curious what it's like working with me?  
+Here's what my clients and collaborators say on Google:
+
+👉 [Read my reviews on Google](https://www.google.pl/maps/place/NORBIX+Norbert+JAKUBCZAK+-+Profesjonalne+Uslugi+IT/@51.8681346,20.8627099,17z/data=!4m8!3m7!1s0x471923ecd6251843:0x9fa103657a0b14eb!8m2!3d51.8681313!4d20.8652902!9m1!1b1!16s%2Fg%2F11kz40tgs9?entry=ttu&g_ep=EgoyMDI1MDQyMC4wIKXMDSoASAFQAw%3D%3D)
+> *Tip: Click 'Sort by → Newest' to see the latest feedback.*
+
+---
+
 ## 🌍 Connect with me
 
 - GitHub: [@norbix](https://github.com/norbix)
