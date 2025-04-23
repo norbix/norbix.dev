@@ -173,3 +173,7 @@ sequenceDiagram
 - 📚 [Official Repo (mermaid-js/mermaid)](https://github.com/mermaid-js/mermaid)
 - 🎓 [YouTube Course](https://www.youtube.com/watch?v=-XV1JBfhgWo&list=PLw5h0DiJ-9PC49ItLKBQlWSMH1zolOCXS)
 - ✨ Try live: Mermaid [Live Editor](https://mermaid.live/edit#pako:eNpVjc1ugzAQhF_F2lMrkYg_B_ChUkPaXCK1h5wKOVhhg1GCjYxRmgLvXkNUtZ3Tjuab2R6OqkBgcLqo61Fwbch-k0ti9ZylQletqXl7IIvF07BFQ2ol8TaQ9cNWkVaopqlk-Xjn1xNE0n43YUiMqOR5vEfp3H-TOJBNtuONUc3hb7K_qoG8ZNW7sPP_E6HRtl6zE2cnvjhyTVKuZwQcKHVVADO6Qwdq1DWfLPRTmoMRWGMOzJ4F1-cccjnaTsPlh1L1T02rrhRgty-tdV1TcIObipea_yIoC9Sp6qQB5kXzBLAePoFF7pKu_DBc0ST0g9iPHbgB85NgGbiev0po4Pl0dOBr_ugu44i6Vp5HaeTGcTh-Az03dPc)
+
+---
+
+🚀 Follow me on [norbix.dev](https://norbix.dev) for more insights on Go, system design, and engineering wisdom.
