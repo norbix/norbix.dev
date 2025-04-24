@@ -2,12 +2,18 @@
 
 This repository contains the source code and content behind [https://norbix.dev](https://norbix.dev) — a personal knowledge base and technical playbook by Norbert Jakubczak (Mr. Norbix), focused on Software Development Lifecycle (SDLC), DevOps, and engineering practices. Built with [Hugo](https://gohugo.io/) and deployed via GitHub Pages.
 
+![banner](static/images/banner.jpg)
+
+---
+
 ## 📊 Analytics
 
 Visitor analytics are powered by [GoatCounter](https://www.goatcounter.com) — a lightweight, privacy-friendly alternative to Google Analytics.
 
 You can explore page view trends and traffic stats publicly at:  
 👉 **[https://norbix.goatcounter.com](https://norbix.goatcounter.com)**
+
+---
 
 ## 📨 Subscribers
 
@@ -20,17 +26,55 @@ Visitors can subscribe to receive new blog posts and updates directly to their i
 
 The subscription form is embedded directly on individual blog posts using a custom Hugo partial.
 
-## Table of Contents
-- [🛠️ Tech Stack](#-tech-stack)
-- [🚀 Deployment](#-deployment)
-  - [🔗 Live URL](#-live-url)
-  - [🧾 Domain](#-domain)
-- [🧼 Local Development](#-local-development)
-- [🛠 Updating Content](#-updating-content)
-- [🔄 Maintenance & Updates](#-maintenance--updates)
-- [🔍 Uptime Monitoring](#-uptime-monitoring)
-- [🤝 Contributing](#-contributing)
-- [📜 License](#-license)
+---
+
+## 🔐 How to get your Google Site Verification token
+
+1. Go to Google Search Console.
+
+2. Add your domain (e.g. norbix.dev) under the Domain property.
+
+3. Copy the TXT record that looks like this:
+  
+  ```text
+  google-site-verification=xxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+  ```
+
+4. Add it to your DNS provider (e.g. Cloudflare or Porkbun) as a TXT record with:
+
+- Host: @ (or leave empty)
+
+- Value: your full token
+
+5. Save and wait a few minutes, then click Verify in Search Console.
+
+You can check propagation using:
+
+```text
+dig TXT norbix.dev +short
+```
+
+---
+
+## 🔍 Google Search Console
+
+To improve search visibility and SEO performance, norbix.dev is connected to Google Search Console.
+
+This allows tracking of:
+
+- Indexed pages
+
+- Search queries bringing traffic
+
+- Click-through rates from Google results
+
+- Crawling and indexing issues
+
+The site submits its automatically generated sitemap.xml to help Google index new blog posts more quickly.
+
+💡 Verification is done via a DNS TXT record or HTML file (configurable via your domain provider or Hugo's `static/` directory).
+
+🔗 Google Search Console: [https://search.google.com/search-console](https://search.google.com/search-console)
 
 ---
 
@@ -51,7 +95,29 @@ The site is automatically deployed to GitHub Pages from the `main` branch using 
 👉 [https://norbix.dev](https://norbix.dev)
 
 ### 🧾 Domain
-Custom domain is set via `static/CNAME` containing `norbix.dev`
+
+The domain `norbix.dev` is registered through [Porkbun](https://porkbun.com), and DNS is managed via [Cloudflare](https://cloudflare.com).  
+GitHub Pages handles hosting, while the domain itself points to GitHub's IPs using A and CNAME records.
+
+Domain configuration is defined via `static/CNAME`, which contains: `norbix.dev`.
+
+#### 🔍 DNS Verification
+
+To verify DNS records (such as the `google-site-verification` TXT record), you can use:
+
+```text
+dig TXT norbix.dev +short
+````
+
+This is especially useful to confirm Google Search Console verification is active and propagated.
+
+#### 🔍 WHOIS Lookup
+
+To check in WHOIS, you can use [https://www.whois.com/whois/norbix.dev](https://www.whois.com/whois/norbix.dev)
+
+#### 🔍 Check DNS Propagation
+
+Check [https://dnschecker.org/#TXT/norbix.dev)(https://dnschecker.org/#TXT/norbix.dev) to verify if `TXT` record is propagated across different DNS servers.
 
 ---
 
