@@ -1,7 +1,7 @@
 +++
 date = '2025-04-19T15:06:25+02:00'
 draft = false
-title = 'DSA- Algorithms and Data Structures'
+title = 'DSA - Data Structures and Algorithms'
 tags = ["go", "golang", "algorithms", "data-structures"]
 categories = ["backend", "golang"]
 summary = "A deep dive into Data Structures and Algorithms (DSA) using Go, covering essential concepts, implementations, and best practices."
