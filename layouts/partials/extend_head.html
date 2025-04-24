@@ -1,3 +1,36 @@
+<!-- Meta Description -->
+{{ with .Params.description }}
+<meta name="description" content="{{ . }}">
+{{ end }}
+
+<!-- Canonical URL -->
+<link rel="canonical" href="{{ .Permalink }}">
+
+<!-- Open Graph -->
+<meta property="og:title" content="{{ .Title }}">
+{{ with .Params.description }}
+<meta property="og:description" content="{{ . }}">
+{{ end }}
+<meta property="og:url" content="{{ .Permalink }}">
+{{ with .Params.image }}
+<meta property="og:image" content="{{ . | absURL }}">
+{{ else }}
+<meta property="og:image" content="{{ "default-og-image.png" | absURL }}">
+{{ end }}
+<meta property="og:type" content="article">
+
+<!-- Twitter -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="{{ .Title }}">
+{{ with .Params.description }}
+<meta name="twitter:description" content="{{ . }}">
+{{ end }}
+{{ with .Params.image }}
+<meta name="twitter:image" content="{{ . | absURL }}">
+{{ else }}
+<meta name="twitter:image" content="{{ "default-og-image.png" | absURL }}">
+{{ end }}
+
 <!-- GoatCounter analytics -->
 <script data-goatcounter="https://norbix.goatcounter.com/count"
         async src="//gc.zgo.at/count.js"></script>
@@ -5,7 +38,7 @@
 <!-- RSS Feed Discovery -->
 <link rel="alternate" type="application/rss+xml" title="RSS Feed for norbix.dev" href="{{ "index.xml" | relURL }}">
 
-<!-- Optional schema override (if you want to inject a simpler JSON-LD block yourself) -->
+<!-- Structured Data for Homepage -->
 {{ if .IsHome }}
 <script type="application/ld+json">
     {
