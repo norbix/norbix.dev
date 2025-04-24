@@ -1,0 +1,28 @@
+<!-- Meta Description -->
+{{ with .Params.description }}
+<meta name="description" content="{{ . }}">
+{{ end }}
+
+<!-- Canonical URL -->
+<link rel="canonical" href="{{ .Permalink }}">
+
+<!-- Open Graph -->
+<meta property="og:title" content="{{ .Title }}">
+{{ with .Params.description }}
+<meta property="og:description" content="{{ . }}">
+{{ end }}
+<meta property="og:url" content="{{ .Permalink }}">
+{{ with .Params.image }}
+<meta property="og:image" content="{{ . | absURL }}">
+{{ end }}
+<meta property="og:type" content="article">
+
+<!-- Twitter -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="{{ .Title }}">
+{{ with .Params.description }}
+<meta name="twitter:description" content="{{ . }}">
+{{ end }}
+{{ with .Params.image }}
+<meta name="twitter:image" content="{{ . | absURL }}">
+{{ end }}
