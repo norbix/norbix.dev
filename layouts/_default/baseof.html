@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Theme persistence script (run early, before CSS) -->
+    <script>
+        (function() {
+            const savedTheme = localStorage.getItem('theme');
+            const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+            if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+
+            window.setTheme = function(theme) {
+                localStorage.setItem('theme', theme);
+                document.documentElement.classList.toggle('dark', theme === 'dark');
+            }
+        })();
+    </script>
+
+    <title>
+        {{ if .Title }}
+        {{ .Title }} | norbix.dev
+        {{ else }}
+        norbix.dev – The log of my journey through code & software systems architecture
+        {{ end }}
+    </title>
+
+    {{ partial "head.html" . }}
+</head>
+<body>
+{{ partial "header.html" . }}
+
+<main>
+    {{ block "main" . }}{{ end }}
+</main>
+
+{{ partial "footer.html" . }}
+</body>
+</html>
