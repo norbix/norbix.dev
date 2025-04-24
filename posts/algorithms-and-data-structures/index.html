@@ -1,1 +1,202 @@
-<title>DSA - Data Structures and Algorithms | norbix.dev</title>
+<!doctype html><html lang=en><head><meta charset=UTF-8><meta name=viewport content="width=device-width,initial-scale=1"><title>DSA - Data Structures and Algorithms | norbix.dev
+</title><meta charset=utf-8><meta http-equiv=X-UA-Compatible content="IE=edge"><meta name=viewport content="width=device-width,initial-scale=1,shrink-to-fit=no"><meta name=robots content="index, follow"><title>DSA - Data Structures and Algorithms | norbix.dev - The log of my journey through code & software systems architecture</title>
+<meta name=keywords content="go,golang,algorithms,data-structures"><meta name=description content="A deep dive into Data Structures and Algorithms (DSA) using Go, covering essential concepts, implementations, and best practices."><meta name=author content><link rel=canonical href=https://norbix.dev/posts/algorithms-and-data-structures/><link crossorigin=anonymous href=/assets/css/stylesheet.fc220c15db4aef0318bbf30adc45d33d4d7c88deff3238b23eb255afdc472ca6.css integrity="sha256-/CIMFdtK7wMYu/MK3EXTPU18iN7/MjiyPrJVr9xHLKY=" rel="preload stylesheet" as=style><link rel=icon href=https://norbix.dev/favicon.ico><link rel=icon type=image/png sizes=16x16 href=https://norbix.dev/favicon-16x16.png><link rel=icon type=image/png sizes=32x32 href=https://norbix.dev/favicon-32x32.png><link rel=apple-touch-icon href=https://norbix.dev/apple-touch-icon.png><link rel=mask-icon href=https://norbix.dev/safari-pinned-tab.svg><meta name=theme-color content="#2e2e33"><meta name=msapplication-TileColor content="#2e2e33"><link rel=alternate hreflang=en href=https://norbix.dev/posts/algorithms-and-data-structures/><noscript><style>#theme-toggle,.top-link{display:none}</style></noscript><script data-goatcounter=https://norbix.goatcounter.com/count async src=//gc.zgo.at/count.js></script><link rel=alternate type=application/rss+xml title="RSS Feed for norbix.dev" href=/index.xml><meta property="og:title" content="DSA - Data Structures and Algorithms"><meta property="og:description" content="A deep dive into Data Structures and Algorithms (DSA) using Go, covering essential concepts, implementations, and best practices."><meta property="og:type" content="article"><meta property="og:url" content="https://norbix.dev/posts/algorithms-and-data-structures/"><meta property="article:section" content="posts"><meta property="article:published_time" content="2025-04-19T15:06:25+02:00"><meta property="article:modified_time" content="2025-04-19T15:06:25+02:00"><meta name=twitter:card content="summary"><meta name=twitter:title content="DSA - Data Structures and Algorithms"><meta name=twitter:description content="A deep dive into Data Structures and Algorithms (DSA) using Go, covering essential concepts, implementations, and best practices."><script type=application/ld+json>{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Posts","item":"https://norbix.dev/posts/"},{"@type":"ListItem","position":2,"name":"DSA - Data Structures and Algorithms","item":"https://norbix.dev/posts/algorithms-and-data-structures/"}]}</script><script type=application/ld+json>{"@context":"https://schema.org","@type":"BlogPosting","headline":"DSA - Data Structures and Algorithms","name":"DSA - Data Structures and Algorithms","description":"A deep dive into Data Structures and Algorithms (DSA) using Go, covering essential concepts, implementations, and best practices.","keywords":["go","golang","algorithms","data-structures"],"articleBody":" 🧠 Mastering Data Structures and Algorithms (DSA) with Go Whether you’re preparing for technical interviews, optimizing backend systems, or simply sharpening your problem-solving chops, Data Structures and Algorithms (DSA) are foundational to your success as a developer.\nIn this article, I’ll walk you through core DSA concepts using Golang, a language praised for its simplicity, performance, and concurrency model. You’ll see how Go makes understanding DSA both intuitive and powerful.\n🚀 What is DSA? Data Structures organize and store data efficiently, while Algorithms define step-by-step instructions to solve problems or manipulate data.\nTogether, DSA provides the backbone for high-performance applications.\n📦 Essential Data Structures in Go Arrays \u0026 Slices\n1 2 3 4 5 arr := [5]int{1, 2, 3, 4, 5} // Fixed-size array slice := []int{1, 2, 3} // Dynamic size slice = append(slice, 4) fmt.Println(slice) // [1 2 3 4] Slices are the idiomatic way to work with collections in Go. They offer flexibility while leveraging arrays under the hood.\nLinked List\nGo doesn’t have a built-in linked list, but the container/list package provides one.\n1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 package main import ( \"container/list\" \"fmt\" ) func main() { l := list.New() l.PushBack(\"Go\") l.PushBack(\"DSA\") for e := l.Front(); e != nil; e = e.Next() { fmt.Println(e.Value) } } Stack (LIFO)\nA stack can be easily implemented using slices.\n1 2 3 4 5 6 7 8 9 10 11 12 type Stack []int func (s *Stack) Push(v int) { *s = append(*s, v) } func (s *Stack) Pop() int { n := len(*s) val := (*s)[n-1] *s = (*s)[:n-1] return val } Queue (FIFO)\nQueues can also be implemented using slices.\n1 2 3 4 5 6 7 8 9 10 11 type Queue []int func (q *Queue) Enqueue(v int) { *q = append(*q, v) } func (q *Queue) Dequeue() int { val := (*q)[0] *q = (*q)[1:] return val } Hash Map (Go's map)\n1 2 3 4 5 m := map[string]int{ \"apple\": 5, \"banana\": 3, } fmt.Println(m[\"apple\"]) // 5 Hint: Go’s built-in map is a powerful hash table implementation for key-value pairs.\n🧩 Must-Know Algorithms in Go Binary Search\nEfficient O(log n) search on sorted arrays.\n1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 func binarySearch(arr []int, target int) int { low, high := 0, len(arr)-1 for low \u003c= high { mid := (low + high) / 2 if arr[mid] == target { return mid } else if arr[mid] \u003c target { low = mid + 1 } else { high = mid - 1 } } return -1 } Sorting (Bubble Sort Example)\n1 2 3 4 5 6 7 8 9 10 func bubbleSort(arr []int) { n := len(arr) for i := 0; i \u003c n-1; i++ { for j := 0; j \u003c n-i-1; j++ { if arr[j] \u003e arr[j+1] { arr[j], arr[j+1] = arr[j+1], arr[j] } } } } For real projects, use Go’s built-in sorting:\n1 sort.Ints(arr) Recursion: Factorial\n1 2 3 4 5 6 7 func factorial(n int) int { if n == 0 { return 1 } return n * factorial(n-1) } Graph and Trees\nFor binary trees, you define custom structures.\n1 2 3 4 5 type Node struct { Value int Left *Node Right *Node } Depth-first traversal:\n1 2 3 4 5 6 7 8 9 func dfs(n *Node) { if n == nil { return } fmt.Println(n.Value) dfs(n.Left) dfs(n.Right) } 🧠 Tips for Learning DSA with Go Practice problems: Use platforms like LeetCode, HackerRank, or Exercism. Understand time complexity: Know Big-O analysis for every structure and algorithm. Build mini-projects: Implement your own LRU Cache, Trie, or Priority Queue. 🎯 Final Thoughts Mastering DSA not only sharpens your coding skills but also prepares you for systems design, performance optimization, and real-world problem-solving.\nWith Go’s clean syntax and powerful standard library, you’re equipped to tackle DSA challenges efficiently and idiomatically.\n🚀 Follow me on norbix.dev for more insights on Go, system design, and engineering wisdom.\n","wordCount":"677","inLanguage":"en","datePublished":"2025-04-19T15:06:25+02:00","dateModified":"2025-04-19T15:06:25+02:00","mainEntityOfPage":{"@type":"WebPage","@id":"https://norbix.dev/posts/algorithms-and-data-structures/"},"publisher":{"@type":"Organization","name":"norbix.dev - The log of my journey through code \u0026 software systems architecture","logo":{"@type":"ImageObject","url":"https://norbix.dev/favicon.ico"}}}</script></head><body><script>localStorage.getItem("pref-theme")==="light"&&document.body.classList.remove("dark")</script><header class=header><nav class=nav><div class=logo><a href=https://norbix.dev/ accesskey=h title="norbix.dev - The log of my journey through code & software systems architecture (Alt + H)">norbix.dev - The log of my journey through code & software systems architecture</a><div class=logo-switches><button id=theme-toggle accesskey=t title="(Alt + T)"><svg id="moon" width="24" height="18" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg><svg id="sun" width="24" height="18" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg></button></div></div><ul id=menu><li><a href=https://norbix.dev/ title=Home><span>Home</span></a></li><li><a href=https://norbix.dev/posts/ title=Posts><span>Posts</span></a></li><li><a href=https://norbix.dev/tags/ title=Tags><span>Tags</span></a></li><li><a href=https://norbix.dev/about/ title=About><span>About</span></a></li><li><a href=https://norbix.dev/index.xml title="📡 RSS"><span>📡 RSS</span></a></li></ul></nav></header><main><main id=main><article class=post-single><header class=post-header><h1 class=post-title>DSA - Data Structures and Algorithms</h1><span title='2025-04-19 15:06:25 +0200 +0200'>April 19, 2025</span></header><div class=post-content><nav class=table-of-contents><nav id=TableOfContents><ul><li><a href=#-mastering-data-structures-and-algorithms-dsa-with-go>🧠 Mastering Data Structures and Algorithms (DSA) with Go</a></li><li><a href=#-what-is-dsa>🚀 What is DSA?</a></li><li><a href=#-essential-data-structures-in-go>📦 Essential Data Structures in Go</a></li><li><a href=#-must-know-algorithms-in-go>🧩 Must-Know Algorithms in Go</a></li><li><a href=#-tips-for-learning-dsa-with-go>🧠 Tips for Learning DSA with Go</a></li><li><a href=#-final-thoughts>🎯 Final Thoughts</a></li></ul></nav></nav><p><img loading=lazy src=banner.jpg alt=banner></p><hr><h2 id=-mastering-data-structures-and-algorithms-dsa-with-go>🧠 Mastering Data Structures and Algorithms (DSA) with Go</h2><p>Whether you&rsquo;re preparing for technical interviews, optimizing backend systems, or simply sharpening your problem-solving chops, Data Structures and Algorithms (DSA) are foundational to your success as a developer.</p><p>In this article, I’ll walk you through core DSA concepts using Golang, a language praised for its simplicity, performance, and concurrency model. You&rsquo;ll see how Go makes understanding DSA both intuitive and powerful.</p><hr><h2 id=-what-is-dsa>🚀 What is DSA?</h2><p>Data Structures organize and store data efficiently, while Algorithms define step-by-step instructions to solve problems or manipulate data.</p><p>Together, DSA provides the backbone for high-performance applications.</p><hr><h2 id=-essential-data-structures-in-go>📦 Essential Data Structures in Go</h2><ol><li><p>Arrays & Slices</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-go data-lang=go><span class=line><span class=cl><span class=nx>arr</span> <span class=o>:=</span> <span class=p>[</span><span class=mi>5</span><span class=p>]</span><span class=kt>int</span><span class=p>{</span><span class=mi>1</span><span class=p>,</span> <span class=mi>2</span><span class=p>,</span> <span class=mi>3</span><span class=p>,</span> <span class=mi>4</span><span class=p>,</span> <span class=mi>5</span><span class=p>}</span> <span class=c1>// Fixed-size array</span>
+</span></span><span class=line><span class=cl><span class=nx>slice</span> <span class=o>:=</span> <span class=p>[]</span><span class=kt>int</span><span class=p>{</span><span class=mi>1</span><span class=p>,</span> <span class=mi>2</span><span class=p>,</span> <span class=mi>3</span><span class=p>}</span>      <span class=c1>// Dynamic size</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=nx>slice</span> <span class=p>=</span> <span class=nb>append</span><span class=p>(</span><span class=nx>slice</span><span class=p>,</span> <span class=mi>4</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=nx>fmt</span><span class=p>.</span><span class=nf>Println</span><span class=p>(</span><span class=nx>slice</span><span class=p>)</span> <span class=c1>// [1 2 3 4]</span>
+</span></span></code></pre></td></tr></table></div></div><p>Slices are the idiomatic way to work with collections in Go. They offer flexibility while leveraging arrays under the hood.</p></li><li><p>Linked List</p><p>Go doesn’t have a built-in linked list, but the container/list package provides one.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-go data-lang=go><span class=line><span class=cl><span class=kn>package</span> <span class=nx>main</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kn>import</span> <span class=p>(</span>
+</span></span><span class=line><span class=cl><span class=s>&#34;container/list&#34;</span>
+</span></span><span class=line><span class=cl><span class=s>&#34;fmt&#34;</span>
+</span></span><span class=line><span class=cl><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kd>func</span> <span class=nf>main</span><span class=p>()</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl><span class=nx>l</span> <span class=o>:=</span> <span class=nx>list</span><span class=p>.</span><span class=nf>New</span><span class=p>()</span>
+</span></span><span class=line><span class=cl><span class=nx>l</span><span class=p>.</span><span class=nf>PushBack</span><span class=p>(</span><span class=s>&#34;Go&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=nx>l</span><span class=p>.</span><span class=nf>PushBack</span><span class=p>(</span><span class=s>&#34;DSA&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=k>for</span> <span class=nx>e</span> <span class=o>:=</span> <span class=nx>l</span><span class=p>.</span><span class=nf>Front</span><span class=p>();</span> <span class=nx>e</span> <span class=o>!=</span> <span class=kc>nil</span><span class=p>;</span> <span class=nx>e</span> <span class=p>=</span> <span class=nx>e</span><span class=p>.</span><span class=nf>Next</span><span class=p>()</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=nx>fmt</span><span class=p>.</span><span class=nf>Println</span><span class=p>(</span><span class=nx>e</span><span class=p>.</span><span class=nx>Value</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div></li><li><p>Stack (<code>LIFO</code>)</p><p>A stack can be easily implemented using slices.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-go data-lang=go><span class=line><span class=cl><span class=kd>type</span> <span class=nx>Stack</span> <span class=p>[]</span><span class=kt>int</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kd>func</span> <span class=p>(</span><span class=nx>s</span> <span class=o>*</span><span class=nx>Stack</span><span class=p>)</span> <span class=nf>Push</span><span class=p>(</span><span class=nx>v</span> <span class=kt>int</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=o>*</span><span class=nx>s</span> <span class=p>=</span> <span class=nb>append</span><span class=p>(</span><span class=o>*</span><span class=nx>s</span><span class=p>,</span> <span class=nx>v</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kd>func</span> <span class=p>(</span><span class=nx>s</span> <span class=o>*</span><span class=nx>Stack</span><span class=p>)</span> <span class=nf>Pop</span><span class=p>()</span> <span class=kt>int</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=nx>n</span> <span class=o>:=</span> <span class=nb>len</span><span class=p>(</span><span class=o>*</span><span class=nx>s</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=nx>val</span> <span class=o>:=</span> <span class=p>(</span><span class=o>*</span><span class=nx>s</span><span class=p>)[</span><span class=nx>n</span><span class=o>-</span><span class=mi>1</span><span class=p>]</span>
+</span></span><span class=line><span class=cl>    <span class=o>*</span><span class=nx>s</span> <span class=p>=</span> <span class=p>(</span><span class=o>*</span><span class=nx>s</span><span class=p>)[:</span><span class=nx>n</span><span class=o>-</span><span class=mi>1</span><span class=p>]</span>
+</span></span><span class=line><span class=cl>    <span class=k>return</span> <span class=nx>val</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div></li><li><p>Queue (<code>FIFO</code>)</p><p>Queues can also be implemented using slices.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-go data-lang=go><span class=line><span class=cl><span class=kd>type</span> <span class=nx>Queue</span> <span class=p>[]</span><span class=kt>int</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kd>func</span> <span class=p>(</span><span class=nx>q</span> <span class=o>*</span><span class=nx>Queue</span><span class=p>)</span> <span class=nf>Enqueue</span><span class=p>(</span><span class=nx>v</span> <span class=kt>int</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=o>*</span><span class=nx>q</span> <span class=p>=</span> <span class=nb>append</span><span class=p>(</span><span class=o>*</span><span class=nx>q</span><span class=p>,</span> <span class=nx>v</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kd>func</span> <span class=p>(</span><span class=nx>q</span> <span class=o>*</span><span class=nx>Queue</span><span class=p>)</span> <span class=nf>Dequeue</span><span class=p>()</span> <span class=kt>int</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=nx>val</span> <span class=o>:=</span> <span class=p>(</span><span class=o>*</span><span class=nx>q</span><span class=p>)[</span><span class=mi>0</span><span class=p>]</span>
+</span></span><span class=line><span class=cl>    <span class=o>*</span><span class=nx>q</span> <span class=p>=</span> <span class=p>(</span><span class=o>*</span><span class=nx>q</span><span class=p>)[</span><span class=mi>1</span><span class=p>:]</span>
+</span></span><span class=line><span class=cl>    <span class=k>return</span> <span class=nx>val</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div></li><li><p>Hash Map (<code>Go's map</code>)</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-go data-lang=go><span class=line><span class=cl><span class=nx>m</span> <span class=o>:=</span> <span class=kd>map</span><span class=p>[</span><span class=kt>string</span><span class=p>]</span><span class=kt>int</span><span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=s>&#34;apple&#34;</span><span class=p>:</span>  <span class=mi>5</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=s>&#34;banana&#34;</span><span class=p>:</span> <span class=mi>3</span><span class=p>,</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=nx>fmt</span><span class=p>.</span><span class=nf>Println</span><span class=p>(</span><span class=nx>m</span><span class=p>[</span><span class=s>&#34;apple&#34;</span><span class=p>])</span> <span class=c1>// 5</span>
+</span></span></code></pre></td></tr></table></div></div><p><strong>Hint:</strong>
+Go’s built-in map is a powerful hash table implementation for key-value pairs.</p></li></ol><hr><h2 id=-must-know-algorithms-in-go>🧩 Must-Know Algorithms in Go</h2><ol><li><p>Binary Search</p><p>Efficient O(log n) search on sorted arrays.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-go data-lang=go><span class=line><span class=cl><span class=kd>func</span> <span class=nf>binarySearch</span><span class=p>(</span><span class=nx>arr</span> <span class=p>[]</span><span class=kt>int</span><span class=p>,</span> <span class=nx>target</span> <span class=kt>int</span><span class=p>)</span> <span class=kt>int</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=nx>low</span><span class=p>,</span> <span class=nx>high</span> <span class=o>:=</span> <span class=mi>0</span><span class=p>,</span> <span class=nb>len</span><span class=p>(</span><span class=nx>arr</span><span class=p>)</span><span class=o>-</span><span class=mi>1</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=k>for</span> <span class=nx>low</span> <span class=o>&lt;=</span> <span class=nx>high</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=nx>mid</span> <span class=o>:=</span> <span class=p>(</span><span class=nx>low</span> <span class=o>+</span> <span class=nx>high</span><span class=p>)</span> <span class=o>/</span> <span class=mi>2</span>
+</span></span><span class=line><span class=cl>        <span class=k>if</span> <span class=nx>arr</span><span class=p>[</span><span class=nx>mid</span><span class=p>]</span> <span class=o>==</span> <span class=nx>target</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>            <span class=k>return</span> <span class=nx>mid</span>
+</span></span><span class=line><span class=cl>        <span class=p>}</span> <span class=k>else</span> <span class=k>if</span> <span class=nx>arr</span><span class=p>[</span><span class=nx>mid</span><span class=p>]</span> <span class=p>&lt;</span> <span class=nx>target</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>            <span class=nx>low</span> <span class=p>=</span> <span class=nx>mid</span> <span class=o>+</span> <span class=mi>1</span>
+</span></span><span class=line><span class=cl>        <span class=p>}</span> <span class=k>else</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>            <span class=nx>high</span> <span class=p>=</span> <span class=nx>mid</span> <span class=o>-</span> <span class=mi>1</span>
+</span></span><span class=line><span class=cl>        <span class=p>}</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl>    <span class=k>return</span> <span class=o>-</span><span class=mi>1</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div></li><li><p>Sorting (<code>Bubble Sort</code> Example)</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-go data-lang=go><span class=line><span class=cl><span class=kd>func</span> <span class=nf>bubbleSort</span><span class=p>(</span><span class=nx>arr</span> <span class=p>[]</span><span class=kt>int</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=nx>n</span> <span class=o>:=</span> <span class=nb>len</span><span class=p>(</span><span class=nx>arr</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=k>for</span> <span class=nx>i</span> <span class=o>:=</span> <span class=mi>0</span><span class=p>;</span> <span class=nx>i</span> <span class=p>&lt;</span> <span class=nx>n</span><span class=o>-</span><span class=mi>1</span><span class=p>;</span> <span class=nx>i</span><span class=o>++</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=k>for</span> <span class=nx>j</span> <span class=o>:=</span> <span class=mi>0</span><span class=p>;</span> <span class=nx>j</span> <span class=p>&lt;</span> <span class=nx>n</span><span class=o>-</span><span class=nx>i</span><span class=o>-</span><span class=mi>1</span><span class=p>;</span> <span class=nx>j</span><span class=o>++</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>            <span class=k>if</span> <span class=nx>arr</span><span class=p>[</span><span class=nx>j</span><span class=p>]</span> <span class=p>&gt;</span> <span class=nx>arr</span><span class=p>[</span><span class=nx>j</span><span class=o>+</span><span class=mi>1</span><span class=p>]</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>                <span class=nx>arr</span><span class=p>[</span><span class=nx>j</span><span class=p>],</span> <span class=nx>arr</span><span class=p>[</span><span class=nx>j</span><span class=o>+</span><span class=mi>1</span><span class=p>]</span> <span class=p>=</span> <span class=nx>arr</span><span class=p>[</span><span class=nx>j</span><span class=o>+</span><span class=mi>1</span><span class=p>],</span> <span class=nx>arr</span><span class=p>[</span><span class=nx>j</span><span class=p>]</span>
+</span></span><span class=line><span class=cl>            <span class=p>}</span>
+</span></span><span class=line><span class=cl>        <span class=p>}</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><p>For real projects, use Go’s built-in sorting:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-go data-lang=go><span class=line><span class=cl><span class=nx>sort</span><span class=p>.</span><span class=nf>Ints</span><span class=p>(</span><span class=nx>arr</span><span class=p>)</span>
+</span></span></code></pre></td></tr></table></div></div></li><li><p>Recursion: Factorial</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-go data-lang=go><span class=line><span class=cl><span class=kd>func</span> <span class=nf>factorial</span><span class=p>(</span><span class=nx>n</span> <span class=kt>int</span><span class=p>)</span> <span class=kt>int</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=k>if</span> <span class=nx>n</span> <span class=o>==</span> <span class=mi>0</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=k>return</span> <span class=mi>1</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=k>return</span> <span class=nx>n</span> <span class=o>*</span> <span class=nf>factorial</span><span class=p>(</span><span class=nx>n</span><span class=o>-</span><span class=mi>1</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div></li><li><p>Graph and Trees</p><p>For binary trees, you define custom structures.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-go data-lang=go><span class=line><span class=cl><span class=kd>type</span> <span class=nx>Node</span> <span class=kd>struct</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl><span class=nx>Value</span> <span class=kt>int</span>
+</span></span><span class=line><span class=cl><span class=nx>Left</span>  <span class=o>*</span><span class=nx>Node</span>
+</span></span><span class=line><span class=cl><span class=nx>Right</span> <span class=o>*</span><span class=nx>Node</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><p>Depth-first traversal:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span><span class=lnt>8
+</span><span class=lnt>9
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-go data-lang=go><span class=line><span class=cl><span class=kd>func</span> <span class=nf>dfs</span><span class=p>(</span><span class=nx>n</span> <span class=o>*</span><span class=nx>Node</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=k>if</span> <span class=nx>n</span> <span class=o>==</span> <span class=kc>nil</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=k>return</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=nx>fmt</span><span class=p>.</span><span class=nf>Println</span><span class=p>(</span><span class=nx>n</span><span class=p>.</span><span class=nx>Value</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=nf>dfs</span><span class=p>(</span><span class=nx>n</span><span class=p>.</span><span class=nx>Left</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=nf>dfs</span><span class=p>(</span><span class=nx>n</span><span class=p>.</span><span class=nx>Right</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div></li></ol><hr><h2 id=-tips-for-learning-dsa-with-go>🧠 Tips for Learning DSA with Go</h2><ul><li>Practice problems: Use platforms like <a href=https://leetcode.com/>LeetCode</a>, <a href=https://www.hackerrank.com/>HackerRank</a>, or <a href=https://exercism.org/>Exercism</a>.</li><li>Understand time complexity: Know Big-O analysis for every structure and algorithm.</li><li>Build mini-projects: Implement your own <code>LRU Cache</code>, <code>Trie</code>, or <code>Priority Queue</code>.</li></ul><hr><h2 id=-final-thoughts>🎯 Final Thoughts</h2><p>Mastering DSA not only sharpens your coding skills but also prepares you for systems design, performance optimization, and real-world problem-solving.</p><p>With Go’s clean syntax and powerful standard library, you&rsquo;re equipped to tackle DSA challenges efficiently and idiomatically.</p><hr><p>🚀 Follow me on <a href=https://norbix.dev>norbix.dev</a> for more insights on Go, system design, and engineering wisdom.</p></div><div class=post-subscribe><style>.subscribe-form{display:flex;gap:.5rem;margin-top:1rem;align-items:center}.subscribe-form input[type=email]{padding:.5rem;border-radius:6px;border:1px solid #ccc;background-color:#1f1f1f;color:#fff}.subscribe-form input[type=submit],.subscribe-form button{padding:.5rem 1rem;border-radius:6px;background-color:#facc15;color:#000;border:none;cursor:pointer;font-weight:700}.subscribe-form input[type=submit]:hover{background-color:#fcd34d}</style><form action=https://buttondown.email/api/emails/embed-subscribe/norbix method=post target=popupwindow onsubmit='window.open("https://buttondown.email/norbix","popupwindow")' class=subscribe-form><input type=email name=email placeholder="Enter your email" required>
+<input type=submit value=Subscribe></form><p style=font-size:.875rem;opacity:.6>Powered by Buttondown.</p></div><div class=post-comments><script src=https://giscus.app/client.js data-repo=norbix/norbix.dev data-repo-id=R_kgDOOV_xMQ data-category=Announcements data-category-id=DIC_kwDOOV_xMc4CpF5M data-mapping=pathname data-strict=0 data-reactions-enabled=1 data-emit-metadata=0 data-input-position=bottom data-theme=dark data-lang=en crossorigin=anonymous async></script></div><nav class=paginav><a class=prev href=https://norbix.dev/posts/design-patterns/><span class=title>« Prev</span><br><span>Design Patterns in Go: Practical Examples</span>
+</a><a class=next href=https://norbix.dev/posts/graph-theory-algorithms-4-competitive-programming/><span class=title>Next »</span><br><span>Graph Theory Algorithms 4 Competitive Programming</span></a></nav></article></main></main><footer class=footer><span>&copy; 2025 <a href=https://norbix.dev/>norbix.dev - The log of my journey through code & software systems architecture</a></span> ·
+<span>Powered by
+<a href=https://gohugo.io/ rel="noopener noreferrer" target=_blank>Hugo</a> &
+        <a href=https://github.com/adityatelange/hugo-PaperMod/ rel=noopener target=_blank>PaperMod</a></span></footer><a href=#top aria-label="go to top" title="Go to Top (Alt + G)" class=top-link id=top-link accesskey=g><svg viewBox="0 0 12 6" fill="currentcolor"><path d="M12 6H0l6-6z"/></svg>
+</a><script>let menu=document.getElementById("menu");menu&&(menu.scrollLeft=localStorage.getItem("menu-scroll-position"),menu.onscroll=function(){localStorage.setItem("menu-scroll-position",menu.scrollLeft)}),document.querySelectorAll('a[href^="#"]').forEach(e=>{e.addEventListener("click",function(e){e.preventDefault();var t=this.getAttribute("href").substr(1);window.matchMedia("(prefers-reduced-motion: reduce)").matches?document.querySelector(`[id='${decodeURIComponent(t)}']`).scrollIntoView():document.querySelector(`[id='${decodeURIComponent(t)}']`).scrollIntoView({behavior:"smooth"}),t==="top"?history.replaceState(null,null," "):history.pushState(null,null,`#${t}`)})})</script><script>var mybutton=document.getElementById("top-link");window.onscroll=function(){document.body.scrollTop>800||document.documentElement.scrollTop>800?(mybutton.style.visibility="visible",mybutton.style.opacity="1"):(mybutton.style.visibility="hidden",mybutton.style.opacity="0")}</script><script>document.getElementById("theme-toggle").addEventListener("click",()=>{document.body.className.includes("dark")?(document.body.classList.remove("dark"),localStorage.setItem("pref-theme","light")):(document.body.classList.add("dark"),localStorage.setItem("pref-theme","dark"))})</script></body></html>
