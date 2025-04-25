@@ -179,4 +179,3 @@ This is a personal site, but you're welcome to open issues or PRs if you spot so
 ## 📜 License
 
 MIT — see `LICENSE` for details.
-
