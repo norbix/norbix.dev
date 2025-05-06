@@ -7,6 +7,8 @@ draft: false
 
 Hi, I'm **Norbert Jakubczak** — aka **Norbix** 👋
 
+![my_photo.jgp](/images/my_photo.jpg)
+
 I'm a polyglot **Software Engineer** with a strong focus on **Golang** and **Python**, working across the full stack — from backend and cloud infrastructure to frontend integration and developer tooling.
 
 I specialize in building **Internal Developer Platforms (IDPs)** and architecting scalable **Software-as-a-Service (SaaS)** systems using microservices and modern cloud-native technologies.
