@@ -7,11 +7,12 @@ draft: false
 
 Hi, I'm **Norbert Jakubczak** — aka **Norbix** 👋
 
+<figure style="max-width: 250px; margin: 1rem 0;">
+  <img src="/images/my_photo.jpg" alt="Norbert Jakubczak - Norbix" style="width: 100%; border-radius: 10px;" />
   <figcaption style="text-align: center; font-style: italic; color: #aaa;">
     Welcome to my tech blog — where code, systems thinking, and engineering mindset meet. 🚀
   </figcaption>
-
-![my_photo.jgp](/images/my_photo.jpg)
+</figure>
 
 I'm a polyglot **Software Engineer** with a strong focus on **Golang** and **Python**, working across the full stack — from backend and cloud infrastructure to frontend integration and developer tooling.
 
