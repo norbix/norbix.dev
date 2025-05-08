@@ -23,11 +23,13 @@ Before stepping fully into tech, I was a **professional basketball player** — 
 > _"Never say never, because limits, like fears, are often just an illusion."_  
 > — **Michael Jordan**
 
+[Watch Michael Jordan deliver this line in his 2009 Hall of Fame speech](https://www.youtube.com/watch?v=U0Yqxd_8l2U)
+
 ---
 
 ## 🛠️ Areas of Expertise
 
-- 🐍 & 🦫 Polyglot systems in **Python** and **Go**
+- 🐍 & 🦫 Building polyglot systems in **Python** and **Go**
 - 🧱 **Internal Developer Platforms (IDP)**
 - 🧩 **SaaS Microservices** architecture
 - ☁️ **Kubernetes (K8s)** and cloud-native platforms
