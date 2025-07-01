@@ -257,7 +257,8 @@ In this article, we'll explore some of the most widely used design patterns in G
     }
     
     type Adaptee struct{}
-        func (a Adaptee) SpecificRequest() string {
+    
+    func (a Adaptee) SpecificRequest() string {
             return "Specific behavior"
     }
     
@@ -312,9 +313,10 @@ In this article, we'll explore some of the most widely used design patterns in G
     }
     
     type SimpleCoffee struct{}
-        func (s SimpleCoffee) Cost() float64 { 
+
+    func (s SimpleCoffee) Cost() float64 { 
             return 2.0 
-        }
+	}
     
     type MilkDecorator struct {
         Coffee
@@ -529,7 +531,6 @@ In this article, we'll explore some of the most widely used design patterns in G
     type Context struct {
         strategy Strategy
     }
-    
     func (c *Context) SetStrategy(s Strategy) {
         c.strategy = s
     }
