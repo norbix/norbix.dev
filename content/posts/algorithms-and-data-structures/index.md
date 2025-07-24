@@ -366,7 +366,7 @@ Each of these sorting algorithms serves different use cases. While Go’s sort p
 
 ---
 
-## 📑 Sorting Algorithms Cheat Sheet
+## 📑 Sorting Algorithms - Cheat Sheet
 
 | Algorithm       | Best Time    | Avg Time     | Worst Time   | Space     | Stable | In-Place | Notes                               |
 |----------------|--------------|--------------|--------------|-----------|--------|----------|-------------------------------------|
@@ -379,6 +379,125 @@ Each of these sorting algorithms serves different use cases. While Go’s sort p
 
 > ✅ **Stable**: Maintains the relative order of equal elements  
 > ✅ **In-Place**: Uses constant extra space (excluding recursion stack)
+
+---
+
+## 🔍 Search Algorithms
+
+Search algorithms are foundational tools in computer science used to retrieve information stored in data structures like arrays, trees, or graphs. Whether you're working with sorted arrays, exploring hierarchical structures, or traversing complex graphs, the right search algorithm can dramatically improve efficiency and performance.
+
+Let’s dive into three essential search algorithms and their Go implementations:
+
+1. 🧭 Binary Search
+
+   Use Case: Efficiently search for a value in a sorted array.
+   Time Complexity: O(log n)
+   Space Complexity: O(1) (iterative), O(log n) (recursive)
+   
+   Concept:
+   Binary Search divides the array into halves, eliminating one half at each step, depending on whether the target is greater or smaller than the midpoint.
+   
+   ```go
+   func BinarySearch(arr []int, target int) int {
+       left, right := 0, len(arr)-1
+       for left <= right {
+           mid := left + (right-left)/2
+           if arr[mid] == target {
+               return mid
+           } else if arr[mid] < target {
+               left = mid + 1
+           } else {
+               right = mid - 1
+           }
+       }
+       return -1 // not found
+   }
+   ```
+
+1.  🌐 Breadth-First Search (BFS)
+
+   Use Case: Traverse or search tree/graph level by level. Ideal for finding the shortest path in unweighted graphs.
+   Time Complexity: O(V + E) (vertices + edges)
+   Space Complexity: O(V)
+   
+   Concept:
+   BFS uses a queue to explore all neighboring nodes before going deeper. It’s a level-order traversal for trees or graphs.
+   
+   ```go
+   func BFS(graph map[int][]int, start int) []int {
+       visited := make(map[int]bool)
+       queue := []int{start}
+       result := []int{}
+   
+       for len(queue) > 0 {
+           node := queue[0]
+           queue = queue[1:]
+   
+           if visited[node] {
+               continue
+           }
+           visited[node] = true
+           result = append(result, node)
+   
+           for _, neighbor := range graph[node] {
+               if !visited[neighbor] {
+                   queue = append(queue, neighbor)
+               }
+           }
+       }
+       return result
+   }
+   ```
+
+1. 🧱 Depth-First Search (DFS)
+
+   Use Case: Explore all paths or check for connectivity in graphs/trees. Great for scenarios like maze-solving, backtracking, and topological sorting.
+   Time Complexity: O(V + E)
+   Space Complexity: O(V) (recursive stack or visited map)
+   
+   Concept:
+   DFS explores as far as possible along each branch before backtracking. Implemented with recursion or a stack.
+   
+   ```go
+   func DFS(graph map[int][]int, start int, visited map[int]bool, result *[]int) {
+       if visited[start] {
+           return
+       }
+       visited[start] = true
+       *result = append(*result, start)
+   
+       for _, neighbor := range graph[start] {
+           if !visited[neighbor] {
+               DFS(graph, neighbor, visited, result)
+           }
+       }
+   }
+   ```
+   
+   To initiate `DFS`:
+   
+   ```go
+   graph := map[int][]int{
+       1: {2, 3},
+       2: {4},
+       3: {},
+       4: {},
+   }
+   visited := make(map[int]bool)
+   result := []int{}
+   DFS(graph, 1, visited, &result)
+   fmt.Println(result) // Output: [1 2 4 3] (DFS order may vary)
+   ```
+
+---
+
+## 🔍 Search Algorithms – Cheat Sheet
+
+| Algorithm | Use Case | Time Complexity | Space Complexity | Notes |
+|----------|----------|------------------|------------------|-------|
+| **Binary Search** | Search in sorted arrays | O(log n) | O(1) (iterative)<br>O(log n) (recursive) | Requires sorted input |
+| **Breadth-First Search (BFS)** | Shortest path in unweighted graphs | O(V + E) | O(V) | Level-order traversal, uses a queue |
+| **Depth-First Search (DFS)** | Exploring all paths, topological sort, cycle detection | O(V + E) | O(V) | Preorder traversal, uses recursion or stack |
 
 ---
 
