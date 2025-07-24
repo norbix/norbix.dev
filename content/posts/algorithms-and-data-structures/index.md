@@ -501,6 +501,157 @@ Let’s dive into three essential search algorithms and their Go implementations
 
 ---
 
+## 🌳 Tree Traversal Algorithms
+
+Traversing a tree means visiting every node in a specific order. Whether you're parsing expressions, printing a binary tree, or converting structures, understanding traversal strategies is fundamental in computer science.
+
+This guide covers the four most common tree traversal algorithms:
+
+   - Pre-Order Traversal
+
+   - In-Order Traversal
+
+   - Post-Order Traversal
+
+   - Level-Order Traversal
+
+1. 📐 Tree Node Definition in Go
+
+   Before diving into each traversal, here’s the standard binary tree structure we'll use:
+   
+   ```go
+   type TreeNode struct {
+       Val   int
+       Left  *TreeNode
+       Right *TreeNode
+   }
+   ```
+
+1. 🔁 Pre-Order Traversal (Root → Left → Right)
+
+   Use Case:
+   Useful for copying a tree or prefix expression evaluation.
+
+   Steps:
+
+   1. Visit root
+
+   1. Traverse left subtree
+
+   1. Traverse right subtree
+
+   ```go
+   func PreOrder(node *TreeNode, result *[]int) {
+       if node == nil {
+           return
+       }
+       *result = append(*result, node.Val)
+       PreOrder(node.Left, result)
+       PreOrder(node.Right, result)
+   }
+   ```
+
+1. 📏 2. In-Order Traversal (Left → Root → Right)
+
+   Use Case:
+   Yields nodes in ascending order for Binary Search Trees (BST).
+   
+   Steps:
+   
+    1. Traverse left subtree
+   
+    1. Visit root
+   
+    1. Traverse right subtree
+
+   ```go
+   func InOrder(node *TreeNode, result *[]int) {
+       if node == nil {
+           return
+       }
+       InOrder(node.Left, result)
+       *result = append(*result, node.Val)
+       InOrder(node.Right, result)
+   }
+   ```
+
+1. 🧮 3. Post-Order Traversal (Left → Right → Root)
+
+   Use Case:
+   Ideal for deleting or freeing nodes, postfix expression evaluation.
+   
+   Steps:
+   
+    1. Traverse left subtree
+   
+    1. Traverse right subtree
+   
+    1. Visit root
+   
+   ```go
+   func PostOrder(node *TreeNode, result *[]int) {
+       if node == nil {
+           return
+       }
+       PostOrder(node.Left, result)
+       PostOrder(node.Right, result)
+       *result = append(*result, node.Val)
+   }
+   ```
+
+
+1. 🏛️ 4. Level-Order Traversal (Breadth-First)
+
+   Use Case:
+   Used for printing trees by level or finding the shortest path in a tree.
+   
+   Steps:
+   
+    1. Traverse nodes level by level (left to right)
+   
+   ```go
+   func LevelOrder(root *TreeNode) []int {
+       if root == nil {
+           return nil
+       }
+   
+       queue := []*TreeNode{root}
+       var result []int
+   
+       for len(queue) > 0 {
+           node := queue[0]
+           queue = queue[1:]
+           result = append(result, node.Val)
+   
+           if node.Left != nil {
+               queue = append(queue, node.Left)
+           }
+           if node.Right != nil {
+               queue = append(queue, node.Right)
+           }
+       }
+       return result
+   }
+   ```
+
+---
+
+## 🌳 Tree Traversal Algorithms – Cheat Sheet
+
+ Traversal Type  | Visit Order                | Use Case                          | Time Complexity | Space Complexity |
+|-----------------|----------------------------|-----------------------------------|------------------|------------------|
+| **Pre-Order**   | Root → Left → Right        | Copy tree, prefix expressions     | O(n)            | O(h)             |
+| **In-Order**    | Left → Root → Right        | Sorted output in BSTs             | O(n)            | O(h)             |
+| **Post-Order**  | Left → Right → Root        | Delete tree, postfix expressions  | O(n)            | O(h)             |
+| **Level-Order** | Level by level (BFS)       | Print by level, shortest path     | O(n)            | O(w)             |
+
+**Legend**:
+- `n`: number of nodes
+- `h`: tree height (log n for balanced, n for skewed)
+- `w`: max width of the tree (can be up to n/2 in balanced trees)
+
+---
+
 ## 🧠 Tips for Learning DSA with Go
 
 - Practice problems: Use platforms like [LeetCode](https://leetcode.com/), [HackerRank](https://www.hackerrank.com/), or [Exercism](https://exercism.org/).
