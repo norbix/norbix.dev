@@ -1,5 +1,5 @@
 +++
-date = '2025-04-19T15:06:25+02:00'
+date = '2025-07-24T18:10:25+02:00'
 draft = false
 title = 'DSA - Data Structures and Algorithms'
 tags = ["go", "golang", "algorithms", "data-structures"]
@@ -203,6 +203,182 @@ Together, DSA provides the backbone for high-performance applications.
         dfs(n.Right)
     }
     ```
+
+---
+
+## 🔃 Sort Algorithms
+
+Sorting is a fundamental concept in computer science used in everything from searching to data normalization and ranking systems. Below are essential sorting algorithms every developer should know, implemented in Go.
+
+1. Merge Sort (🧬 Divide and Conquer – O(n log n))
+
+   Merge Sort recursively splits arrays into halves and merges them in a sorted manner.
+   
+   ```go
+   func mergeSort(arr []int) []int {
+       if len(arr) <= 1 {
+           return arr
+       }
+   
+       mid := len(arr) / 2
+       left := mergeSort(arr[:mid])
+       right := mergeSort(arr[mid:])
+       return merge(left, right)
+   }
+   
+   func merge(left, right []int) []int {
+       result := []int{}
+       i, j := 0, 0
+   
+       for i < len(left) && j < len(right) {
+           if left[i] < right[j] {
+               result = append(result, left[i])
+               i++
+           } else {
+               result = append(result, right[j])
+               j++
+           }
+       }
+       return append(result, append(left[i:], right[j:]...)...)
+   }
+   ```
+
+1. Quick Sort (⚡ Partition-based – Average: O(n log n), Worst: O(n²))
+
+   Quick Sort selects a pivot and partitions the array into smaller and larger elements.
+   
+   ```go
+   func quickSort(arr []int) {
+       if len(arr) < 2 {
+           return
+       }
+   
+       left, right := 0, len(arr)-1
+       pivot := rand.Int() % len(arr)
+       arr[pivot], arr[right] = arr[right], arr[pivot]
+   
+       for i := range arr {
+           if arr[i] < arr[right] {
+               arr[i], arr[left] = arr[left], arr[i]
+               left++
+           }
+       }
+   
+       arr[left], arr[right] = arr[right], arr[left]
+       quickSort(arr[:left])
+       quickSort(arr[left+1:])
+   }
+   ```
+
+1.  Bubble Sort (🫧 Simple but Inefficient – O(n²))
+
+   Repeatedly swaps adjacent elements if they are in the wrong order.
+   
+   ```go
+   func bubbleSort(arr []int) {
+       n := len(arr)
+       for i := 0; i < n-1; i++ {
+           for j := 0; j < n-i-1; j++ {
+               if arr[j] > arr[j+1] {
+                   arr[j], arr[j+1] = arr[j+1], arr[j]
+               }
+           }
+       }
+   }
+   ```
+
+1. Insertion Sort (🧩 Efficient for Small Datasets – O(n²))
+
+   Builds the sorted array one item at a time.
+   
+   ```go
+   func insertionSort(arr []int) {
+       for i := 1; i < len(arr); i++ {
+           key := arr[i]
+           j := i - 1
+           for j >= 0 && arr[j] > key {
+               arr[j+1] = arr[j]
+               j--
+           }
+           arr[j+1] = key
+       }
+   }
+   ```
+
+1.  Selection Sort (📌 Selects Minimum – O(n²))
+
+   Repeatedly finds the minimum element and places it at the beginning.
+   
+   ```go
+   func selectionSort(arr []int) {
+       n := len(arr)
+       for i := 0; i < n-1; i++ {
+           minIdx := i
+           for j := i + 1; j < n; j++ {
+               if arr[j] < arr[minIdx] {
+                   minIdx = j
+               }
+           }
+           arr[i], arr[minIdx] = arr[minIdx], arr[i]
+       }
+   }
+   ```
+
+1. Heap Sort (🏗️ Priority Queue-based – O(n log n))
+
+   Uses a binary heap structure to repeatedly extract the max element.
+   
+   ```go
+   func heapSort(arr []int) {
+       n := len(arr)
+   
+       // Build max heap
+       for i := n/2 - 1; i >= 0; i-- {
+           heapify(arr, n, i)
+       }
+   
+       for i := n - 1; i > 0; i-- {
+           arr[0], arr[i] = arr[i], arr[0]
+           heapify(arr, i, 0)
+       }
+   }
+   
+   func heapify(arr []int, n, i int) {
+       largest := i
+       left := 2*i + 1
+       right := 2*i + 2
+   
+       if left < n && arr[left] > arr[largest] {
+           largest = left
+       }
+       if right < n && arr[right] > arr[largest] {
+           largest = right
+       }
+   
+       if largest != i {
+           arr[i], arr[largest] = arr[largest], arr[i]
+           heapify(arr, n, largest)
+       }
+   }
+   ```
+
+Each of these sorting algorithms serves different use cases. While Go’s sort package provides optimized versions, understanding how these work internally is critical for building performance-conscious software.
+
+---
+
+## 📑 Sorting Algorithms Cheat Sheet
+
+| Algorithm       | Best Time    | Avg Time     | Worst Time   | Space     | Stable | In-Place | Notes                               |
+|----------------|--------------|--------------|--------------|-----------|--------|----------|-------------------------------------|
+| **Merge Sort**  | O(n log n)   | O(n log n)   | O(n log n)   | O(n)      | ✅ Yes | ❌ No     | Divide and conquer, great for linked lists |
+| **Quick Sort**  | O(n log n)   | O(n log n)   | O(n²)        | O(log n)  | ❌ No  | ✅ Yes    | Very fast in practice, not stable   |
+| **Bubble Sort** | O(n)         | O(n²)        | O(n²)        | O(1)      | ✅ Yes | ✅ Yes    | Educational use only, very slow     |
+| **Insertion Sort** | O(n)     | O(n²)        | O(n²)        | O(1)      | ✅ Yes | ✅ Yes    | Efficient for small or nearly sorted data |
+| **Selection Sort** | O(n²)    | O(n²)        | O(n²)        | O(1)      | ❌ No  | ✅ Yes    | Always O(n²), rarely used           |
+| **Heap Sort**   | O(n log n)   | O(n log n)   | O(n log n)   | O(1)      | ❌ No  | ✅ Yes    | Good for priority queues            |
+
+> ✅ **Stable**: Maintains the relative order of equal elements  
+> ✅ **In-Place**: Uses constant extra space (excluding recursion stack)
 
 ---
 
