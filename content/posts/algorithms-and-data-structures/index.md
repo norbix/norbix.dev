@@ -551,7 +551,7 @@ This guide covers the four most common tree traversal algorithms:
    }
    ```
 
-1. 📏 2. In-Order Traversal (Left → Root → Right)
+1. 📏 In-Order Traversal (Left → Root → Right)
 
    Use Case:
    Yields nodes in ascending order for Binary Search Trees (BST).
@@ -575,7 +575,7 @@ This guide covers the four most common tree traversal algorithms:
    }
    ```
 
-1. 🧮 3. Post-Order Traversal (Left → Right → Root)
+1. 🧮 Post-Order Traversal (Left → Right → Root)
 
    Use Case:
    Ideal for deleting or freeing nodes, postfix expression evaluation.
@@ -600,7 +600,7 @@ This guide covers the four most common tree traversal algorithms:
    ```
 
 
-1. 🏛️ 4. Level-Order Traversal (Breadth-First)
+1. 🏛️ Level-Order Traversal (Breadth-First)
 
    Use Case:
    Used for printing trees by level or finding the shortest path in a tree.
@@ -615,6 +615,92 @@ This guide covers the four most common tree traversal algorithms:
            return nil
        }
    
+       queue := []*TreeNode{root}
+       var result []int
+   
+       for len(queue) > 0 {
+           node := queue[0]
+           queue = queue[1:]
+           result = append(result, node.Val)
+   
+           if node.Left != nil {
+               queue = append(queue, node.Left)
+           }
+           if node.Right != nil {
+               queue = append(queue, node.Right)
+           }
+       }
+       return result
+   }
+   ```
+
+1. 🔧 Test Tree Example
+
+   ```go
+   // Construct the following tree:
+   //      1
+   //     / \
+   //    2   3
+   //   / \   \
+   //  4   5   6
+   
+   root := &TreeNode{Val: 1}
+   root.Left = &TreeNode{Val: 2}
+   root.Right = &TreeNode{Val: 3}
+   root.Left.Left = &TreeNode{Val: 4}
+   root.Left.Right = &TreeNode{Val: 5}
+   root.Right.Right = &TreeNode{Val: 6}
+   
+   var pre, in, post []int
+   PreOrder(root, &pre)
+   InOrder(root, &in)
+   PostOrder(root, &post)
+   level := LevelOrder(root)
+   
+   fmt.Println("Pre-Order:", pre)    // [1 2 4 5 3 6]
+   fmt.Println("In-Order:", in)      // [4 2 5 1 3 6]
+   fmt.Println("Post-Order:", post)  // [4 5 2 6 3 1]
+   fmt.Println("Level-Order:", level)// [1 2 3 4 5 6]
+   ```
+
+1. ⚙️ Quick Go Snippets
+
+   ```go
+   // Pre-Order Traversal
+   func PreOrder(node *TreeNode, result *[]int) {
+       if node == nil {
+           return
+       }
+       *result = append(*result, node.Val)
+       PreOrder(node.Left, result)
+       PreOrder(node.Right, result)
+   }
+   
+   // In-Order Traversal
+   func InOrder(node *TreeNode, result *[]int) {
+       if node == nil {
+           return
+       }
+       InOrder(node.Left, result)
+       *result = append(*result, node.Val)
+       InOrder(node.Right, result)
+   }
+   
+   // Post-Order Traversal
+   func PostOrder(node *TreeNode, result *[]int) {
+       if node == nil {
+           return
+       }
+       PostOrder(node.Left, result)
+       PostOrder(node.Right, result)
+       *result = append(*result, node.Val)
+   }
+   
+   // Level-Order Traversal (BFS)
+   func LevelOrder(root *TreeNode) []int {
+       if root == nil {
+           return nil
+       }
        queue := []*TreeNode{root}
        var result []int
    
