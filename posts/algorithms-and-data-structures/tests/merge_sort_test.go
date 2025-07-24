@@ -31,7 +31,21 @@ func merge(left, right []int) []int {
 			j++
 		}
 	}
-	return append(result, append(left[i:], right[j:]...)...)
+
+	// Equivalent short code
+	// return append(result, append(left[i:], right[j:]...)...)
+
+	for i < len(left) {
+		result = append(result, left[i])
+		i++
+	}
+
+	for j < len(right) {
+		result = append(result, right[j])
+		j++
+	}
+
+	return result
 }
 
 func Test_mergeSort(t *testing.T) {
