@@ -270,7 +270,7 @@ Sorting is a fundamental concept in computer science used in everything from sea
    }
    ```
 
-1.  Bubble Sort (🫧 Simple but Inefficient – O(n²))
+1. Bubble Sort (🫧 Simple but Inefficient – O(n²))
 
    Repeatedly swaps adjacent elements if they are in the wrong order.
    
@@ -305,7 +305,7 @@ Sorting is a fundamental concept in computer science used in everything from sea
    }
    ```
 
-1.  Selection Sort (📌 Selects Minimum – O(n²))
+1. Selection Sort (📌 Selects Minimum – O(n²))
 
    Repeatedly finds the minimum element and places it at the beginning.
    
