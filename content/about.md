@@ -79,6 +79,7 @@ Here's what my clients and collaborators say on Google:
 - Twitter: [@norbixjakubczak](https://x.com/norbixjakubczak)
 - Email: [norbert.jakubczak@gmail.com](mailto:norbert.jakubczak@gmail.com)
 - Mobile: [+48 885 259 225](tel:+48885259225)
+- LinkedIn: [@norbix-dev](https://www.linkedin.com/in/norbix-dev)
 
 ---
 
