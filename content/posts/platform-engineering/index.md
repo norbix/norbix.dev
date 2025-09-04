@@ -126,4 +126,4 @@ The future of software delivery is internal platforms that combine speed, reliab
 
 ---
 
-🚀 Follow me on [norbix.dev](https://norbix.dev) for more insights on Go, system design, and engineering wisdom.
+🚀 Follow me on [norbix.dev](https://norbix.dev) for more insights on Go, Python, AI, system design, and engineering wisdom.

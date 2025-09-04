@@ -127,4 +127,4 @@ Extreme Programming pushes your team to build better software faster, but not re
 
 ---
 
-🚀 Follow me on [norbix.dev](https://norbix.dev) for more insights on Go, system design, and engineering wisdom.
+🚀 Follow me on [norbix.dev](https://norbix.dev) for more insights on Go, Python, AI, system design, and engineering wisdom.

@@ -247,4 +247,4 @@ Go makes concurrency not only powerful—but approachable. You don't need thread
 
 ---
 
-🚀 Follow me on [norbix.dev](https://norbix.dev) for more insights on Go, system design, and engineering wisdom.
+🚀 Follow me on [norbix.dev](https://norbix.dev) for more insights on Go, Python, AI, system design, and engineering wisdom.
