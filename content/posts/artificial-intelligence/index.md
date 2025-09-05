@@ -198,6 +198,44 @@ AI drives billions in revenue across industries:
 
 ---
 
+## 🤖 AI Agents: From Tools to Teammates
+
+Traditional AI models (like ChatGPT or Copilot) generate outputs when prompted.  
+But **AI agents** go further: they *perceive, decide, and act* in pursuit of goals.
+
+### What Makes an AI Agent?
+- **Autonomy** – operates without step-by-step human instructions.
+- **Goal-oriented** – works toward objectives (e.g., “book me a trip to Berlin”).
+- **Adaptive** – learns from the environment or feedback loops.
+- **Interactive** – can collaborate with humans or other agents.
+
+### Examples in Action
+- **Self-driving cars** – sense the road, plan routes, and control the vehicle.
+- **AI trading bots** – analyze markets and execute trades in real time.
+- **Customer support bots** – combine LLMs with APIs to resolve tickets.
+- **Multi-agent systems** – groups of agents cooperating in logistics or simulations.
+
+### LLM-Powered Agents
+Modern frameworks (AutoGPT, LangChain agents, Microsoft Autogen) turn LLMs into **agents with tools**:
+- Search the web for live data.
+- Write and execute code.
+- Call APIs and databases.
+- Plan multi-step workflows.
+- Collaborate with other agents.
+
+👉 This transforms AI from a **chat assistant** into a **digital coworker** capable of handling end-to-end tasks.
+
+### Why It Matters
+AI agents represent the next leap in AI evolution:
+- **AI** – the vision of intelligence in machines.
+- **ML/DL** – the methods that make learning possible.
+- **AI Agents** – the embodiment of intelligence in *action*.
+
+We’re entering an era where AI won’t just answer — it will **decide, act, and coordinate**.  
+That shift will redefine software, business processes, and even how humans collaborate with machines.
+
+---
+
 ## 🔄 Wrapping Up
 
 - **AI** = vision (smart systems)
