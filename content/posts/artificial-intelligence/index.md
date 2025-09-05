@@ -215,6 +215,8 @@ But **AI agents** go further: they *perceive, decide, and act* in pursuit of goa
 - **Customer support bots** – combine LLMs with APIs to resolve tickets.
 - **Multi-agent systems** – groups of agents cooperating in logistics or simulations.
 
+💡 **Case Study:** [ClickHouse ran an experiment](https://clickhouse.com/blog/llm-observability-challenge) to see if large language models could act as on-call SREs, performing root cause analysis (RCA) during incidents. The results showed that while LLMs are *helpful assistants* in summarizing logs and suggesting hypotheses, they still fall short of replacing human SREs. This highlights a key theme: today’s AI agents **augment human expertise rather than replace it** in high-stakes domains.
+
 ### LLM-Powered Agents
 Modern frameworks (AutoGPT, LangChain agents, Microsoft Autogen) turn LLMs into **agents with tools**:
 - Search the web for live data.
