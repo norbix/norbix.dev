@@ -1,0 +1,901 @@
+<!doctype html><html lang=en><head><meta charset=UTF-8><meta name=viewport content="width=device-width,initial-scale=1"><script>(function(){const e=localStorage.getItem("theme"),t=window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches;e==="dark"||!e&&t?document.documentElement.classList.add("dark"):document.documentElement.classList.remove("dark"),window.setTheme=function(e){localStorage.setItem("theme",e),document.documentElement.classList.toggle("dark",e==="dark")}})()</script><title>Architectural Patterns in Go: MVC, Hexagonal, CQRS, and Microservices | norbix.dev
+</title><meta charset=utf-8><meta http-equiv=X-UA-Compatible content="IE=edge"><meta name=viewport content="width=device-width,initial-scale=1,shrink-to-fit=no"><meta name=robots content="index, follow"><title>Architectural Patterns in Go: MVC, Hexagonal, CQRS, and Microservices | norbix.dev - The log of my journey through code & software systems architecture</title>
+<meta name=keywords content="go,golang,architecture,mvc,hexagonal,cqrs,microservices"><meta name=description content="Understand the difference between design patterns and architectural patterns. Explore how MVC, Hexagonal, CQRS, and Microservices can be applied in Go projects with practical insights and examples."><meta name=author content><link rel=canonical href=https://norbix.dev/posts/architectural-patterns/><link crossorigin=anonymous href=/assets/css/stylesheet.fc220c15db4aef0318bbf30adc45d33d4d7c88deff3238b23eb255afdc472ca6.css integrity="sha256-/CIMFdtK7wMYu/MK3EXTPU18iN7/MjiyPrJVr9xHLKY=" rel="preload stylesheet" as=style><link rel=icon href=https://norbix.dev/favicon.ico><link rel=icon type=image/png sizes=16x16 href=https://norbix.dev/favicon-16x16.png><link rel=icon type=image/png sizes=32x32 href=https://norbix.dev/favicon-32x32.png><link rel=apple-touch-icon href=https://norbix.dev/apple-touch-icon.png><link rel=mask-icon href=https://norbix.dev/safari-pinned-tab.svg><meta name=theme-color content="#2e2e33"><meta name=msapplication-TileColor content="#2e2e33"><link rel=alternate hreflang=en href=https://norbix.dev/posts/architectural-patterns/><noscript><style>#theme-toggle,.top-link{display:none}</style></noscript><link rel=canonical href=https://norbix.dev/posts/architectural-patterns/><meta property="og:title" content="Architectural Patterns in Go: MVC, Hexagonal, CQRS, and Microservices"><meta property="og:url" content="https://norbix.dev/posts/architectural-patterns/"><meta property="og:image" content="https://norbix.dev/architecture-banner.jpg"><meta property="og:type" content="article"><meta name=twitter:card content="summary_large_image"><meta name=twitter:title content="Architectural Patterns in Go: MVC, Hexagonal, CQRS, and Microservices"><meta name=twitter:image content="https://norbix.dev/architecture-banner.jpg"><script data-goatcounter=https://norbix.goatcounter.com/count async src=//gc.zgo.at/count.js></script><link rel=alternate type=application/rss+xml title="RSS Feed for norbix.dev" href=/index.xml><meta property="og:title" content="Architectural Patterns in Go: MVC, Hexagonal, CQRS, and Microservices"><meta property="og:description" content="Understand the difference between design patterns and architectural patterns. Explore how MVC, Hexagonal, CQRS, and Microservices can be applied in Go projects with practical insights and examples."><meta property="og:type" content="article"><meta property="og:url" content="https://norbix.dev/posts/architectural-patterns/"><meta property="article:section" content="posts"><meta property="article:published_time" content="2025-09-06T12:00:00+02:00"><meta property="article:modified_time" content="2025-09-06T12:00:00+02:00"><meta name=twitter:card content="summary"><meta name=twitter:title content="Architectural Patterns in Go: MVC, Hexagonal, CQRS, and Microservices"><meta name=twitter:description content="Understand the difference between design patterns and architectural patterns. Explore how MVC, Hexagonal, CQRS, and Microservices can be applied in Go projects with practical insights and examples."><script type=application/ld+json>{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Posts","item":"https://norbix.dev/posts/"},{"@type":"ListItem","position":2,"name":"Architectural Patterns in Go: MVC, Hexagonal, CQRS, and Microservices","item":"https://norbix.dev/posts/architectural-patterns/"}]}</script><script type=application/ld+json>{"@context":"https://schema.org","@type":"BlogPosting","headline":"Architectural Patterns in Go: MVC, Hexagonal, CQRS, and Microservices","name":"Architectural Patterns in Go: MVC, Hexagonal, CQRS, and Microservices","description":"Understand the difference between design patterns and architectural patterns. Explore how MVC, Hexagonal, CQRS, and Microservices can be applied in Go projects with practical insights and examples.","keywords":["go","golang","architecture","mvc","hexagonal","cqrs","microservices"],"articleBody":"Design patterns (like Singleton, Factory, Strategy) are reusable solutions to small-scale design problems.\nArchitectural patterns, on the other hand, define the big picture of how systems are structured, how components interact, and how responsibilities are separated.\nIn this article, we’ll explore four influential architectural patterns — MVC, Hexagonal, CQRS, and Microservices — and see how they apply to Go development.\n🖼 MVC (Model–View–Controller) The MVC pattern splits an application into three roles:\nModel → data and business logic View → presentation layer (UI, HTML templates, JSON responses) Controller → handles input and orchestrates between Model and View Goal: keep responsibilities crisp. Model (Domain): business entities + rules (no framework details).\nView: JSON/HTML returned to the client.\nController: HTTP entrypoint; validates input, calls services, shapes output.\nDTO (Data Transfer Object): API-facing structs (request/response). Shields the domain from external shape changes.\nDAO/Repository: persistence port; hides database from the domain. (DAO is essentially a repository here.)\nWhy DTO + DAO with MVC? DTOs prevent leaking internal domain fields (e.g., hashed passwords, internal IDs) and stabilize your public API.\nDAO/Repository makes business logic testable (swap Postgres for in-memory in tests) and keeps SQL out of controllers.\nSuggested backend layout (Go) Domain has zero dependency on infra (DB/HTTP).\nServices orchestrate use cases.\nControllers adapt HTTP ↔️ services and map DTO ↔️ Model.\n1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 . ├─ cmd/ │ └─ server/ │ └─ main.go # wire HTTP router, DI, config ├─ internal/ │ ├─ app/ │ │ ├─ http/ │ │ │ └─ controllers/ # controllers (handlers) — “C” │ │ └─ services/ # application/services layer (use cases) │ ├─ domain/ │ │ └─ user/ # domain models \u0026 interfaces — “M” │ │ ├─ model.go │ │ ├─ repository.go # DAO (port) │ │ └─ errors.go │ ├─ infra/ │ │ ├─ db/ # db bootstrapping (sqlx/gorm/pgx) │ │ └─ repository/ # DAO impls (adapters) — Postgres/MySQL │ │ └─ user_pg.go │ └─ transport/ │ └─ http/ │ ├─ router.go # gin/chi mux + routes │ └─ dto/ # DTOs — request/response │ └─ user.go ├─ pkg/ │ ├─ logger/ │ └─ validator/ └─ go.mod MVC Diagram. flowchart LR subgraph Client[\"Client (Frontend/UI)\"] A[\"HTTP Request\\nJSON Payload\"] end subgraph Transport[\"Transport Layer\"] B[\"Controller\\nGin/Chi Handler\"] C[\"DTO\\nRequest/Response\"] end subgraph App[\"Application Layer\"] D[\"Service\\nBusiness Use Case\"] end subgraph Domain[\"Domain Layer\"] E[\"Domain Model\\nEntities \u0026 Rules\"] F[\"Repository Interface\\n(DAO Port)\"] end subgraph Infra[\"Infrastructure Layer\"] G[\"Repository Impl\\nPostgres Adapter\"] H[(\"Database\\nPostgres\")] end A --\u003e|HTTP JSON| B B --\u003e|Map to DTO| C C --\u003e|Pass Valid Data| D D --\u003e|Use Entities| E D --\u003e|Call Port| F F --\u003e|Implemented by| G G --\u003e|SQL Queries| H H --\u003e|Result Rows| G G --\u003e|Return Entities| F F --\u003e|Back to| D D --\u003e|Domain → DTO| C C --\u003e|JSON Response| B B --\u003e|HTTP Response| A 🧩 Domain Model (M) File: internal/domain/user/model.go\n1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 package user import \"time\" type ID string type User struct { ID ID Name string Email string Active bool CreatedAt time.Time } // Domain invariants/constructors keep the model valid. func New(name, email string) (User, error) { if name == \"\" { return User{}, ErrInvalidName } if !isValidEmail(email) { return User{}, ErrInvalidEmail } return User{ ID: ID(NewID()), Name: name, Email: email, Active: true, // CreatedAt set in service or repo }, nil } File: internal/domain/user/repository.go (DAO Port)\n1 2 3 4 5 6 7 8 9 10 11 12 package user import \"context\" type Repository interface { Create(ctx context.Context, u User) error ByID(ctx context.Context, id ID) (User, error) ByEmail(ctx context.Context, email string) (User, error) List(ctx context.Context, limit, offset int) ([]User, error) Update(ctx context.Context, u User) error Delete(ctx context.Context, id ID) error } 🧰 DAO Implementation (Adapter) File: internal/infra/repository/user_pg.go\n1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 package repository import ( \"context\" \"database/sql\" \"errors\" \"time\" domain \"yourapp/internal/domain/user\" ) type UserPG struct { db *sql.DB } func NewUserPG(db *sql.DB) *UserPG { return \u0026UserPG{db: db} } func (r *UserPG) Create(ctx context.Context, u domain.User) error { _, err := r.db.ExecContext(ctx, `INSERT INTO users (id, name, email, active, created_at) VALUES ($1,$2,$3,$4,$5)`, u.ID, u.Name, u.Email, u.Active, time.Now().UTC(), ) return err } func (r *UserPG) ByID(ctx context.Context, id domain.ID) (domain.User, error) { row := r.db.QueryRowContext(ctx, `SELECT id, name, email, active, created_at FROM users WHERE id=$1`, id) var u domain.User if err := row.Scan(\u0026u.ID, \u0026u.Name, \u0026u.Email, \u0026u.Active, \u0026u.CreatedAt); err != nil { if errors.Is(err, sql.ErrNoRows) { return domain.User{}, domain.ErrNotFound } return domain.User{}, err } return u, nil } // ... ByEmail, List, Update, Delete similarly 🧠 Application Service (Use Case Layer) Services speak domain and depend on ports (interfaces).\nThey’re trivial to unit-test with a fake repository.\nFile: internal/app/services/user_service.go\n1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 package services import ( \"context\" \"time\" domain \"yourapp/internal/domain/user\" ) type UserService struct { repo domain.Repository } func NewUserService(repo domain.Repository) *UserService { return \u0026UserService{repo: repo} } func (s *UserService) Register(ctx context.Context, name, email string) (domain.User, error) { u, err := domain.New(name, email) if err != nil { return domain.User{}, err } // set creation time here if not in repo u.CreatedAt = time.Now().UTC() if err := s.repo.Create(ctx, u); err != nil { return domain.User{}, err } return u, nil } func (s *UserService) Get(ctx context.Context, id domain.ID) (domain.User, error) { return s.repo.ByID(ctx, id) } 📦 DTOs (Requests/Responses) Keep validation on DTOs (with validator).\nMapping functions isolate domain ↔️ transport conversion.\nFile: internal/transport/http/dto/user.go\n1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 package dto import ( domain \"yourapp/internal/domain/user\" ) type CreateUserRequest struct { Name string `json:\"name\" validate:\"required,min=2\"` Email string `json:\"email\" validate:\"required,email\"` } type UserResponse struct { ID string `json:\"id\"` Name string `json:\"name\"` Email string `json:\"email\"` Active bool `json:\"active\"` } func ToUserResponse(u domain.User) UserResponse { return UserResponse{ ID: string(u.ID), Name: u.Name, Email: u.Email, Active: u.Active, } } 🎮 Controller (C) — HTTP Handlers File: internal/app/http/controllers/user_controller.go\n1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 package controllers import ( \"net/http\" \"github.com/gin-gonic/gin\" \"yourapp/internal/app/services\" \"yourapp/internal/transport/http/dto\" domain \"yourapp/internal/domain/user\" ) type UserController struct { svc *services.UserService } func NewUserController(svc *services.UserService) *UserController { return \u0026UserController{svc: svc} } func (uc *UserController) Register(c *gin.Context) { var req dto.CreateUserRequest if err := c.ShouldBindJSON(\u0026req); err != nil { c.JSON(http.StatusBadRequest, gin.H{\"error\": \"invalid_payload\"}) return } // optional: validate req with pkg/validator user, err := uc.svc.Register(c.Request.Context(), req.Name, req.Email) if err != nil { switch err { case domain.ErrInvalidEmail, domain.ErrInvalidName: c.JSON(http.StatusUnprocessableEntity, gin.H{\"error\": err.Error()}) default: c.JSON(http.StatusInternalServerError, gin.H{\"error\": \"internal_error\"}) } return } c.JSON(http.StatusCreated, dto.ToUserResponse(user)) } func (uc *UserController) Get(c *gin.Context) { id := domain.ID(c.Param(\"id\")) user, err := uc.svc.Get(c.Request.Context(), id) if err != nil { if err == domain.ErrNotFound { c.JSON(http.StatusNotFound, gin.H{\"error\": \"not_found\"}) return } c.JSON(http.StatusInternalServerError, gin.H{\"error\": \"internal_error\"}) return } c.JSON(http.StatusOK, dto.ToUserResponse(user)) } File: internal/transport/http/router.go\n1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 package http import ( \"github.com/gin-gonic/gin\" \"yourapp/internal/app/http/controllers\" ) func NewRouter(userCtrl *controllers.UserController) *gin.Engine { r := gin.New() r.Use(gin.Recovery()) v1 := r.Group(\"/v1\") { v1.POST(\"/users\", userCtrl.Register) v1.GET(\"/users/:id\", userCtrl.Get) } return r } 🚀 Wiring (main) File: cmd/server/main.go\n1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 package main import ( \"database/sql\" \"log\" \"net/http\" _ \"github.com/lib/pq\" \"yourapp/internal/app/http/controllers\" \"yourapp/internal/app/services\" \"yourapp/internal/infra/repository\" transport \"yourapp/internal/transport/http\" ) func main() { db, err := sql.Open(\"postgres\", \"postgres://user:pass@localhost:5432/app?sslmode=disable\") if err != nil { log.Fatal(err) } userRepo := repository.NewUserPG(db) // DAO impl userSvc := services.NewUserService(userRepo) // Service userCtrl := controllers.NewUserController(userSvc) router := transport.NewRouter(userCtrl) log.Println(\"listening on :8080\") log.Fatal(http.ListenAndServe(\":8080\", router)) } ✅ Checklist \u0026 Tips Controller: tiny; only HTTP + mapping + error codes.\nDTO: versioned (e.g., /v1), validated, stable to external changes.\nService: business orchestration; no HTTP/SQL.\nDomain: invariants, pure logic; no frameworks.\nDAO/Repository: concrete DB code; easily mocked.\nTesting: unit test services with in-memory repo; integration test DAO with a test DB.\nErrors: map domain errors to HTTP status codes in controllers.\nVersioning: keep DTOs under transport/http/dto/v1 if you plan multiple API versions.\n✅ When to use: Web applications with clear input/output flows\nGreat for monolithic Go services\n⚠️ Pitfall: Controllers can easily become “fat” if not managed well.\n🛡 Hexagonal Architecture (Ports \u0026 Adapters) Idea: keep your domain core pure and push frameworks, DBs, and transports to the edges.\nDomain (core): entities, value objects, domain services, errors.\nPorts: interfaces the core depends on (e.g., UserRepository, Mailer).\nAdapters: implementations for ports (Postgres, Redis, SMTP, HTTP clients).\nDrivers: incoming adapters (HTTP/gRPC/CLI/Jobs) that call the core.\nSuggested layout (Go)\n1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 . ├─ cmd/api/ # app entrypoint(s) │ └─ main.go ├─ internal/ │ ├─ domain/ # PURE core (no imports of gin/sql/http) │ │ └─ user/ │ │ ├─ entity.go # entities/value objects │ │ ├─ service.go # domain services (pure) │ │ ├─ ports.go # ports (interfaces) e.g., UserRepo, Mailer │ │ └─ errors.go │ ├─ app/ # use-cases/application services │ │ └─ user/ │ │ └─ usecase.go # RegisterUser, ActivateUser, etc. │ ├─ adapters/ │ │ ├─ in/ # driving adapters │ │ │ └─ http/ # HTTP handlers (gin/chi) │ │ │ ├─ router.go │ │ │ └─ user_controller.go │ │ └─ out/ # driven adapters │ │ ├─ postgres/ │ │ │ └─ user_repo.go # implements domain.UserRepository │ │ └─ mail/ │ │ └─ smtp_mailer.go # implements domain.Mailer │ └─ platform/ # cross-cutting infra (db, config, log) │ ├─ db.go │ ├─ config.go │ └─ logger.go └─ go.mod Minimal Go example File: internal/domain/user/ports.go\n1 2 3 4 5 6 7 8 9 10 11 12 package user import \"context\" type Repository interface { Save(ctx context.Context, u User) error ByID(ctx context.Context, id ID) (User, error) } type Mailer interface { SendWelcome(ctx context.Context, email string) error } File: internal/app/user/usecase.go\n1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 package userapp import ( \"context\" domain \"yourapp/internal/domain/user\" ) type RegisterUser struct { Repo domain.Repository Mailer domain.Mailer } func (uc RegisterUser) Do(ctx context.Context, name, email string) (domain.User, error) { u, err := domain.New(name, email) if err != nil { return domain.User{}, err } if err := uc.Repo.Save(ctx, u); err != nil { return domain.User{}, err } _ = uc.Mailer.SendWelcome(ctx, u.Email) // best-effort, log on failure return u, nil } Hexagonal Diagram flowchart LR subgraph Drivers[\"Drivers (Incoming Adapters)\"] A[\"HTTP\\n(gin/chi)\"] B[\"CLI\\nCron/Jobs\"] C[\"gRPC\\nGateway\"] end subgraph Core[\"Core (Domain + Application)\"] D[\"Application Services\\nUse Cases\"] E[\"Domain Entities\\nValue Objects\\nDomain Services\"] F[\"Ports\\n(Repo, Mailer, Cache)\"] end subgraph Adapters[\"Driven Adapters (Infra)\"] G[\"Postgres Repo\\nimplements Repo\"] H[\"SMTP Mailer\\nimplements Mailer\"] I[\"Redis Cache\\nimplements Cache\"] end A --\u003e D B --\u003e D C --\u003e D D --\u003e E D --\u003e F F --\u003e G F --\u003e H F --\u003e I ✅ Checklist \u0026 Tips Keep internal/domain import-clean (no framework/DB imports).\nDefine ports in the domain; implement them in adapters.\nTests: unit-test use-cases with fakes for ports; integration-test adapters.\n✅ When to use: Systems with high read/write load\nEvent-sourced systems (CQRS often pairs with Event Sourcing)\n⚠️ Pitfall: Adds complexity — not always worth it for simple apps.\n🔀 CQRS (Command Query Responsibility Segregation) CQRS separates read and write responsibilities into different models:\nCommands → update state (writes)\nQueries → read state (reads)\nThis avoids having one bloated model handling both responsibilities.\n📍 Go Example:\n1 2 3 4 5 6 7 8 9 // Command Handler func CreateUser(repo UserRepository, user User) error { return repo.Save(user) } // Query Handler func GetUser(repo UserRepository, id int) (User, error) { return repo.Find(id) } CQRS Diagram flowchart LR subgraph API[\"API Layer\"] A[\"HTTP Endpoints\\n/commands\\n/queries\"] end subgraph WriteSide[\"Write Side\"] B[\"Command Handler\\n(Validate + Execute)\"] C[\"Write Model\\n(Domain + Repo)\"] D[(\"Write DB\")] end subgraph ReadSide[\"Read Side\"] E[\"Projector\\n(Update Projections)\"] F[\"Read Model\\n(DTO Repository)\"] G[(\"Read DB\")] H[\"Query Handler\\n(Reads Only)\"] end subgraph Bus[\"Event Bus (Optional)\"] X[\"Domain Events\"] end %% Command path A --\u003e|POST /commands| B B --\u003e C C --\u003e D C --\u003e|Emit Events| X %% Projection path X --\u003e E E --\u003e F F --\u003e G %% Query path A --\u003e|GET /queries| H H --\u003e F %% Notes classDef dim fill:#f7f7f7,stroke:#bbb,color:#333 class API,WriteSide,ReadSide,Bus dim ✅ When to use:\nSystems with high read/write load\nEvent-sourced systems (CQRS often pairs with Event Sourcing)\n⚠️ Pitfall: Adds complexity — not always worth it for simple apps.\n☁️ Microservices A Microservices architecture structures applications as a collection of small, independent services:\nEach service owns its data and logic\nServices communicate via APIs (HTTP, gRPC, messaging)\nEach can be deployed and scaled independently\nIdea: split a system into small, independently deployable services that each own their data and domain.\nServices communicate via synchronous (HTTP/gRPC) or asynchronous (Kafka/NATS) channels.\nEach service has its own database (no shared schema).\nRequires solid platform engineering: CI/CD, observability, API governance, SLOs.\nSuggested repo layout (mono-repo)\n1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 . ├─ services/ │ ├─ usersvc/ │ │ ├─ cmd/usersvc/main.go │ │ ├─ internal/... │ │ └─ api/openapi.yaml │ ├─ ordersvc/ │ │ ├─ cmd/ordersvc/main.go │ │ ├─ internal/... │ │ └─ api/openapi.yaml │ └─ paymentsvc/ │ ├─ cmd/paymentsvc/main.go │ ├─ internal/... │ └─ api/openapi.yaml ├─ pkg/ # shared libs (careful: avoid domain leakage) │ ├─ logger/ │ ├─ tracing/ │ └─ httpx/ ├─ deploy/ │ ├─ k8s/ # Helm/Manifests │ └─ infra/ # Terraform (DBs, queues, buckets) └─ Makefile / Taskfile.yaml Minimal service skeleton (Gin) File: services/usersvc/cmd/usersvc/main.go\n1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 package main import ( \"log\" \"net/http\" \"github.com/gin-gonic/gin\" ) func main() { r := gin.New() r.Use(gin.Recovery()) r.GET(\"/v1/users/:id\", func(c *gin.Context) { c.JSON(http.StatusOK, gin.H{\"id\": c.Param(\"id\"), \"name\": \"Alice\"}) }) log.Println(\"usersvc listening on :8081\") log.Fatal(http.ListenAndServe(\":8081\", r)) } Microservice Diagram flowchart LR subgraph Clients[\"Clients\"] A[\"Web\\nMobile\"] end subgraph Edge[\"API Gateway\\nIngress\"] B[\"Routing\\nAuth\\nRate Limit\"] end subgraph Services[\"Microservices\"] U[\"User Service\\nDB owned by service\"] O[\"Order Service\\nDB owned by service\"] P[\"Payment Service\\nDB owned by service\"] end subgraph Async[\"Async Messaging\"] K[\"Kafka/NATS\\nTopics\"] end A --\u003e B B --\u003e U B --\u003e O B --\u003e P O \u003c--\u003e|Events| K P \u003c--\u003e|Events| K U \u003c--\u003e|Events| K ✅ Checklist \u0026 Tips\nStart with modular monolith → extract services when boundaries stabilize.\nEach service: own DB schema, own CI, own versioning.\nInvest early in observability (traces, logs, metrics) and API contracts.\n✅ When to use:\nLarge, complex systems needing scalability\nTeams working on independent modules\n⚠️ Pitfall: Operational overhead (DevOps, CI/CD, observability, networking).\n🔚 Wrap-up pointers Hexagonal: best baseline for testability and longevity; add adapters as you go.\nCQRS: apply where read/write divergence brings value; don’t over-split prematurely.\nMicroservices: only when team size, domain boundaries, and scaling needs justify the operational cost.\n🧠 Summary MVC → Clear separation of concerns in monolithic apps\nHexagonal → Isolate core logic, improve testability\nCQRS → Split reads and writes for clarity and scalability\nMicroservices → Independent, scalable services for large systems\n👉 Think of it this way: Design patterns = small tools (Singleton, Observer, Strategy)\nArchitectural patterns = the blueprint of the entire building\nBoth are essential, but at different levels of abstraction.\n🚀 Follow me on norbix.dev for more insights on Go, Python, AI, system design, and engineering wisdom.\n","wordCount":"2648","inLanguage":"en","datePublished":"2025-09-06T12:00:00+02:00","dateModified":"2025-09-06T12:00:00+02:00","mainEntityOfPage":{"@type":"WebPage","@id":"https://norbix.dev/posts/architectural-patterns/"},"publisher":{"@type":"Organization","name":"norbix.dev - The log of my journey through code \u0026 software systems architecture","logo":{"@type":"ImageObject","url":"https://norbix.dev/favicon.ico"}}}</script></head><body><script>localStorage.getItem("pref-theme")==="light"&&document.body.classList.remove("dark")</script><header class=header><nav class=nav><div class=logo><a href=https://norbix.dev/ accesskey=h title="norbix.dev - The log of my journey through code & software systems architecture (Alt + H)">norbix.dev - The log of my journey through code & software systems architecture</a><div class=logo-switches><button id=theme-toggle accesskey=t title="(Alt + T)"><svg id="moon" width="24" height="18" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg><svg id="sun" width="24" height="18" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg></button></div></div><ul id=menu><li><a href=https://norbix.dev/ title=Home><span>Home</span></a></li><li><a href=https://norbix.dev/posts/ title=Posts><span>Posts</span></a></li><li><a href=https://norbix.dev/tags/ title=Tags><span>Tags</span></a></li><li><a href=https://norbix.dev/about/ title=About><span>About</span></a></li><li><a href=https://norbix.dev/index.xml title="📡 RSS"><span>📡 RSS</span></a></li></ul></nav></header><main><main id=main><article class=post-single><header class=post-header><h1 class=post-title>Architectural Patterns in Go: MVC, Hexagonal, CQRS, and Microservices</h1><span title='2025-09-06 12:00:00 +0200 +0200'>September 6, 2025</span></header><div class=post-content><nav class=table-of-contents><nav id=TableOfContents><ul><li><a href=#-mvc-modelviewcontroller>🖼 MVC (Model–View–Controller)</a><ul><li><a href=#goal-keep-responsibilities-crisp>Goal: keep responsibilities crisp.</a></li><li><a href=#why-dto--dao-with-mvc>Why DTO + DAO with MVC?</a></li><li><a href=#suggested-backend-layout-go>Suggested backend layout (Go)</a></li><li><a href=#mvc-diagram>MVC Diagram.</a></li><li><a href=#-domain-model-m>🧩 Domain Model (M)</a></li><li><a href=#-dao-implementation-adapter>🧰 DAO Implementation (Adapter)</a></li><li><a href=#-application-service-use-case-layer>🧠 Application Service (Use Case Layer)</a></li><li><a href=#-dtos-requestsresponses>📦 DTOs (Requests/Responses)</a></li><li><a href=#-controller-c--http-handlers>🎮 Controller (C) — HTTP Handlers</a></li><li><a href=#-wiring-main>🚀 Wiring (main)</a></li><li><a href=#-checklist--tips>✅ Checklist & Tips</a></li><li><a href=#-when-to-use>✅ When to use:</a></li></ul></li><li><a href=#-hexagonal-architecture-ports--adapters>🛡 Hexagonal Architecture (Ports & Adapters)</a><ul><li><a href=#minimal-go-example>Minimal Go example</a></li><li><a href=#hexagonal-diagram>Hexagonal Diagram</a></li><li><a href=#-checklist--tips-1>✅ Checklist & Tips</a></li><li><a href=#-when-to-use-1>✅ When to use:</a></li></ul></li><li><a href=#-cqrs-command-query-responsibility-segregation>🔀 CQRS (Command Query Responsibility Segregation)</a><ul><li><a href=#cqrs-diagram>CQRS Diagram</a></li></ul></li><li><a href=#-microservices>☁️ Microservices</a><ul><li><a href=#minimal-service-skeleton-gin>Minimal service skeleton (Gin)</a></li><li><a href=#microservice-diagram>Microservice Diagram</a></li></ul></li><li><a href=#-wrap-up-pointers>🔚 Wrap-up pointers</a></li><li><a href=#-summary>🧠 Summary</a><ul><li><a href=#-think-of-it-this-way>👉 Think of it this way:</a></li></ul></li></ul></nav></nav><p><strong>Design patterns</strong> (like Singleton, Factory, Strategy) are reusable solutions to small-scale design problems.</p><p><strong>Architectural patterns</strong>, on the other hand, define the <strong>big picture</strong> of how systems are structured, how components interact, and how responsibilities are separated.</p><p>In this article, we’ll explore four influential architectural patterns — <strong>MVC</strong>, <strong>Hexagonal</strong>, <strong>CQRS</strong>, and <strong>Microservices</strong> — and see how they apply to Go development.</p><div style=display:flex;justify-content:center><img src=banner.jpg alt="Architectural Patterns in Go" style=max-width:100%;height:auto></div><hr><h2 id=-mvc-modelviewcontroller>🖼 MVC (Model–View–Controller)</h2><p>The <strong>MVC pattern</strong> splits an application into three roles:</p><ul><li><strong>Model</strong> → data and business logic</li><li><strong>View</strong> → presentation layer (UI, HTML templates, JSON responses)</li><li><strong>Controller</strong> → handles input and orchestrates between Model and View</li></ul><h3 id=goal-keep-responsibilities-crisp>Goal: keep responsibilities crisp.</h3><ul><li><p>Model (Domain): business entities + rules (no framework details).</p></li><li><p>View: JSON/HTML returned to the client.</p></li><li><p>Controller: HTTP entrypoint; validates input, calls services, shapes output.</p></li><li><p>DTO (Data Transfer Object): API-facing structs (request/response). Shields the domain from external shape changes.</p></li><li><p>DAO/Repository: persistence port; hides database from the domain. (DAO is essentially a repository here.)</p></li></ul><h3 id=why-dto--dao-with-mvc>Why DTO + DAO with MVC?</h3><ul><li><p>DTOs prevent leaking internal domain fields (e.g., hashed passwords, internal IDs) and stabilize your public API.</p></li><li><p>DAO/Repository makes business logic testable (swap Postgres for in-memory in tests) and keeps SQL out of controllers.</p></li></ul><h3 id=suggested-backend-layout-go>Suggested backend layout (Go)</h3><ul><li><p>Domain has zero dependency on infra (DB/HTTP).</p></li><li><p>Services orchestrate use cases.</p></li><li><p>Controllers adapt HTTP ↔️ services and map DTO ↔️ Model.</p></li></ul><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-text data-lang=text><span class=line><span class=cl>.
+</span></span><span class=line><span class=cl>├─ cmd/
+</span></span><span class=line><span class=cl>│  └─ server/
+</span></span><span class=line><span class=cl>│     └─ main.go                  # wire HTTP router, DI, config
+</span></span><span class=line><span class=cl>├─ internal/
+</span></span><span class=line><span class=cl>│  ├─ app/
+</span></span><span class=line><span class=cl>│  │  ├─ http/
+</span></span><span class=line><span class=cl>│  │  │  └─ controllers/          # controllers (handlers) — “C”
+</span></span><span class=line><span class=cl>│  │  └─ services/                # application/services layer (use cases)
+</span></span><span class=line><span class=cl>│  ├─ domain/
+</span></span><span class=line><span class=cl>│  │  └─ user/                    # domain models &amp; interfaces — “M”
+</span></span><span class=line><span class=cl>│  │     ├─ model.go
+</span></span><span class=line><span class=cl>│  │     ├─ repository.go         # DAO (port)
+</span></span><span class=line><span class=cl>│  │     └─ errors.go
+</span></span><span class=line><span class=cl>│  ├─ infra/
+</span></span><span class=line><span class=cl>│  │  ├─ db/                      # db bootstrapping (sqlx/gorm/pgx)
+</span></span><span class=line><span class=cl>│  │  └─ repository/              # DAO impls (adapters) — Postgres/MySQL
+</span></span><span class=line><span class=cl>│  │     └─ user_pg.go
+</span></span><span class=line><span class=cl>│  └─ transport/
+</span></span><span class=line><span class=cl>│     └─ http/
+</span></span><span class=line><span class=cl>│        ├─ router.go             # gin/chi mux + routes
+</span></span><span class=line><span class=cl>│        └─ dto/                  # DTOs — request/response
+</span></span><span class=line><span class=cl>│           └─ user.go
+</span></span><span class=line><span class=cl>├─ pkg/
+</span></span><span class=line><span class=cl>│  ├─ logger/
+</span></span><span class=line><span class=cl>│  └─ validator/
+</span></span><span class=line><span class=cl>└─ go.mod
+</span></span></code></pre></td></tr></table></div></div><h3 id=mvc-diagram>MVC Diagram.</h3><pre tabindex=0><code class=language-mermaid data-lang=mermaid>flowchart LR
+    subgraph Client[&#34;Client (Frontend/UI)&#34;]
+        A[&#34;HTTP Request\nJSON Payload&#34;]
+    end
+
+    subgraph Transport[&#34;Transport Layer&#34;]
+        B[&#34;Controller\nGin/Chi Handler&#34;]
+        C[&#34;DTO\nRequest/Response&#34;]
+    end
+
+    subgraph App[&#34;Application Layer&#34;]
+        D[&#34;Service\nBusiness Use Case&#34;]
+    end
+
+    subgraph Domain[&#34;Domain Layer&#34;]
+        E[&#34;Domain Model\nEntities &amp; Rules&#34;]
+        F[&#34;Repository Interface\n(DAO Port)&#34;]
+    end
+
+    subgraph Infra[&#34;Infrastructure Layer&#34;]
+        G[&#34;Repository Impl\nPostgres Adapter&#34;]
+        H[(&#34;Database\nPostgres&#34;)]
+    end
+
+    A --&gt;|HTTP JSON| B
+    B --&gt;|Map to DTO| C
+    C --&gt;|Pass Valid Data| D
+    D --&gt;|Use Entities| E
+    D --&gt;|Call Port| F
+    F --&gt;|Implemented by| G
+    G --&gt;|SQL Queries| H
+    H --&gt;|Result Rows| G
+    G --&gt;|Return Entities| F
+    F --&gt;|Back to| D
+    D --&gt;|Domain → DTO| C
+    C --&gt;|JSON Response| B
+    B --&gt;|HTTP Response| A
+</code></pre><h3 id=-domain-model-m>🧩 Domain Model (M)</h3><p>File: <code>internal/domain/user/model.go</code></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-go data-lang=go><span class=line><span class=cl><span class=kn>package</span> <span class=nx>user</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kn>import</span> <span class=s>&#34;time&#34;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kd>type</span> <span class=nx>ID</span> <span class=kt>string</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kd>type</span> <span class=nx>User</span> <span class=kd>struct</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>	<span class=nx>ID</span>        <span class=nx>ID</span>
+</span></span><span class=line><span class=cl>	<span class=nx>Name</span>      <span class=kt>string</span>
+</span></span><span class=line><span class=cl>	<span class=nx>Email</span>     <span class=kt>string</span>
+</span></span><span class=line><span class=cl>	<span class=nx>Active</span>    <span class=kt>bool</span>
+</span></span><span class=line><span class=cl>	<span class=nx>CreatedAt</span> <span class=nx>time</span><span class=p>.</span><span class=nx>Time</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1>// Domain invariants/constructors keep the model valid.</span>
+</span></span><span class=line><span class=cl><span class=kd>func</span> <span class=nf>New</span><span class=p>(</span><span class=nx>name</span><span class=p>,</span> <span class=nx>email</span> <span class=kt>string</span><span class=p>)</span> <span class=p>(</span><span class=nx>User</span><span class=p>,</span> <span class=kt>error</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>	<span class=k>if</span> <span class=nx>name</span> <span class=o>==</span> <span class=s>&#34;&#34;</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>		<span class=k>return</span> <span class=nx>User</span><span class=p>{},</span> <span class=nx>ErrInvalidName</span>
+</span></span><span class=line><span class=cl>	<span class=p>}</span>
+</span></span><span class=line><span class=cl>	<span class=k>if</span> <span class=p>!</span><span class=nf>isValidEmail</span><span class=p>(</span><span class=nx>email</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>		<span class=k>return</span> <span class=nx>User</span><span class=p>{},</span> <span class=nx>ErrInvalidEmail</span>
+</span></span><span class=line><span class=cl>	<span class=p>}</span>
+</span></span><span class=line><span class=cl>	<span class=k>return</span> <span class=nx>User</span><span class=p>{</span>
+</span></span><span class=line><span class=cl>		<span class=nx>ID</span><span class=p>:</span>     <span class=nf>ID</span><span class=p>(</span><span class=nf>NewID</span><span class=p>()),</span>
+</span></span><span class=line><span class=cl>		<span class=nx>Name</span><span class=p>:</span>   <span class=nx>name</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>		<span class=nx>Email</span><span class=p>:</span>  <span class=nx>email</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>		<span class=nx>Active</span><span class=p>:</span> <span class=kc>true</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>		<span class=c1>// CreatedAt set in service or repo</span>
+</span></span><span class=line><span class=cl>	<span class=p>},</span> <span class=kc>nil</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><p>File: <code>internal/domain/user/repository.go (DAO Port)</code></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-go data-lang=go><span class=line><span class=cl><span class=kn>package</span> <span class=nx>user</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kn>import</span> <span class=s>&#34;context&#34;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kd>type</span> <span class=nx>Repository</span> <span class=kd>interface</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>	<span class=nf>Create</span><span class=p>(</span><span class=nx>ctx</span> <span class=nx>context</span><span class=p>.</span><span class=nx>Context</span><span class=p>,</span> <span class=nx>u</span> <span class=nx>User</span><span class=p>)</span> <span class=kt>error</span>
+</span></span><span class=line><span class=cl>	<span class=nf>ByID</span><span class=p>(</span><span class=nx>ctx</span> <span class=nx>context</span><span class=p>.</span><span class=nx>Context</span><span class=p>,</span> <span class=nx>id</span> <span class=nx>ID</span><span class=p>)</span> <span class=p>(</span><span class=nx>User</span><span class=p>,</span> <span class=kt>error</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>	<span class=nf>ByEmail</span><span class=p>(</span><span class=nx>ctx</span> <span class=nx>context</span><span class=p>.</span><span class=nx>Context</span><span class=p>,</span> <span class=nx>email</span> <span class=kt>string</span><span class=p>)</span> <span class=p>(</span><span class=nx>User</span><span class=p>,</span> <span class=kt>error</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>	<span class=nf>List</span><span class=p>(</span><span class=nx>ctx</span> <span class=nx>context</span><span class=p>.</span><span class=nx>Context</span><span class=p>,</span> <span class=nx>limit</span><span class=p>,</span> <span class=nx>offset</span> <span class=kt>int</span><span class=p>)</span> <span class=p>([]</span><span class=nx>User</span><span class=p>,</span> <span class=kt>error</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>	<span class=nf>Update</span><span class=p>(</span><span class=nx>ctx</span> <span class=nx>context</span><span class=p>.</span><span class=nx>Context</span><span class=p>,</span> <span class=nx>u</span> <span class=nx>User</span><span class=p>)</span> <span class=kt>error</span>
+</span></span><span class=line><span class=cl>	<span class=nf>Delete</span><span class=p>(</span><span class=nx>ctx</span> <span class=nx>context</span><span class=p>.</span><span class=nx>Context</span><span class=p>,</span> <span class=nx>id</span> <span class=nx>ID</span><span class=p>)</span> <span class=kt>error</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><h3 id=-dao-implementation-adapter>🧰 DAO Implementation (Adapter)</h3><p>File: <code>internal/infra/repository/user_pg.go</code></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span><span class=lnt>37
+</span><span class=lnt>38
+</span><span class=lnt>39
+</span><span class=lnt>40
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-go data-lang=go><span class=line><span class=cl><span class=kn>package</span> <span class=nx>repository</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kn>import</span> <span class=p>(</span>
+</span></span><span class=line><span class=cl>	<span class=s>&#34;context&#34;</span>
+</span></span><span class=line><span class=cl>	<span class=s>&#34;database/sql&#34;</span>
+</span></span><span class=line><span class=cl>	<span class=s>&#34;errors&#34;</span>
+</span></span><span class=line><span class=cl>	<span class=s>&#34;time&#34;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>	<span class=nx>domain</span> <span class=s>&#34;yourapp/internal/domain/user&#34;</span>
+</span></span><span class=line><span class=cl><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kd>type</span> <span class=nx>UserPG</span> <span class=kd>struct</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>	<span class=nx>db</span> <span class=o>*</span><span class=nx>sql</span><span class=p>.</span><span class=nx>DB</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kd>func</span> <span class=nf>NewUserPG</span><span class=p>(</span><span class=nx>db</span> <span class=o>*</span><span class=nx>sql</span><span class=p>.</span><span class=nx>DB</span><span class=p>)</span> <span class=o>*</span><span class=nx>UserPG</span> <span class=p>{</span> <span class=k>return</span> <span class=o>&amp;</span><span class=nx>UserPG</span><span class=p>{</span><span class=nx>db</span><span class=p>:</span> <span class=nx>db</span><span class=p>}</span> <span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kd>func</span> <span class=p>(</span><span class=nx>r</span> <span class=o>*</span><span class=nx>UserPG</span><span class=p>)</span> <span class=nf>Create</span><span class=p>(</span><span class=nx>ctx</span> <span class=nx>context</span><span class=p>.</span><span class=nx>Context</span><span class=p>,</span> <span class=nx>u</span> <span class=nx>domain</span><span class=p>.</span><span class=nx>User</span><span class=p>)</span> <span class=kt>error</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>	<span class=nx>_</span><span class=p>,</span> <span class=nx>err</span> <span class=o>:=</span> <span class=nx>r</span><span class=p>.</span><span class=nx>db</span><span class=p>.</span><span class=nf>ExecContext</span><span class=p>(</span><span class=nx>ctx</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>		<span class=s>`INSERT INTO users (id, name, email, active, created_at)
+</span></span></span><span class=line><span class=cl><span class=s>         VALUES ($1,$2,$3,$4,$5)`</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>		<span class=nx>u</span><span class=p>.</span><span class=nx>ID</span><span class=p>,</span> <span class=nx>u</span><span class=p>.</span><span class=nx>Name</span><span class=p>,</span> <span class=nx>u</span><span class=p>.</span><span class=nx>Email</span><span class=p>,</span> <span class=nx>u</span><span class=p>.</span><span class=nx>Active</span><span class=p>,</span> <span class=nx>time</span><span class=p>.</span><span class=nf>Now</span><span class=p>().</span><span class=nf>UTC</span><span class=p>(),</span>
+</span></span><span class=line><span class=cl>	<span class=p>)</span>
+</span></span><span class=line><span class=cl>	<span class=k>return</span> <span class=nx>err</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kd>func</span> <span class=p>(</span><span class=nx>r</span> <span class=o>*</span><span class=nx>UserPG</span><span class=p>)</span> <span class=nf>ByID</span><span class=p>(</span><span class=nx>ctx</span> <span class=nx>context</span><span class=p>.</span><span class=nx>Context</span><span class=p>,</span> <span class=nx>id</span> <span class=nx>domain</span><span class=p>.</span><span class=nx>ID</span><span class=p>)</span> <span class=p>(</span><span class=nx>domain</span><span class=p>.</span><span class=nx>User</span><span class=p>,</span> <span class=kt>error</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>	<span class=nx>row</span> <span class=o>:=</span> <span class=nx>r</span><span class=p>.</span><span class=nx>db</span><span class=p>.</span><span class=nf>QueryRowContext</span><span class=p>(</span><span class=nx>ctx</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>		<span class=s>`SELECT id, name, email, active, created_at FROM users WHERE id=$1`</span><span class=p>,</span> <span class=nx>id</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>	<span class=kd>var</span> <span class=nx>u</span> <span class=nx>domain</span><span class=p>.</span><span class=nx>User</span>
+</span></span><span class=line><span class=cl>	<span class=k>if</span> <span class=nx>err</span> <span class=o>:=</span> <span class=nx>row</span><span class=p>.</span><span class=nf>Scan</span><span class=p>(</span><span class=o>&amp;</span><span class=nx>u</span><span class=p>.</span><span class=nx>ID</span><span class=p>,</span> <span class=o>&amp;</span><span class=nx>u</span><span class=p>.</span><span class=nx>Name</span><span class=p>,</span> <span class=o>&amp;</span><span class=nx>u</span><span class=p>.</span><span class=nx>Email</span><span class=p>,</span> <span class=o>&amp;</span><span class=nx>u</span><span class=p>.</span><span class=nx>Active</span><span class=p>,</span> <span class=o>&amp;</span><span class=nx>u</span><span class=p>.</span><span class=nx>CreatedAt</span><span class=p>);</span> <span class=nx>err</span> <span class=o>!=</span> <span class=kc>nil</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>		<span class=k>if</span> <span class=nx>errors</span><span class=p>.</span><span class=nf>Is</span><span class=p>(</span><span class=nx>err</span><span class=p>,</span> <span class=nx>sql</span><span class=p>.</span><span class=nx>ErrNoRows</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>			<span class=k>return</span> <span class=nx>domain</span><span class=p>.</span><span class=nx>User</span><span class=p>{},</span> <span class=nx>domain</span><span class=p>.</span><span class=nx>ErrNotFound</span>
+</span></span><span class=line><span class=cl>		<span class=p>}</span>
+</span></span><span class=line><span class=cl>		<span class=k>return</span> <span class=nx>domain</span><span class=p>.</span><span class=nx>User</span><span class=p>{},</span> <span class=nx>err</span>
+</span></span><span class=line><span class=cl>	<span class=p>}</span>
+</span></span><span class=line><span class=cl>	<span class=k>return</span> <span class=nx>u</span><span class=p>,</span> <span class=kc>nil</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1>// ... ByEmail, List, Update, Delete similarly</span>
+</span></span></code></pre></td></tr></table></div></div><h3 id=-application-service-use-case-layer>🧠 Application Service (Use Case Layer)</h3><ul><li><p>Services speak domain and depend on ports (interfaces).</p></li><li><p>They’re trivial to unit-test with a fake repository.</p></li></ul><p>File: <code>internal/app/services/user_service.go</code></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-go data-lang=go><span class=line><span class=cl><span class=kn>package</span> <span class=nx>services</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kn>import</span> <span class=p>(</span>
+</span></span><span class=line><span class=cl>	<span class=s>&#34;context&#34;</span>
+</span></span><span class=line><span class=cl>	<span class=s>&#34;time&#34;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>	<span class=nx>domain</span> <span class=s>&#34;yourapp/internal/domain/user&#34;</span>
+</span></span><span class=line><span class=cl><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kd>type</span> <span class=nx>UserService</span> <span class=kd>struct</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>	<span class=nx>repo</span> <span class=nx>domain</span><span class=p>.</span><span class=nx>Repository</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kd>func</span> <span class=nf>NewUserService</span><span class=p>(</span><span class=nx>repo</span> <span class=nx>domain</span><span class=p>.</span><span class=nx>Repository</span><span class=p>)</span> <span class=o>*</span><span class=nx>UserService</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>	<span class=k>return</span> <span class=o>&amp;</span><span class=nx>UserService</span><span class=p>{</span><span class=nx>repo</span><span class=p>:</span> <span class=nx>repo</span><span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kd>func</span> <span class=p>(</span><span class=nx>s</span> <span class=o>*</span><span class=nx>UserService</span><span class=p>)</span> <span class=nf>Register</span><span class=p>(</span><span class=nx>ctx</span> <span class=nx>context</span><span class=p>.</span><span class=nx>Context</span><span class=p>,</span> <span class=nx>name</span><span class=p>,</span> <span class=nx>email</span> <span class=kt>string</span><span class=p>)</span> <span class=p>(</span><span class=nx>domain</span><span class=p>.</span><span class=nx>User</span><span class=p>,</span> <span class=kt>error</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>	<span class=nx>u</span><span class=p>,</span> <span class=nx>err</span> <span class=o>:=</span> <span class=nx>domain</span><span class=p>.</span><span class=nf>New</span><span class=p>(</span><span class=nx>name</span><span class=p>,</span> <span class=nx>email</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>	<span class=k>if</span> <span class=nx>err</span> <span class=o>!=</span> <span class=kc>nil</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>		<span class=k>return</span> <span class=nx>domain</span><span class=p>.</span><span class=nx>User</span><span class=p>{},</span> <span class=nx>err</span>
+</span></span><span class=line><span class=cl>	<span class=p>}</span>
+</span></span><span class=line><span class=cl>	<span class=c1>// set creation time here if not in repo</span>
+</span></span><span class=line><span class=cl>	<span class=nx>u</span><span class=p>.</span><span class=nx>CreatedAt</span> <span class=p>=</span> <span class=nx>time</span><span class=p>.</span><span class=nf>Now</span><span class=p>().</span><span class=nf>UTC</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>	<span class=k>if</span> <span class=nx>err</span> <span class=o>:=</span> <span class=nx>s</span><span class=p>.</span><span class=nx>repo</span><span class=p>.</span><span class=nf>Create</span><span class=p>(</span><span class=nx>ctx</span><span class=p>,</span> <span class=nx>u</span><span class=p>);</span> <span class=nx>err</span> <span class=o>!=</span> <span class=kc>nil</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>		<span class=k>return</span> <span class=nx>domain</span><span class=p>.</span><span class=nx>User</span><span class=p>{},</span> <span class=nx>err</span>
+</span></span><span class=line><span class=cl>	<span class=p>}</span>
+</span></span><span class=line><span class=cl>	<span class=k>return</span> <span class=nx>u</span><span class=p>,</span> <span class=kc>nil</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kd>func</span> <span class=p>(</span><span class=nx>s</span> <span class=o>*</span><span class=nx>UserService</span><span class=p>)</span> <span class=nf>Get</span><span class=p>(</span><span class=nx>ctx</span> <span class=nx>context</span><span class=p>.</span><span class=nx>Context</span><span class=p>,</span> <span class=nx>id</span> <span class=nx>domain</span><span class=p>.</span><span class=nx>ID</span><span class=p>)</span> <span class=p>(</span><span class=nx>domain</span><span class=p>.</span><span class=nx>User</span><span class=p>,</span> <span class=kt>error</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>	<span class=k>return</span> <span class=nx>s</span><span class=p>.</span><span class=nx>repo</span><span class=p>.</span><span class=nf>ByID</span><span class=p>(</span><span class=nx>ctx</span><span class=p>,</span> <span class=nx>id</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><h3 id=-dtos-requestsresponses>📦 DTOs (Requests/Responses)</h3><ul><li><p>Keep validation on DTOs (with validator).</p></li><li><p>Mapping functions isolate domain ↔️ transport conversion.</p></li></ul><p>File: <code>internal/transport/http/dto/user.go</code></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-go data-lang=go><span class=line><span class=cl><span class=kn>package</span> <span class=nx>dto</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kn>import</span> <span class=p>(</span>
+</span></span><span class=line><span class=cl>	<span class=nx>domain</span> <span class=s>&#34;yourapp/internal/domain/user&#34;</span>
+</span></span><span class=line><span class=cl><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kd>type</span> <span class=nx>CreateUserRequest</span> <span class=kd>struct</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>	<span class=nx>Name</span>  <span class=kt>string</span> <span class=s>`json:&#34;name&#34; validate:&#34;required,min=2&#34;`</span>
+</span></span><span class=line><span class=cl>	<span class=nx>Email</span> <span class=kt>string</span> <span class=s>`json:&#34;email&#34; validate:&#34;required,email&#34;`</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kd>type</span> <span class=nx>UserResponse</span> <span class=kd>struct</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>	<span class=nx>ID</span>     <span class=kt>string</span> <span class=s>`json:&#34;id&#34;`</span>
+</span></span><span class=line><span class=cl>	<span class=nx>Name</span>   <span class=kt>string</span> <span class=s>`json:&#34;name&#34;`</span>
+</span></span><span class=line><span class=cl>	<span class=nx>Email</span>  <span class=kt>string</span> <span class=s>`json:&#34;email&#34;`</span>
+</span></span><span class=line><span class=cl>	<span class=nx>Active</span> <span class=kt>bool</span>   <span class=s>`json:&#34;active&#34;`</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kd>func</span> <span class=nf>ToUserResponse</span><span class=p>(</span><span class=nx>u</span> <span class=nx>domain</span><span class=p>.</span><span class=nx>User</span><span class=p>)</span> <span class=nx>UserResponse</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>	<span class=k>return</span> <span class=nx>UserResponse</span><span class=p>{</span>
+</span></span><span class=line><span class=cl>		<span class=nx>ID</span><span class=p>:</span>     <span class=nb>string</span><span class=p>(</span><span class=nx>u</span><span class=p>.</span><span class=nx>ID</span><span class=p>),</span>
+</span></span><span class=line><span class=cl>		<span class=nx>Name</span><span class=p>:</span>   <span class=nx>u</span><span class=p>.</span><span class=nx>Name</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>		<span class=nx>Email</span><span class=p>:</span>  <span class=nx>u</span><span class=p>.</span><span class=nx>Email</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>		<span class=nx>Active</span><span class=p>:</span> <span class=nx>u</span><span class=p>.</span><span class=nx>Active</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>	<span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><h3 id=-controller-c--http-handlers>🎮 Controller (C) — HTTP Handlers</h3><p>File: <code>internal/app/http/controllers/user_controller.go</code></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span><span class=lnt>37
+</span><span class=lnt>38
+</span><span class=lnt>39
+</span><span class=lnt>40
+</span><span class=lnt>41
+</span><span class=lnt>42
+</span><span class=lnt>43
+</span><span class=lnt>44
+</span><span class=lnt>45
+</span><span class=lnt>46
+</span><span class=lnt>47
+</span><span class=lnt>48
+</span><span class=lnt>49
+</span><span class=lnt>50
+</span><span class=lnt>51
+</span><span class=lnt>52
+</span><span class=lnt>53
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-go data-lang=go><span class=line><span class=cl><span class=kn>package</span> <span class=nx>controllers</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kn>import</span> <span class=p>(</span>
+</span></span><span class=line><span class=cl>	<span class=s>&#34;net/http&#34;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>	<span class=s>&#34;github.com/gin-gonic/gin&#34;</span>
+</span></span><span class=line><span class=cl>	<span class=s>&#34;yourapp/internal/app/services&#34;</span>
+</span></span><span class=line><span class=cl>	<span class=s>&#34;yourapp/internal/transport/http/dto&#34;</span>
+</span></span><span class=line><span class=cl>	<span class=nx>domain</span> <span class=s>&#34;yourapp/internal/domain/user&#34;</span>
+</span></span><span class=line><span class=cl><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kd>type</span> <span class=nx>UserController</span> <span class=kd>struct</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>	<span class=nx>svc</span> <span class=o>*</span><span class=nx>services</span><span class=p>.</span><span class=nx>UserService</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kd>func</span> <span class=nf>NewUserController</span><span class=p>(</span><span class=nx>svc</span> <span class=o>*</span><span class=nx>services</span><span class=p>.</span><span class=nx>UserService</span><span class=p>)</span> <span class=o>*</span><span class=nx>UserController</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>	<span class=k>return</span> <span class=o>&amp;</span><span class=nx>UserController</span><span class=p>{</span><span class=nx>svc</span><span class=p>:</span> <span class=nx>svc</span><span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kd>func</span> <span class=p>(</span><span class=nx>uc</span> <span class=o>*</span><span class=nx>UserController</span><span class=p>)</span> <span class=nf>Register</span><span class=p>(</span><span class=nx>c</span> <span class=o>*</span><span class=nx>gin</span><span class=p>.</span><span class=nx>Context</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>	<span class=kd>var</span> <span class=nx>req</span> <span class=nx>dto</span><span class=p>.</span><span class=nx>CreateUserRequest</span>
+</span></span><span class=line><span class=cl>	<span class=k>if</span> <span class=nx>err</span> <span class=o>:=</span> <span class=nx>c</span><span class=p>.</span><span class=nf>ShouldBindJSON</span><span class=p>(</span><span class=o>&amp;</span><span class=nx>req</span><span class=p>);</span> <span class=nx>err</span> <span class=o>!=</span> <span class=kc>nil</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>		<span class=nx>c</span><span class=p>.</span><span class=nf>JSON</span><span class=p>(</span><span class=nx>http</span><span class=p>.</span><span class=nx>StatusBadRequest</span><span class=p>,</span> <span class=nx>gin</span><span class=p>.</span><span class=nx>H</span><span class=p>{</span><span class=s>&#34;error&#34;</span><span class=p>:</span> <span class=s>&#34;invalid_payload&#34;</span><span class=p>})</span>
+</span></span><span class=line><span class=cl>		<span class=k>return</span>
+</span></span><span class=line><span class=cl>	<span class=p>}</span>
+</span></span><span class=line><span class=cl>	<span class=c1>// optional: validate req with pkg/validator</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>	<span class=nx>user</span><span class=p>,</span> <span class=nx>err</span> <span class=o>:=</span> <span class=nx>uc</span><span class=p>.</span><span class=nx>svc</span><span class=p>.</span><span class=nf>Register</span><span class=p>(</span><span class=nx>c</span><span class=p>.</span><span class=nx>Request</span><span class=p>.</span><span class=nf>Context</span><span class=p>(),</span> <span class=nx>req</span><span class=p>.</span><span class=nx>Name</span><span class=p>,</span> <span class=nx>req</span><span class=p>.</span><span class=nx>Email</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>	<span class=k>if</span> <span class=nx>err</span> <span class=o>!=</span> <span class=kc>nil</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>		<span class=k>switch</span> <span class=nx>err</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>		<span class=k>case</span> <span class=nx>domain</span><span class=p>.</span><span class=nx>ErrInvalidEmail</span><span class=p>,</span> <span class=nx>domain</span><span class=p>.</span><span class=nx>ErrInvalidName</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>			<span class=nx>c</span><span class=p>.</span><span class=nf>JSON</span><span class=p>(</span><span class=nx>http</span><span class=p>.</span><span class=nx>StatusUnprocessableEntity</span><span class=p>,</span> <span class=nx>gin</span><span class=p>.</span><span class=nx>H</span><span class=p>{</span><span class=s>&#34;error&#34;</span><span class=p>:</span> <span class=nx>err</span><span class=p>.</span><span class=nf>Error</span><span class=p>()})</span>
+</span></span><span class=line><span class=cl>		<span class=k>default</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>			<span class=nx>c</span><span class=p>.</span><span class=nf>JSON</span><span class=p>(</span><span class=nx>http</span><span class=p>.</span><span class=nx>StatusInternalServerError</span><span class=p>,</span> <span class=nx>gin</span><span class=p>.</span><span class=nx>H</span><span class=p>{</span><span class=s>&#34;error&#34;</span><span class=p>:</span> <span class=s>&#34;internal_error&#34;</span><span class=p>})</span>
+</span></span><span class=line><span class=cl>		<span class=p>}</span>
+</span></span><span class=line><span class=cl>		<span class=k>return</span>
+</span></span><span class=line><span class=cl>	<span class=p>}</span>
+</span></span><span class=line><span class=cl>	<span class=nx>c</span><span class=p>.</span><span class=nf>JSON</span><span class=p>(</span><span class=nx>http</span><span class=p>.</span><span class=nx>StatusCreated</span><span class=p>,</span> <span class=nx>dto</span><span class=p>.</span><span class=nf>ToUserResponse</span><span class=p>(</span><span class=nx>user</span><span class=p>))</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kd>func</span> <span class=p>(</span><span class=nx>uc</span> <span class=o>*</span><span class=nx>UserController</span><span class=p>)</span> <span class=nf>Get</span><span class=p>(</span><span class=nx>c</span> <span class=o>*</span><span class=nx>gin</span><span class=p>.</span><span class=nx>Context</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>	<span class=nx>id</span> <span class=o>:=</span> <span class=nx>domain</span><span class=p>.</span><span class=nf>ID</span><span class=p>(</span><span class=nx>c</span><span class=p>.</span><span class=nf>Param</span><span class=p>(</span><span class=s>&#34;id&#34;</span><span class=p>))</span>
+</span></span><span class=line><span class=cl>	<span class=nx>user</span><span class=p>,</span> <span class=nx>err</span> <span class=o>:=</span> <span class=nx>uc</span><span class=p>.</span><span class=nx>svc</span><span class=p>.</span><span class=nf>Get</span><span class=p>(</span><span class=nx>c</span><span class=p>.</span><span class=nx>Request</span><span class=p>.</span><span class=nf>Context</span><span class=p>(),</span> <span class=nx>id</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>	<span class=k>if</span> <span class=nx>err</span> <span class=o>!=</span> <span class=kc>nil</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>		<span class=k>if</span> <span class=nx>err</span> <span class=o>==</span> <span class=nx>domain</span><span class=p>.</span><span class=nx>ErrNotFound</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>			<span class=nx>c</span><span class=p>.</span><span class=nf>JSON</span><span class=p>(</span><span class=nx>http</span><span class=p>.</span><span class=nx>StatusNotFound</span><span class=p>,</span> <span class=nx>gin</span><span class=p>.</span><span class=nx>H</span><span class=p>{</span><span class=s>&#34;error&#34;</span><span class=p>:</span> <span class=s>&#34;not_found&#34;</span><span class=p>})</span>
+</span></span><span class=line><span class=cl>			<span class=k>return</span>
+</span></span><span class=line><span class=cl>		<span class=p>}</span>
+</span></span><span class=line><span class=cl>		<span class=nx>c</span><span class=p>.</span><span class=nf>JSON</span><span class=p>(</span><span class=nx>http</span><span class=p>.</span><span class=nx>StatusInternalServerError</span><span class=p>,</span> <span class=nx>gin</span><span class=p>.</span><span class=nx>H</span><span class=p>{</span><span class=s>&#34;error&#34;</span><span class=p>:</span> <span class=s>&#34;internal_error&#34;</span><span class=p>})</span>
+</span></span><span class=line><span class=cl>		<span class=k>return</span>
+</span></span><span class=line><span class=cl>	<span class=p>}</span>
+</span></span><span class=line><span class=cl>	<span class=nx>c</span><span class=p>.</span><span class=nf>JSON</span><span class=p>(</span><span class=nx>http</span><span class=p>.</span><span class=nx>StatusOK</span><span class=p>,</span> <span class=nx>dto</span><span class=p>.</span><span class=nf>ToUserResponse</span><span class=p>(</span><span class=nx>user</span><span class=p>))</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><p>File: <code>internal/transport/http/router.go</code></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-go data-lang=go><span class=line><span class=cl><span class=kn>package</span> <span class=nx>http</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kn>import</span> <span class=p>(</span>
+</span></span><span class=line><span class=cl>	<span class=s>&#34;github.com/gin-gonic/gin&#34;</span>
+</span></span><span class=line><span class=cl>	<span class=s>&#34;yourapp/internal/app/http/controllers&#34;</span>
+</span></span><span class=line><span class=cl><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kd>func</span> <span class=nf>NewRouter</span><span class=p>(</span><span class=nx>userCtrl</span> <span class=o>*</span><span class=nx>controllers</span><span class=p>.</span><span class=nx>UserController</span><span class=p>)</span> <span class=o>*</span><span class=nx>gin</span><span class=p>.</span><span class=nx>Engine</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>	<span class=nx>r</span> <span class=o>:=</span> <span class=nx>gin</span><span class=p>.</span><span class=nf>New</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>	<span class=nx>r</span><span class=p>.</span><span class=nf>Use</span><span class=p>(</span><span class=nx>gin</span><span class=p>.</span><span class=nf>Recovery</span><span class=p>())</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>	<span class=nx>v1</span> <span class=o>:=</span> <span class=nx>r</span><span class=p>.</span><span class=nf>Group</span><span class=p>(</span><span class=s>&#34;/v1&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>	<span class=p>{</span>
+</span></span><span class=line><span class=cl>		<span class=nx>v1</span><span class=p>.</span><span class=nf>POST</span><span class=p>(</span><span class=s>&#34;/users&#34;</span><span class=p>,</span> <span class=nx>userCtrl</span><span class=p>.</span><span class=nx>Register</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>		<span class=nx>v1</span><span class=p>.</span><span class=nf>GET</span><span class=p>(</span><span class=s>&#34;/users/:id&#34;</span><span class=p>,</span> <span class=nx>userCtrl</span><span class=p>.</span><span class=nx>Get</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>	<span class=p>}</span>
+</span></span><span class=line><span class=cl>	<span class=k>return</span> <span class=nx>r</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><h3 id=-wiring-main>🚀 Wiring (main)</h3><p>File: <code>cmd/server/main.go</code></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-go data-lang=go><span class=line><span class=cl><span class=kn>package</span> <span class=nx>main</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kn>import</span> <span class=p>(</span>
+</span></span><span class=line><span class=cl>	<span class=s>&#34;database/sql&#34;</span>
+</span></span><span class=line><span class=cl>	<span class=s>&#34;log&#34;</span>
+</span></span><span class=line><span class=cl>	<span class=s>&#34;net/http&#34;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>	<span class=nx>_</span> <span class=s>&#34;github.com/lib/pq&#34;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>	<span class=s>&#34;yourapp/internal/app/http/controllers&#34;</span>
+</span></span><span class=line><span class=cl>	<span class=s>&#34;yourapp/internal/app/services&#34;</span>
+</span></span><span class=line><span class=cl>	<span class=s>&#34;yourapp/internal/infra/repository&#34;</span>
+</span></span><span class=line><span class=cl>	<span class=nx>transport</span> <span class=s>&#34;yourapp/internal/transport/http&#34;</span>
+</span></span><span class=line><span class=cl><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kd>func</span> <span class=nf>main</span><span class=p>()</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>	<span class=nx>db</span><span class=p>,</span> <span class=nx>err</span> <span class=o>:=</span> <span class=nx>sql</span><span class=p>.</span><span class=nf>Open</span><span class=p>(</span><span class=s>&#34;postgres&#34;</span><span class=p>,</span> <span class=s>&#34;postgres://user:pass@localhost:5432/app?sslmode=disable&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>	<span class=k>if</span> <span class=nx>err</span> <span class=o>!=</span> <span class=kc>nil</span> <span class=p>{</span> <span class=nx>log</span><span class=p>.</span><span class=nf>Fatal</span><span class=p>(</span><span class=nx>err</span><span class=p>)</span> <span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>	<span class=nx>userRepo</span> <span class=o>:=</span> <span class=nx>repository</span><span class=p>.</span><span class=nf>NewUserPG</span><span class=p>(</span><span class=nx>db</span><span class=p>)</span>          <span class=c1>// DAO impl</span>
+</span></span><span class=line><span class=cl>	<span class=nx>userSvc</span>  <span class=o>:=</span> <span class=nx>services</span><span class=p>.</span><span class=nf>NewUserService</span><span class=p>(</span><span class=nx>userRepo</span><span class=p>)</span> <span class=c1>// Service</span>
+</span></span><span class=line><span class=cl>	<span class=nx>userCtrl</span> <span class=o>:=</span> <span class=nx>controllers</span><span class=p>.</span><span class=nf>NewUserController</span><span class=p>(</span><span class=nx>userSvc</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>	<span class=nx>router</span> <span class=o>:=</span> <span class=nx>transport</span><span class=p>.</span><span class=nf>NewRouter</span><span class=p>(</span><span class=nx>userCtrl</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>	<span class=nx>log</span><span class=p>.</span><span class=nf>Println</span><span class=p>(</span><span class=s>&#34;listening on :8080&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>	<span class=nx>log</span><span class=p>.</span><span class=nf>Fatal</span><span class=p>(</span><span class=nx>http</span><span class=p>.</span><span class=nf>ListenAndServe</span><span class=p>(</span><span class=s>&#34;:8080&#34;</span><span class=p>,</span> <span class=nx>router</span><span class=p>))</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><h3 id=-checklist--tips>✅ Checklist & Tips</h3><ul><li><p>Controller: tiny; only HTTP + mapping + error codes.</p></li><li><p>DTO: versioned (e.g., /v1), validated, stable to external changes.</p></li><li><p>Service: business orchestration; no HTTP/SQL.</p></li><li><p>Domain: invariants, pure logic; no frameworks.</p></li><li><p>DAO/Repository: concrete DB code; easily mocked.</p></li><li><p>Testing: unit test services with in-memory repo; integration test DAO with a test DB.</p></li><li><p>Errors: map domain errors to HTTP status codes in controllers.</p></li><li><p>Versioning: keep DTOs under transport/http/dto/v1 if you plan multiple API versions.</p></li></ul><h3 id=-when-to-use>✅ When to use:</h3><ul><li><p>Web applications with clear input/output flows</p></li><li><p>Great for monolithic Go services</p></li><li><p>⚠️ Pitfall: Controllers can easily become “fat” if not managed well.</p></li></ul><hr><h2 id=-hexagonal-architecture-ports--adapters>🛡 Hexagonal Architecture (Ports & Adapters)</h2><p>Idea: keep your domain core pure and push frameworks, DBs, and transports to the edges.</p><ul><li><p>Domain (core): entities, value objects, domain services, errors.</p></li><li><p>Ports: interfaces the core depends on (e.g., UserRepository, Mailer).</p></li><li><p>Adapters: implementations for ports (Postgres, Redis, SMTP, HTTP clients).</p></li><li><p>Drivers: incoming adapters (HTTP/gRPC/CLI/Jobs) that call the core.</p></li></ul><p>Suggested layout (Go)</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-text data-lang=text><span class=line><span class=cl>.
+</span></span><span class=line><span class=cl>├─ cmd/api/                         # app entrypoint(s)
+</span></span><span class=line><span class=cl>│  └─ main.go
+</span></span><span class=line><span class=cl>├─ internal/
+</span></span><span class=line><span class=cl>│  ├─ domain/                       # PURE core (no imports of gin/sql/http)
+</span></span><span class=line><span class=cl>│  │  └─ user/
+</span></span><span class=line><span class=cl>│  │     ├─ entity.go               # entities/value objects
+</span></span><span class=line><span class=cl>│  │     ├─ service.go              # domain services (pure)
+</span></span><span class=line><span class=cl>│  │     ├─ ports.go                # ports (interfaces) e.g., UserRepo, Mailer
+</span></span><span class=line><span class=cl>│  │     └─ errors.go
+</span></span><span class=line><span class=cl>│  ├─ app/                          # use-cases/application services
+</span></span><span class=line><span class=cl>│  │  └─ user/
+</span></span><span class=line><span class=cl>│  │     └─ usecase.go              # RegisterUser, ActivateUser, etc.
+</span></span><span class=line><span class=cl>│  ├─ adapters/
+</span></span><span class=line><span class=cl>│  │  ├─ in/                        # driving adapters
+</span></span><span class=line><span class=cl>│  │  │  └─ http/                   # HTTP handlers (gin/chi)
+</span></span><span class=line><span class=cl>│  │  │     ├─ router.go
+</span></span><span class=line><span class=cl>│  │  │     └─ user_controller.go
+</span></span><span class=line><span class=cl>│  │  └─ out/                       # driven adapters
+</span></span><span class=line><span class=cl>│  │     ├─ postgres/
+</span></span><span class=line><span class=cl>│  │     │  └─ user_repo.go         # implements domain.UserRepository
+</span></span><span class=line><span class=cl>│  │     └─ mail/
+</span></span><span class=line><span class=cl>│  │        └─ smtp_mailer.go       # implements domain.Mailer
+</span></span><span class=line><span class=cl>│  └─ platform/                     # cross-cutting infra (db, config, log)
+</span></span><span class=line><span class=cl>│     ├─ db.go
+</span></span><span class=line><span class=cl>│     ├─ config.go
+</span></span><span class=line><span class=cl>│     └─ logger.go
+</span></span><span class=line><span class=cl>└─ go.mod
+</span></span></code></pre></td></tr></table></div></div><h3 id=minimal-go-example>Minimal Go example</h3><p>File: <code>internal/domain/user/ports.go</code></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-go data-lang=go><span class=line><span class=cl><span class=kn>package</span> <span class=nx>user</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kn>import</span> <span class=s>&#34;context&#34;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kd>type</span> <span class=nx>Repository</span> <span class=kd>interface</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>	<span class=nf>Save</span><span class=p>(</span><span class=nx>ctx</span> <span class=nx>context</span><span class=p>.</span><span class=nx>Context</span><span class=p>,</span> <span class=nx>u</span> <span class=nx>User</span><span class=p>)</span> <span class=kt>error</span>
+</span></span><span class=line><span class=cl>	<span class=nf>ByID</span><span class=p>(</span><span class=nx>ctx</span> <span class=nx>context</span><span class=p>.</span><span class=nx>Context</span><span class=p>,</span> <span class=nx>id</span> <span class=nx>ID</span><span class=p>)</span> <span class=p>(</span><span class=nx>User</span><span class=p>,</span> <span class=kt>error</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kd>type</span> <span class=nx>Mailer</span> <span class=kd>interface</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>	<span class=nf>SendWelcome</span><span class=p>(</span><span class=nx>ctx</span> <span class=nx>context</span><span class=p>.</span><span class=nx>Context</span><span class=p>,</span> <span class=nx>email</span> <span class=kt>string</span><span class=p>)</span> <span class=kt>error</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><p>File: <code>internal/app/user/usecase.go</code></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-go data-lang=go><span class=line><span class=cl><span class=kn>package</span> <span class=nx>userapp</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kn>import</span> <span class=p>(</span>
+</span></span><span class=line><span class=cl>	<span class=s>&#34;context&#34;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>	<span class=nx>domain</span> <span class=s>&#34;yourapp/internal/domain/user&#34;</span>
+</span></span><span class=line><span class=cl><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kd>type</span> <span class=nx>RegisterUser</span> <span class=kd>struct</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>	<span class=nx>Repo</span>   <span class=nx>domain</span><span class=p>.</span><span class=nx>Repository</span>
+</span></span><span class=line><span class=cl>	<span class=nx>Mailer</span> <span class=nx>domain</span><span class=p>.</span><span class=nx>Mailer</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kd>func</span> <span class=p>(</span><span class=nx>uc</span> <span class=nx>RegisterUser</span><span class=p>)</span> <span class=nf>Do</span><span class=p>(</span><span class=nx>ctx</span> <span class=nx>context</span><span class=p>.</span><span class=nx>Context</span><span class=p>,</span> <span class=nx>name</span><span class=p>,</span> <span class=nx>email</span> <span class=kt>string</span><span class=p>)</span> <span class=p>(</span><span class=nx>domain</span><span class=p>.</span><span class=nx>User</span><span class=p>,</span> <span class=kt>error</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>	<span class=nx>u</span><span class=p>,</span> <span class=nx>err</span> <span class=o>:=</span> <span class=nx>domain</span><span class=p>.</span><span class=nf>New</span><span class=p>(</span><span class=nx>name</span><span class=p>,</span> <span class=nx>email</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>	<span class=k>if</span> <span class=nx>err</span> <span class=o>!=</span> <span class=kc>nil</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>		<span class=k>return</span> <span class=nx>domain</span><span class=p>.</span><span class=nx>User</span><span class=p>{},</span> <span class=nx>err</span>
+</span></span><span class=line><span class=cl>	<span class=p>}</span>
+</span></span><span class=line><span class=cl>	<span class=k>if</span> <span class=nx>err</span> <span class=o>:=</span> <span class=nx>uc</span><span class=p>.</span><span class=nx>Repo</span><span class=p>.</span><span class=nf>Save</span><span class=p>(</span><span class=nx>ctx</span><span class=p>,</span> <span class=nx>u</span><span class=p>);</span> <span class=nx>err</span> <span class=o>!=</span> <span class=kc>nil</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>		<span class=k>return</span> <span class=nx>domain</span><span class=p>.</span><span class=nx>User</span><span class=p>{},</span> <span class=nx>err</span>
+</span></span><span class=line><span class=cl>	<span class=p>}</span>
+</span></span><span class=line><span class=cl>	<span class=nx>_</span> <span class=p>=</span> <span class=nx>uc</span><span class=p>.</span><span class=nx>Mailer</span><span class=p>.</span><span class=nf>SendWelcome</span><span class=p>(</span><span class=nx>ctx</span><span class=p>,</span> <span class=nx>u</span><span class=p>.</span><span class=nx>Email</span><span class=p>)</span> <span class=c1>// best-effort, log on failure</span>
+</span></span><span class=line><span class=cl>	<span class=k>return</span> <span class=nx>u</span><span class=p>,</span> <span class=kc>nil</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><h3 id=hexagonal-diagram>Hexagonal Diagram</h3><pre tabindex=0><code class=language-mermaid data-lang=mermaid>flowchart LR
+    subgraph Drivers[&#34;Drivers (Incoming Adapters)&#34;]
+        A[&#34;HTTP\n(gin/chi)&#34;]
+        B[&#34;CLI\nCron/Jobs&#34;]
+        C[&#34;gRPC\nGateway&#34;]
+    end
+
+    subgraph Core[&#34;Core (Domain + Application)&#34;]
+        D[&#34;Application Services\nUse Cases&#34;]
+        E[&#34;Domain Entities\nValue Objects\nDomain Services&#34;]
+        F[&#34;Ports\n(Repo, Mailer, Cache)&#34;]
+    end
+
+    subgraph Adapters[&#34;Driven Adapters (Infra)&#34;]
+        G[&#34;Postgres Repo\nimplements Repo&#34;]
+        H[&#34;SMTP Mailer\nimplements Mailer&#34;]
+        I[&#34;Redis Cache\nimplements Cache&#34;]
+    end
+
+    A --&gt; D
+    B --&gt; D
+    C --&gt; D
+    D --&gt; E
+    D --&gt; F
+    F --&gt; G
+    F --&gt; H
+    F --&gt; I
+</code></pre><h3 id=-checklist--tips-1>✅ Checklist & Tips</h3><ul><li><p>Keep internal/domain import-clean (no framework/DB imports).</p></li><li><p>Define ports in the domain; implement them in adapters.</p></li><li><p>Tests: unit-test use-cases with fakes for ports; integration-test adapters.</p></li></ul><h3 id=-when-to-use-1>✅ When to use:</h3><ul><li><p>Systems with high read/write load</p></li><li><p>Event-sourced systems (CQRS often pairs with Event Sourcing)</p></li><li><p>⚠️ Pitfall: Adds complexity — not always worth it for simple apps.</p></li></ul><hr><h2 id=-cqrs-command-query-responsibility-segregation>🔀 CQRS (Command Query Responsibility Segregation)</h2><p>CQRS separates read and write responsibilities into different models:</p><p>Commands → update state (writes)</p><p>Queries → read state (reads)</p><p>This avoids having one bloated model handling both responsibilities.</p><p>📍 <strong>Go Example</strong>:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span><span class=lnt>8
+</span><span class=lnt>9
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-go data-lang=go><span class=line><span class=cl><span class=c1>// Command Handler</span>
+</span></span><span class=line><span class=cl><span class=kd>func</span> <span class=nf>CreateUser</span><span class=p>(</span><span class=nx>repo</span> <span class=nx>UserRepository</span><span class=p>,</span> <span class=nx>user</span> <span class=nx>User</span><span class=p>)</span> <span class=kt>error</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=k>return</span> <span class=nx>repo</span><span class=p>.</span><span class=nf>Save</span><span class=p>(</span><span class=nx>user</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1>// Query Handler</span>
+</span></span><span class=line><span class=cl><span class=kd>func</span> <span class=nf>GetUser</span><span class=p>(</span><span class=nx>repo</span> <span class=nx>UserRepository</span><span class=p>,</span> <span class=nx>id</span> <span class=kt>int</span><span class=p>)</span> <span class=p>(</span><span class=nx>User</span><span class=p>,</span> <span class=kt>error</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=k>return</span> <span class=nx>repo</span><span class=p>.</span><span class=nf>Find</span><span class=p>(</span><span class=nx>id</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><h3 id=cqrs-diagram>CQRS Diagram</h3><pre tabindex=0><code class=language-mermaid data-lang=mermaid>flowchart LR
+    subgraph API[&#34;API Layer&#34;]
+        A[&#34;HTTP Endpoints\n/commands\n/queries&#34;]
+    end
+
+    subgraph WriteSide[&#34;Write Side&#34;]
+        B[&#34;Command Handler\n(Validate + Execute)&#34;]
+        C[&#34;Write Model\n(Domain + Repo)&#34;]
+        D[(&#34;Write DB&#34;)]
+    end
+
+    subgraph ReadSide[&#34;Read Side&#34;]
+        E[&#34;Projector\n(Update Projections)&#34;]
+        F[&#34;Read Model\n(DTO Repository)&#34;]
+        G[(&#34;Read DB&#34;)]
+        H[&#34;Query Handler\n(Reads Only)&#34;]
+    end
+
+    subgraph Bus[&#34;Event Bus (Optional)&#34;]
+        X[&#34;Domain Events&#34;]
+    end
+
+    %% Command path
+    A --&gt;|POST /commands| B
+    B --&gt; C
+    C --&gt; D
+    C --&gt;|Emit Events| X
+
+    %% Projection path
+    X --&gt; E
+    E --&gt; F
+    F --&gt; G
+
+    %% Query path
+    A --&gt;|GET /queries| H
+    H --&gt; F
+
+    %% Notes
+    classDef dim fill:#f7f7f7,stroke:#bbb,color:#333
+    class API,WriteSide,ReadSide,Bus dim
+</code></pre><p>✅ When to use:</p><ul><li><p>Systems with high read/write load</p></li><li><p>Event-sourced systems (CQRS often pairs with Event Sourcing)</p></li><li><p>⚠️ Pitfall: Adds complexity — not always worth it for simple apps.</p></li></ul><hr><h2 id=-microservices>☁️ Microservices</h2><p>A Microservices architecture structures applications as a collection of small, independent services:</p><ul><li><p>Each service owns its data and logic</p></li><li><p>Services communicate via APIs (HTTP, gRPC, messaging)</p></li><li><p>Each can be deployed and scaled independently</p></li></ul><p>Idea: split a system into small, independently deployable services that each own their data and domain.</p><p>Services communicate via synchronous (HTTP/gRPC) or asynchronous (Kafka/NATS) channels.</p><p>Each service has its own database (no shared schema).</p><p>Requires solid platform engineering: CI/CD, observability, API governance, SLOs.</p><p>Suggested repo layout (mono-repo)</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-text data-lang=text><span class=line><span class=cl>.
+</span></span><span class=line><span class=cl>├─ services/
+</span></span><span class=line><span class=cl>│  ├─ usersvc/
+</span></span><span class=line><span class=cl>│  │  ├─ cmd/usersvc/main.go
+</span></span><span class=line><span class=cl>│  │  ├─ internal/...
+</span></span><span class=line><span class=cl>│  │  └─ api/openapi.yaml
+</span></span><span class=line><span class=cl>│  ├─ ordersvc/
+</span></span><span class=line><span class=cl>│  │  ├─ cmd/ordersvc/main.go
+</span></span><span class=line><span class=cl>│  │  ├─ internal/...
+</span></span><span class=line><span class=cl>│  │  └─ api/openapi.yaml
+</span></span><span class=line><span class=cl>│  └─ paymentsvc/
+</span></span><span class=line><span class=cl>│     ├─ cmd/paymentsvc/main.go
+</span></span><span class=line><span class=cl>│     ├─ internal/...
+</span></span><span class=line><span class=cl>│     └─ api/openapi.yaml
+</span></span><span class=line><span class=cl>├─ pkg/                         # shared libs (careful: avoid domain leakage)
+</span></span><span class=line><span class=cl>│  ├─ logger/
+</span></span><span class=line><span class=cl>│  ├─ tracing/
+</span></span><span class=line><span class=cl>│  └─ httpx/
+</span></span><span class=line><span class=cl>├─ deploy/
+</span></span><span class=line><span class=cl>│  ├─ k8s/                      # Helm/Manifests
+</span></span><span class=line><span class=cl>│  └─ infra/                    # Terraform (DBs, queues, buckets)
+</span></span><span class=line><span class=cl>└─ Makefile / Taskfile.yaml
+</span></span></code></pre></td></tr></table></div></div><h3 id=minimal-service-skeleton-gin>Minimal service skeleton (Gin)</h3><p>File: <code>services/usersvc/cmd/usersvc/main.go</code></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-go data-lang=go><span class=line><span class=cl><span class=kn>package</span> <span class=nx>main</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kn>import</span> <span class=p>(</span>
+</span></span><span class=line><span class=cl>	<span class=s>&#34;log&#34;</span>
+</span></span><span class=line><span class=cl>	<span class=s>&#34;net/http&#34;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>	<span class=s>&#34;github.com/gin-gonic/gin&#34;</span>
+</span></span><span class=line><span class=cl><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kd>func</span> <span class=nf>main</span><span class=p>()</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>	<span class=nx>r</span> <span class=o>:=</span> <span class=nx>gin</span><span class=p>.</span><span class=nf>New</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>	<span class=nx>r</span><span class=p>.</span><span class=nf>Use</span><span class=p>(</span><span class=nx>gin</span><span class=p>.</span><span class=nf>Recovery</span><span class=p>())</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>	<span class=nx>r</span><span class=p>.</span><span class=nf>GET</span><span class=p>(</span><span class=s>&#34;/v1/users/:id&#34;</span><span class=p>,</span> <span class=kd>func</span><span class=p>(</span><span class=nx>c</span> <span class=o>*</span><span class=nx>gin</span><span class=p>.</span><span class=nx>Context</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>		<span class=nx>c</span><span class=p>.</span><span class=nf>JSON</span><span class=p>(</span><span class=nx>http</span><span class=p>.</span><span class=nx>StatusOK</span><span class=p>,</span> <span class=nx>gin</span><span class=p>.</span><span class=nx>H</span><span class=p>{</span><span class=s>&#34;id&#34;</span><span class=p>:</span> <span class=nx>c</span><span class=p>.</span><span class=nf>Param</span><span class=p>(</span><span class=s>&#34;id&#34;</span><span class=p>),</span> <span class=s>&#34;name&#34;</span><span class=p>:</span> <span class=s>&#34;Alice&#34;</span><span class=p>})</span>
+</span></span><span class=line><span class=cl>	<span class=p>})</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>	<span class=nx>log</span><span class=p>.</span><span class=nf>Println</span><span class=p>(</span><span class=s>&#34;usersvc listening on :8081&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>	<span class=nx>log</span><span class=p>.</span><span class=nf>Fatal</span><span class=p>(</span><span class=nx>http</span><span class=p>.</span><span class=nf>ListenAndServe</span><span class=p>(</span><span class=s>&#34;:8081&#34;</span><span class=p>,</span> <span class=nx>r</span><span class=p>))</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><h3 id=microservice-diagram>Microservice Diagram</h3><pre tabindex=0><code class=language-mermaid data-lang=mermaid>flowchart LR
+    subgraph Clients[&#34;Clients&#34;]
+        A[&#34;Web\nMobile&#34;]
+    end
+
+    subgraph Edge[&#34;API Gateway\nIngress&#34;]
+        B[&#34;Routing\nAuth\nRate Limit&#34;]
+    end
+
+    subgraph Services[&#34;Microservices&#34;]
+        U[&#34;User Service\nDB owned by service&#34;]
+        O[&#34;Order Service\nDB owned by service&#34;]
+        P[&#34;Payment Service\nDB owned by service&#34;]
+    end
+
+    subgraph Async[&#34;Async Messaging&#34;]
+        K[&#34;Kafka/NATS\nTopics&#34;]
+    end
+
+    A --&gt; B
+    B --&gt; U
+    B --&gt; O
+    B --&gt; P
+
+    O &lt;--&gt;|Events| K
+    P &lt;--&gt;|Events| K
+    U &lt;--&gt;|Events| K
+</code></pre><p>✅ Checklist & Tips</p><ul><li><p>Start with modular monolith → extract services when boundaries stabilize.</p></li><li><p>Each service: own DB schema, own CI, own versioning.</p></li><li><p>Invest early in observability (traces, logs, metrics) and API contracts.</p></li></ul><p>✅ When to use:</p><ul><li><p>Large, complex systems needing scalability</p></li><li><p>Teams working on independent modules</p></li><li><p>⚠️ Pitfall: Operational overhead (DevOps, CI/CD, observability, networking).</p></li></ul><hr><h2 id=-wrap-up-pointers>🔚 Wrap-up pointers</h2><ul><li><p>Hexagonal: best baseline for testability and longevity; add adapters as you go.</p></li><li><p>CQRS: apply where read/write divergence brings value; don’t over-split prematurely.</p></li><li><p>Microservices: only when team size, domain boundaries, and scaling needs justify the operational cost.</p></li></ul><hr><h2 id=-summary>🧠 Summary</h2><ul><li><p>MVC → Clear separation of concerns in monolithic apps</p></li><li><p>Hexagonal → Isolate core logic, improve testability</p></li><li><p>CQRS → Split reads and writes for clarity and scalability</p></li><li><p>Microservices → Independent, scalable services for large systems</p></li></ul><h3 id=-think-of-it-this-way>👉 Think of it this way:</h3><ul><li><p>Design patterns = small tools (Singleton, Observer, Strategy)</p></li><li><p>Architectural patterns = the blueprint of the entire building</p></li><li><p>Both are essential, but at different levels of abstraction.</p></li></ul><hr><p>🚀 Follow me on <a href=https://norbix.dev>norbix.dev</a> for more insights on Go, Python, AI, system design, and engineering wisdom.</p></div><div class=post-subscribe><style>.subscribe-form{display:flex;gap:.5rem;margin-top:1rem;align-items:center}.subscribe-form input[type=email]{padding:.5rem;border-radius:6px;border:1px solid #ccc;background-color:#1f1f1f;color:#fff}.subscribe-form input[type=submit],.subscribe-form button{padding:.5rem 1rem;border-radius:6px;background-color:#facc15;color:#000;border:none;cursor:pointer;font-weight:700}.subscribe-form input[type=submit]:hover{background-color:#fcd34d}</style><form action=https://buttondown.email/api/emails/embed-subscribe/norbix method=post target=popupwindow onsubmit='window.open("https://buttondown.email/norbix","popupwindow")' class=subscribe-form><input type=email name=email placeholder="Enter your email" required>
+<input type=submit value=Subscribe></form><p style=font-size:.875rem;opacity:.6>Powered by Buttondown.</p></div><div class=post-comments><script src=https://giscus.app/client.js data-repo=norbix/norbix.dev data-repo-id=R_kgDOOV_xMQ data-category=Announcements data-category-id=DIC_kwDOOV_xMc4CpF5M data-mapping=pathname data-strict=0 data-reactions-enabled=1 data-emit-metadata=0 data-input-position=bottom data-theme=dark data-lang=en crossorigin=anonymous async></script></div><nav class=paginav><a class=prev href=https://norbix.dev/posts/artificial-intelligence/><span class=title>« Prev</span><br><span>Demystifying Artificial Intelligence: AI, Machine Learning, and Deep Learning</span></a></nav></article></main></main><footer class=footer><span>&copy; 2025 <a href=https://norbix.dev/>norbix.dev - The log of my journey through code & software systems architecture</a></span> ·
+<span>Powered by
+<a href=https://gohugo.io/ rel="noopener noreferrer" target=_blank>Hugo</a> &
+        <a href=https://github.com/adityatelange/hugo-PaperMod/ rel=noopener target=_blank>PaperMod</a></span></footer><a href=#top aria-label="go to top" title="Go to Top (Alt + G)" class=top-link id=top-link accesskey=g><svg viewBox="0 0 12 6" fill="currentcolor"><path d="M12 6H0l6-6z"/></svg>
+</a><script>let menu=document.getElementById("menu");menu&&(menu.scrollLeft=localStorage.getItem("menu-scroll-position"),menu.onscroll=function(){localStorage.setItem("menu-scroll-position",menu.scrollLeft)}),document.querySelectorAll('a[href^="#"]').forEach(e=>{e.addEventListener("click",function(e){e.preventDefault();var t=this.getAttribute("href").substr(1);window.matchMedia("(prefers-reduced-motion: reduce)").matches?document.querySelector(`[id='${decodeURIComponent(t)}']`).scrollIntoView():document.querySelector(`[id='${decodeURIComponent(t)}']`).scrollIntoView({behavior:"smooth"}),t==="top"?history.replaceState(null,null," "):history.pushState(null,null,`#${t}`)})})</script><script>var mybutton=document.getElementById("top-link");window.onscroll=function(){document.body.scrollTop>800||document.documentElement.scrollTop>800?(mybutton.style.visibility="visible",mybutton.style.opacity="1"):(mybutton.style.visibility="hidden",mybutton.style.opacity="0")}</script><script>document.getElementById("theme-toggle").addEventListener("click",()=>{document.body.className.includes("dark")?(document.body.classList.remove("dark"),localStorage.setItem("pref-theme","light")):(document.body.classList.add("dark"),localStorage.setItem("pref-theme","dark"))})</script><script src=https://platform.linkedin.com/badges/js/profile.js async defer type=text/javascript></script></body></html>
