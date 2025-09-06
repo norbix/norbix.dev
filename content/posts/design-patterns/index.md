@@ -1,10 +1,10 @@
 +++
 date = '2025-04-15T12:43:02+02:00'
 draft = false
-title = 'Design Patterns in Go: Practical Examples'
+title = 'GoF Design Patterns in Go: Practical Examples'
 tags = ['go', 'golang', 'design patterns', 'architecture']
 categories = ['Programming', 'Go']
-summary = 'Explore creational, structural, and behavioral design patterns in Go with clear explanations and code snippets.'
+summary = 'Explore the 23 Gang of Four (GoF) design patterns in Go with clear explanations and code snippets, grouped into creational, structural, and behavioral categories.'
 comments = true
 ShowToc = true
 TocOpen = true
