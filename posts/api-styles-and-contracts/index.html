@@ -1,0 +1,536 @@
+<!doctype html><html lang=en><head><meta charset=UTF-8><meta name=viewport content="width=device-width,initial-scale=1"><script>(function(){const e=localStorage.getItem("theme"),t=window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches;e==="dark"||!e&&t?document.documentElement.classList.add("dark"):document.documentElement.classList.remove("dark"),window.setTheme=function(e){localStorage.setItem("theme",e),document.documentElement.classList.toggle("dark",e==="dark")}})()</script><title>REST vs GraphQL vs WebSocket vs gRPC: API Styles and Contracts in Go | norbix.dev
+</title><meta charset=utf-8><meta http-equiv=X-UA-Compatible content="IE=edge"><meta name=viewport content="width=device-width,initial-scale=1,shrink-to-fit=no"><meta name=robots content="index, follow"><title>REST vs GraphQL vs WebSocket vs gRPC: API Styles and Contracts in Go | norbix.dev - The log of my journey through code & software systems architecture</title>
+<meta name=keywords content="api,rest,graphql,websocket,grpc,openapi,swagger,protobuf,go"><meta name=description content="From REST to GraphQL, WebSocket, and gRPC — explore API communication patterns and how contracts like OpenAPI, Swagger, and Protobuf shape modern Go systems."><meta name=author content><link rel=canonical href=https://norbix.dev/posts/api-styles-and-contracts/><link crossorigin=anonymous href=/assets/css/stylesheet.fc220c15db4aef0318bbf30adc45d33d4d7c88deff3238b23eb255afdc472ca6.css integrity="sha256-/CIMFdtK7wMYu/MK3EXTPU18iN7/MjiyPrJVr9xHLKY=" rel="preload stylesheet" as=style><link rel=icon href=https://norbix.dev/favicon.ico><link rel=icon type=image/png sizes=16x16 href=https://norbix.dev/favicon-16x16.png><link rel=icon type=image/png sizes=32x32 href=https://norbix.dev/favicon-32x32.png><link rel=apple-touch-icon href=https://norbix.dev/apple-touch-icon.png><link rel=mask-icon href=https://norbix.dev/safari-pinned-tab.svg><meta name=theme-color content="#2e2e33"><meta name=msapplication-TileColor content="#2e2e33"><link rel=alternate hreflang=en href=https://norbix.dev/posts/api-styles-and-contracts/><noscript><style>#theme-toggle,.top-link{display:none}</style></noscript><link rel=canonical href=https://norbix.dev/posts/api-styles-and-contracts/><meta property="og:title" content="REST vs GraphQL vs WebSocket vs gRPC: API Styles and Contracts in Go"><meta property="og:url" content="https://norbix.dev/posts/api-styles-and-contracts/"><meta property="og:image" content="https://norbix.dev/api-architecture-banner.jpg"><meta property="og:type" content="article"><meta name=twitter:card content="summary_large_image"><meta name=twitter:title content="REST vs GraphQL vs WebSocket vs gRPC: API Styles and Contracts in Go"><meta name=twitter:image content="https://norbix.dev/api-architecture-banner.jpg"><script data-goatcounter=https://norbix.goatcounter.com/count async src=//gc.zgo.at/count.js></script><link rel=alternate type=application/rss+xml title="RSS Feed for norbix.dev" href=/index.xml><meta property="og:title" content="REST vs GraphQL vs WebSocket vs gRPC: API Styles and Contracts in Go"><meta property="og:description" content="From REST to GraphQL, WebSocket, and gRPC — explore API communication patterns and how contracts like OpenAPI, Swagger, and Protobuf shape modern Go systems."><meta property="og:type" content="article"><meta property="og:url" content="https://norbix.dev/posts/api-styles-and-contracts/"><meta property="article:section" content="posts"><meta property="article:published_time" content="2025-09-07T12:00:00+02:00"><meta property="article:modified_time" content="2025-09-07T12:00:00+02:00"><meta name=twitter:card content="summary"><meta name=twitter:title content="REST vs GraphQL vs WebSocket vs gRPC: API Styles and Contracts in Go"><meta name=twitter:description content="From REST to GraphQL, WebSocket, and gRPC — explore API communication patterns and how contracts like OpenAPI, Swagger, and Protobuf shape modern Go systems."><script type=application/ld+json>{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Posts","item":"https://norbix.dev/posts/"},{"@type":"ListItem","position":2,"name":"REST vs GraphQL vs WebSocket vs gRPC: API Styles and Contracts in Go","item":"https://norbix.dev/posts/api-styles-and-contracts/"}]}</script><script type=application/ld+json>{"@context":"https://schema.org","@type":"BlogPosting","headline":"REST vs GraphQL vs WebSocket vs gRPC: API Styles and Contracts in Go","name":"REST vs GraphQL vs WebSocket vs gRPC: API Styles and Contracts in Go","description":"From REST to GraphQL, WebSocket, and gRPC — explore API communication patterns and how contracts like OpenAPI, Swagger, and Protobuf shape modern Go systems.","keywords":["api","rest","graphql","websocket","grpc","openapi","swagger","protobuf","go"],"articleBody":" 📌 Introduction APIs are the backbone of modern distributed systems. Over time, API design evolved from ad-hoc HTTP endpoints to strongly typed contracts with dedicated tooling.\nExample (Go, the “raw” approach):\n1 2 3 http.HandleFunc(\"/hello\", func(w http.ResponseWriter, r *http.Request) { fmt.Fprintln(w, \"Hello World\") }) 🏗️ API-First Approach Before development even starts, the business and product teams should model the contract — not just developers.\nThis is called the API-First approach:\nDefine your OpenAPI or Protobuf contract up front.\nUse it as the source of truth across teams (backend, frontend, QA).\nGenerate server stubs, clients, and mocks directly from the contract.\n👉 Why it matters:\nAligns business expectations with implementation.\nReduces misunderstandings and integration surprises.\nEnables parallel development (frontend builds against mocks while backend is still in progress).\n📜 OpenAPI \u0026 Swagger OpenAPI (OAS): machine-readable spec for REST APIs.\nSwagger: ecosystem of tooling (UI, codegen, validators).\n✅ Benefits:\nContracts as a single source of truth.\nAuto-generate docs, clients, and server stubs.\nExample OpenAPI snippet (YAML):\n1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 paths: /users/{id}: get: summary: Get a user by ID parameters: - name: id in: path required: true schema: type: string responses: '200': description: OK content: application/json: schema: $ref: '#/components/schemas/User' 📍 Swagger UI: renders the spec into interactive docs.\n👉 The link goes to Swagger Editor https://editor.swagger.io/\n📦 Protobuf Contracts Protobuf defines schemas for gRPC services.\nProvides strong typing, binary serialization, and evolution with backward compatibility.\nExample .proto:\n1 2 3 4 5 6 7 8 9 10 11 12 13 14 syntax = \"proto3\"; service UserService { rpc GetUser (UserRequest) returns (UserResponse); } message UserRequest { string id = 1; } message UserResponse { string id = 1; string name = 2; } 👉 Try it online: Buf Schema Registry https://buf.build/ — design, lint, and validate gRPC/Protobuf APIs in the browser.\n🌐 REST Pros: simple, widely supported, cacheable.\nCons: over-fetching/under-fetching, no strong typing.\nExample (Gin):\n1 2 3 r.GET(\"/users/:id\", func(c *gin.Context) { c.JSON(200, gin.H{\"id\": c.Param(\"id\"), \"name\": \"Alice\"}) }) 🔍 GraphQL Pros: client chooses fields, flexible queries.\nCons: complex server, N+1 query problem, caching harder.\nExample query:\n1 2 3 4 5 6 7 query { user(id: \"123\") { id name posts { title } } } 🔄 WebSocket Pros: bidirectional, low-latency, real-time.\nCons: harder to scale, stateful connections.\nExample (Go):\n1 2 conn, _, _ := websocket.DefaultDialer.Dial(\"ws://localhost:8080/ws\", nil) conn.WriteMessage(websocket.TextMessage, []byte(\"hello\")) ⚡ gRPC Pros: fast, strongly typed, streaming support, efficient over HTTP/2.\nCons: tooling overhead, browser requires gRPC-Web.\nExample Go client:\n1 resp, err := client.GetUser(ctx, \u0026pb.UserRequest{Id: \"123\"}) 📊 Visual Comparison flowchart TB REST[\"REST\\n+ Simple\\n+ Cacheable\\n- Over/Under fetching\"] GraphQL[\"GraphQL\\n+ Flexible queries\\n- Complex server\"] WebSocket[\"WebSocket\\n+ Real-time\\n- Scaling issues\"] gRPC[\"gRPC\\n+ Fast, typed\\n+ Streaming\\n- Tooling overhead\"] REST --- GraphQL --- WebSocket --- gRPC 🧪 Testing Your APIs Robust APIs deserve robust tests. Here are practical workflows: 🧰 Toolbox\nContracts: OpenAPI/Swagger (REST), Protobuf (gRPC)\nManual: IntelliJ HTTP Client, IDEA gRPC Client\nCLI: curl, grpcurl\nGUI: Postman (supports REST, GraphQL, WebSocket, gRPC)\nFail-Fast Pattern When testing, adopt a fail-fast mindset:\nDetect invalid inputs and misconfigurations as early as possible.\nFail the request with clear error messages (e.g., 422 Unprocessable Entity) instead of letting bad data flow deeper.\nIn CI, stop the pipeline immediately when contract tests or smoke tests fail.\nThis pattern prevents small mistakes (like missing fields, wrong types, expired tokens) from becoming production outages.\nMocking External Dependencies Your service rarely lives in isolation. It depends on:\nDatabases\nExternal APIs (e.g., payment gateways, identity providers)\nMessage queues / event buses\nFor reliability, these dependencies should be:\nMocked: fake servers responding to API requests (e.g., Prism for REST, fake gRPC server).\nStubbed: minimal hardcoded responses (fast for unit tests).\nReal: integration environment with actual dependencies (used sparingly).\n👉 Testing pyramid for APIs:\nUnit tests → use stubs.\nIntegration tests → use mocks.\nE2E tests → hit real dependencies (but keep scope small).\nDependency Graph flowchart LR subgraph Service[\"Your API Service\"] A[\"Controller / Handler\"] B[\"Application Logic\"] end subgraph Dependencies DB[(\"Database\")] EXT1[\"External API\\n(Payment Service)\"] EXT2[\"External API\\n(Identity Provider)\"] MQ[\"Message Queue\\n(Kafka/NATS)\"] end subgraph TestDoubles[\"Test Doubles\"] M[\"Mocks\\n(simulated servers)\"] S[\"Stubs\\n(fixed responses)\"] end A --\u003e B B --\u003e DB B --\u003e EXT1 B --\u003e EXT2 B --\u003e MQ %% Test mapping B -.-\u003e M B -.-\u003e S ✅ Use dependency injection in Go (pass interfaces, not concrete clients) → swap between real, mock, and stub implementations easily.\nExample (Go interface for payment gateway):\n1 2 3 type PaymentGateway interface { Charge(ctx context.Context, userID string, amount int) error } During tests:\n1 2 3 4 5 type StubPayment struct{} func (s StubPayment) Charge(ctx context.Context, userID string, amount int) error { return nil // always succeed } 🔁 Dependency Inversion Principle (DIP) in Practice DIP:\nHigh-level modules (use cases, services) must not depend on low-level modules (DB clients, HTTP SDKs).\nBoth should depend on abstractions (interfaces).\nAbstractions shouldn’t depend on details; details depend on abstractions.\nIn Go, that means you define interfaces close to the domain/use case (core), and make adapters (DB, external APIs) implement them. Your wiring (composition root) injects the concrete implementations.\nDIP Diagram (who depends on whom)\nflowchart LR subgraph Core[\"Core (Domain + Application)\"] S[\"Service / Use Case\"] P[\"Port Interface\\n(e.g., PaymentGateway, UserRepo)\"] end subgraph Adapters[\"Adapters (Infrastructure)\"] A1[\"PostgresUserRepo\\nimplements UserRepo\"] A2[\"StripePayment\\nimplements PaymentGateway\"] end subgraph Drivers[\"Drivers (Transport)\"] H[\"HTTP/gRPC Handlers\"] end %% Dependencies point TOWARD abstractions H --\u003e S S --\u003e P A1 --\u003e P A2 --\u003e P Handlers depend on services (core).\nServices depend on ports (interfaces).\nAdapters implement ports and therefore depend on the interfaces (not the other way around).\nMinimal Go example (Ports in core, Adapters implement) File internal/core/payment/port.go (❗ abstraction lives in the core)\n1 2 3 4 5 6 7 package payment import \"context\" type Gateway interface { Charge(ctx context.Context, userID string, amountCents int64, currency string) (string, error) } File: internal/core/checkout/service.go (high-level depends on abstraction)\n1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 package checkout import ( \"context\" \"fmt\" \"yourapp/internal/core/payment\" ) type Service struct { pay payment.Gateway } func NewService(pg payment.Gateway) *Service { return \u0026Service{pay: pg} } func (s *Service) Purchase(ctx context.Context, userID string, cents int64) (string, error) { if cents \u003c= 0 { return \"\", fmt.Errorf(\"invalid amount\") } return s.pay.Charge(ctx, userID, cents, \"USD\") } File: internal/adapters/stripe/gateway.go (detail depends on abstraction)\n1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 package stripe import ( \"context\" \"yourapp/internal/core/payment\" ) type Client struct { apiKey string } func New(apiKey string) *Client { return \u0026Client{apiKey: apiKey} } // Ensure it implements the port var _ payment.Gateway = (*Client)(nil) func (c *Client) Charge(ctx context.Context, userID string, amountCents int64, currency string) (string, error) { // call Stripe SDK/HTTP here... return \"ch_123\", nil } File: cmd/api/main.go (composition root: wire details into core)\n1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 package main import ( \"log\" \"yourapp/internal/adapters/stripe\" \"yourapp/internal/core/checkout\" ) func main() { stripeGW := stripe.New(\"sk_test_...\") // detail svc := checkout.NewService(stripeGW) // inject into core // pass svc into HTTP handlers (not shown) log.Println(\"api up\") } Testing with mocks/stubs (DIP makes this trivial) File: internal/core/payment/stub.go\n1 2 3 4 5 6 7 8 9 10 11 12 package payment import \"context\" type StubGateway struct { ChargeFn func(ctx context.Context, userID string, amountCents int64, currency string) (string, error) } func (s StubGateway) Charge(ctx context.Context, userID string, amountCents int64, currency string) (string, error) { if s.ChargeFn != nil { return s.ChargeFn(ctx, userID, amountCents, currency) } return \"stub_tx\", nil } File: internal/core/checkout/service_test.go\n1 2 3 4 5 6 svc := checkout.NewService(payment.StubGateway{ ChargeFn: func(_ context.Context, _ string, amount int64, _ string) (string, error) { if amount \u003e 100_00 { return \"\", fmt.Errorf(\"limit\") } return \"ok\", nil }, }) DIP Checklist Define ports (interfaces) in core (domain/application), not in infra.\nAdapters implement ports; they import core, not vice versa.\nKeep the composition root (wiring) at the edge (e.g., cmd/api/main.go).\nIn tests, replace adapters with stubs/mocks by injecting port implementations.\nEnforce with var _ Port = (*Adapter)(nil) compile-time checks.\nAvoid handlers or services importing vendor SDKs—that’s a DIP smell.\nThis approach aligns perfectly with API-First and your mock/stub strategy: the contract (OpenAPI/Protobuf) defines shapes at the boundary, while DIP ensures your core stays independent from transport and vendor details.\n🧪 When to Use Mock vs Stub Use stubs for deterministic data, mocks for interaction/behavior verification.\nTest level Primary goal Prefer Stub when… Prefer Mock when… Unit Pure logic correctness You just need canned data (happy/unhappy cases) You must assert a call happened (args, order, count) Integration Adapter correctness (DB/API/Queue) You want fast, local tests without spinning dependencies You need to simulate network errors, timeouts, retries E2E / Contract End-to-end flows \u0026 schema compatibility — Use mock servers from OpenAPI/Protobuf for contract fit Stub (deterministic data for unit tests):\n1 2 3 4 5 6 7 8 9 type StubPayment struct { ResultTx string Err error } func (s StubPayment) Charge(ctx context.Context, userID string, amountCents int64, currency string) (string, error) { if s.Err != nil { return \"\", s.Err } return s.ResultTx, nil } Mock (verify interaction):\n1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 type MockPayment struct { Calls []struct { UserID string Amount int64 Curr string } ReturnTx string ReturnErr error } func (m *MockPayment) Charge(ctx context.Context, userID string, amountCents int64, currency string) (string, error) { m.Calls = append(m.Calls, struct { UserID string; Amount int64; Curr string }{userID, amountCents, currency}) return m.ReturnTx, m.ReturnErr } // test mp := \u0026MockPayment{ReturnTx: \"tx_ok\"} svc := checkout.NewService(mp) _, _ = svc.Purchase(ctx, \"u1\", 499) require.Len(t, mp.Calls, 1) require.Equal(t, int64(499), mp.Calls[0].Amount) require.Equal(t, \"USD\", mp.Calls[0].Curr) Tips Start with stubs for 80% of unit tests (fast, simple).\nUse mocks where behavior matters (retry, circuit breaker, idempotency, audit).\nIn integration tests, you can run a mock server (Prism for REST, test gRPC server) to simulate realistic failures: 429/503, timeouts, malformed payloads.\n🧭 Code to an Interface, Not an Implementation Keep your core independent from frameworks and vendors. Depend on ports (interfaces) you own; inject adapters (details) at the edge. Principles\nDefine interfaces in the core (domain/application).\nAdapters implement those interfaces and import the core (not vice versa).\nWire everything in a composition root (cmd/*/main.go).\nPrefer narrow, behavior-based interfaces (only what the use case needs).\nEnforce compile-time checks: var _ Port = (*Adapter)(nil).\nBad (leaky) – core depends on vendor:\n1 2 3 4 // core/checkout/service.go type Service struct { stripe *stripe.Client // ❌ vendor in core } Good (DIP + interface) – core depends on abstraction:\n1 2 3 4 5 6 7 8 9 // core/payment/port.go type Gateway interface { Charge(ctx context.Context, userID string, amountCents int64, currency string) (string, error) } // core/checkout/service.go type Service struct{ pay payment.Gateway } func NewService(gw payment.Gateway) *Service { return \u0026Service{pay: gw} } Adapter implements the port:\n1 2 3 4 5 6 7 8 9 // adapters/stripe/gateway.go var _ payment.Gateway = (*Client)(nil) type Client struct { apiKey string } func (c *Client) Charge(ctx context.Context, userID string, amountCents int64, currency string) (string, error) { // call Stripe SDK / HTTP return \"ch_123\", nil } Composition root wires details:\n1 2 3 4 // cmd/api/main.go stripeGW := stripe.New(os.Getenv(\"STRIPE_KEY\")) svc := checkout.NewService(stripeGW) router := http.NewRouter(svc) Interface design checklist ✅ Define in core (where it’s used), not in infra (where it’s implemented).\n✅ Keep it minimal (YAGNI): expose only methods your use case truly needs.\n✅ Return domain errors or wrap vendor errors at the boundary.\n✅ Make it mock/stub-friendly (simple method signatures, context first arg).\n✅ Avoid leaking transport types (no *http.Request or *sql.DB in ports).\nIntelliJ IDEA HTTP Client\nCreate file api_tests.http:\n1 2 3 4 5 6 7 8 9 10 11 12 13 ### Get user GET http://localhost:8080/v1/users/123 Authorization: Bearer {{TOKEN}} ### Create user POST http://localhost:8080/v1/users Content-Type: application/json Authorization: Bearer {{TOKEN}} { \"name\": \"Alice\", \"email\": \"alice@example.com\" } GraphQL request:\n1 2 3 4 5 6 7 POST http://localhost:8080/graphql Content-Type: application/json { \"query\": \"query($id: ID!) { user(id: $id) { id name posts { title } } }\", \"variables\": { \"id\": \"123\" } } WebSocket request:\n1 2 3 4 5 WEBSOCKET ws://localhost:8080/ws Sec-WebSocket-Protocol: chat \u003c { \"type\": \"hello\", \"payload\": \"Hi\" } \u003c { \"type\": \"subscribe\", \"channel\": \"notifications\" } gRPC request:\n1 2 3 4 5 6 GRPC localhost:50051 com.example.user.UserService/GetUser Content-Type: application/json { \"id\": \"123\" } curl \u0026 grpcurl\nREST:\n1 2 curl -sS -H \"Authorization: Bearer $TOKEN\" \\ http://localhost:8080/v1/users/123 | jq GraphQL:\n1 2 3 curl -sS -H \"Content-Type: application/json\" \\ -d '{\"query\":\"{ user(id:\\\"123\\\"){ id name } }\"}' \\ http://localhost:8080/graphql | jq gRPC:\n1 2 grpcurl -plaintext -d '{\"id\":\"123\"}' \\ localhost:50051 com.example.user.UserService.GetUser Postman\nImport OpenAPI → REST collections.\nImport .proto → gRPC methods.\nUse GraphQL tab for queries.\nUse WebSocket request for real-time testing.\nContract-First Workflows\nOpenAPI (REST): generate Go stubs with oapi-codegen.\nProtobuf (gRPC): generate Go code with protoc.\nUse mock servers (Prism, grpcurl) to test against the contract.\nAdd contract tests in CI to catch drift early.\nTesting Patterns\nEnvironments: manage tokens/URLs in IDEA http-client.env.json or Postman environments.\nNegative tests: invalid payloads, auth errors, rate limiting.\nAutomation: run .http files or Postman collections in CI pipelines.\nQuick Decision Matrix\nStyle Manual Tool CLI Contract Best For REST IDEA HTTP, Postman curl OpenAPI/Swagger ✅ CRUD, ✅ public APIs, ✅ caching GraphQL IDEA HTTP, Postman curl SDL (schema) ✅ Complex clients, ✅ flexible reads, ⚠️ caching harder WebSocket IDEA HTTP, Postman websocat (none) ✅ Real-time, ✅ chat, ✅ dashboards, ⚠️ scaling challenges gRPC IDEA gRPC, Postman grpcurl Protobuf ✅ Service-to-service, ✅ high perf, ✅ streaming, ⚠️ tooling overhead 🎯 When to Use Which? REST → CRUD, public APIs, cache-friendly.\nGraphQL → client-driven queries, mobile apps.\nWebSocket → chat, dashboards, real-time collab.\ngRPC → service-to-service, high-performance internal APIs.\nConclusion First APIs were manual and error-prone.\nOpenAPI/Swagger made REST self-documented.\nProtobuf powers gRPC with strong contracts.\nNo silver bullet — choose API style based on domain, scale, and performance needs.\n🚀 Follow me on norbix.dev for more insights on Go, Python, AI, system design, and engineering wisdom.\n","wordCount":"2338","inLanguage":"en","datePublished":"2025-09-07T12:00:00+02:00","dateModified":"2025-09-07T12:00:00+02:00","mainEntityOfPage":{"@type":"WebPage","@id":"https://norbix.dev/posts/api-styles-and-contracts/"},"publisher":{"@type":"Organization","name":"norbix.dev - The log of my journey through code \u0026 software systems architecture","logo":{"@type":"ImageObject","url":"https://norbix.dev/favicon.ico"}}}</script></head><body><script>localStorage.getItem("pref-theme")==="light"&&document.body.classList.remove("dark")</script><header class=header><nav class=nav><div class=logo><a href=https://norbix.dev/ accesskey=h title="norbix.dev - The log of my journey through code & software systems architecture (Alt + H)">norbix.dev - The log of my journey through code & software systems architecture</a><div class=logo-switches><button id=theme-toggle accesskey=t title="(Alt + T)"><svg id="moon" width="24" height="18" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg><svg id="sun" width="24" height="18" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg></button></div></div><ul id=menu><li><a href=https://norbix.dev/ title=Home><span>Home</span></a></li><li><a href=https://norbix.dev/posts/ title=Posts><span>Posts</span></a></li><li><a href=https://norbix.dev/tags/ title=Tags><span>Tags</span></a></li><li><a href=https://norbix.dev/about/ title=About><span>About</span></a></li><li><a href=https://norbix.dev/index.xml title="📡 RSS"><span>📡 RSS</span></a></li></ul></nav></header><main><main id=main><article class=post-single><header class=post-header><h1 class=post-title>REST vs GraphQL vs WebSocket vs gRPC: API Styles and Contracts in Go</h1><span title='2025-09-07 12:00:00 +0200 +0200'>September 7, 2025</span></header><div class=post-content><nav class=table-of-contents><nav id=TableOfContents><ul><li><a href=#-introduction>📌 Introduction</a></li><li><a href=#-api-first-approach>🏗️ API-First Approach</a></li><li><a href=#-openapi--swagger>📜 OpenAPI & Swagger</a></li><li><a href=#-protobuf-contracts>📦 Protobuf Contracts</a></li><li><a href=#-rest>🌐 REST</a></li><li><a href=#-graphql>🔍 GraphQL</a></li><li><a href=#-websocket>🔄 WebSocket</a></li><li><a href=#-grpc>⚡ gRPC</a></li><li><a href=#-visual-comparison>📊 Visual Comparison</a></li><li><a href=#-testing-your-apis>🧪 Testing Your APIs</a><ul><li><a href=#fail-fast-pattern>Fail-Fast Pattern</a></li></ul></li><li><a href=#mocking-external-dependencies>Mocking External Dependencies</a></li><li><a href=#dependency-graph>Dependency Graph</a></li><li><a href=#-dependency-inversion-principle-dip-in-practice>🔁 Dependency Inversion Principle (DIP) in Practice</a><ul><li><a href=#minimal-go-example-ports-in-core-adapters-implement>Minimal Go example (Ports in core, Adapters implement)</a></li><li><a href=#testing-with-mocksstubs-dip-makes-this-trivial>Testing with mocks/stubs (DIP makes this trivial)</a></li><li><a href=#dip-checklist>DIP Checklist</a></li></ul></li><li><a href=#-when-to-use-mock-vs-stub>🧪 When to Use Mock vs Stub</a><ul><li><a href=#tips>Tips</a></li></ul></li><li><a href=#-code-to-an-interface-not-an-implementation>🧭 Code to an Interface, Not an Implementation</a><ul><li><a href=#interface-design-checklist>Interface design checklist</a></li></ul></li><li><a href=#-when-to-use-which>🎯 When to Use Which?</a></li><li><a href=#conclusion>Conclusion</a></li></ul></nav></nav><div style=display:flex;justify-content:center><img src=api-architecture-banner.jpg alt="API Styles and Contracts in Go" style=max-width:100%;height:auto></div><hr><h2 id=-introduction>📌 Introduction</h2><p>APIs are the backbone of modern distributed systems. Over time, API design evolved from <strong>ad-hoc HTTP endpoints</strong> to <strong>strongly typed contracts</strong> with dedicated tooling.</p><p>Example (Go, the “raw” approach):</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-go data-lang=go><span class=line><span class=cl><span class=nx>http</span><span class=p>.</span><span class=nf>HandleFunc</span><span class=p>(</span><span class=s>&#34;/hello&#34;</span><span class=p>,</span> <span class=kd>func</span><span class=p>(</span><span class=nx>w</span> <span class=nx>http</span><span class=p>.</span><span class=nx>ResponseWriter</span><span class=p>,</span> <span class=nx>r</span> <span class=o>*</span><span class=nx>http</span><span class=p>.</span><span class=nx>Request</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=nx>fmt</span><span class=p>.</span><span class=nf>Fprintln</span><span class=p>(</span><span class=nx>w</span><span class=p>,</span> <span class=s>&#34;Hello World&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=p>})</span>
+</span></span></code></pre></td></tr></table></div></div><hr><h2 id=-api-first-approach>🏗️ API-First Approach</h2><p>Before development even starts, the business and product teams should model the contract — not just developers.</p><p>This is called the API-First approach:</p><ul><li><p>Define your OpenAPI or Protobuf contract up front.</p></li><li><p>Use it as the source of truth across teams (backend, frontend, QA).</p></li><li><p>Generate server stubs, clients, and mocks directly from the contract.</p></li></ul><p>👉 Why it matters:</p><ul><li><p>Aligns business expectations with implementation.</p></li><li><p>Reduces misunderstandings and integration surprises.</p></li><li><p>Enables parallel development (frontend builds against mocks while backend is still in progress).</p></li></ul><hr><h2 id=-openapi--swagger>📜 OpenAPI & Swagger</h2><ul><li><p>OpenAPI (OAS): machine-readable spec for REST APIs.</p></li><li><p>Swagger: ecosystem of tooling (UI, codegen, validators).</p></li></ul><p>✅ Benefits:</p><ul><li><p>Contracts as a single source of truth.</p></li><li><p>Auto-generate docs, clients, and server stubs.</p></li></ul><p>Example OpenAPI snippet (YAML):</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml><span class=line><span class=cl><span class=nt>paths</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=l>/users/{id}:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>get</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span><span class=nt>summary</span><span class=p>:</span><span class=w> </span><span class=l>Get a user by ID</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span><span class=nt>parameters</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span>- <span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>id</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>          </span><span class=nt>in</span><span class=p>:</span><span class=w> </span><span class=l>path</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>          </span><span class=nt>required</span><span class=p>:</span><span class=w> </span><span class=kc>true</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>          </span><span class=nt>schema</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=nt>type</span><span class=p>:</span><span class=w> </span><span class=l>string</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span><span class=nt>responses</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=nt>&#39;200&#39;</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>          </span><span class=nt>description</span><span class=p>:</span><span class=w> </span><span class=l>OK</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>          </span><span class=nt>content</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=nt>application/json</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>              </span><span class=nt>schema</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>                </span><span class=nt>$ref</span><span class=p>:</span><span class=w> </span><span class=s1>&#39;#/components/schemas/User&#39;</span><span class=w>
+</span></span></span></code></pre></td></tr></table></div></div><p>📍 Swagger UI: renders the spec into interactive docs.</p><p>👉 The link goes to Swagger Editor <a href=https://editor.swagger.io/>https://editor.swagger.io/</a></p><hr><h2 id=-protobuf-contracts>📦 Protobuf Contracts</h2><ul><li><p>Protobuf defines schemas for gRPC services.</p></li><li><p>Provides strong typing, binary serialization, and evolution with backward compatibility.</p></li></ul><p>Example .proto:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-protobuf data-lang=protobuf><span class=line><span class=cl><span class=n>syntax</span> <span class=o>=</span> <span class=s>&#34;proto3&#34;</span><span class=p>;</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err></span><span class=kd>service</span> <span class=n>UserService</span> <span class=p>{</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err></span>  <span class=k>rpc</span> <span class=n>GetUser</span> <span class=p>(</span><span class=n>UserRequest</span><span class=p>)</span> <span class=k>returns</span> <span class=p>(</span><span class=n>UserResponse</span><span class=p>);</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err></span><span class=p>}</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err></span><span class=kd>message</span> <span class=nc>UserRequest</span> <span class=p>{</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err></span>  <span class=kt>string</span> <span class=n>id</span> <span class=o>=</span> <span class=mi>1</span><span class=p>;</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err></span><span class=p>}</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err></span><span class=kd>message</span> <span class=nc>UserResponse</span> <span class=p>{</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err></span>  <span class=kt>string</span> <span class=n>id</span> <span class=o>=</span> <span class=mi>1</span><span class=p>;</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err></span>  <span class=kt>string</span> <span class=n>name</span> <span class=o>=</span> <span class=mi>2</span><span class=p>;</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err></span><span class=p>}</span><span class=err>
+</span></span></span></code></pre></td></tr></table></div></div><p>👉 Try it online: Buf Schema Registry <a href=https://buf.build/>https://buf.build/</a> — design, lint, and validate gRPC/Protobuf APIs in the browser.</p><hr><h2 id=-rest>🌐 REST</h2><ul><li><p>Pros: simple, widely supported, cacheable.</p></li><li><p>Cons: over-fetching/under-fetching, no strong typing.</p></li></ul><p>Example (Gin):</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-go data-lang=go><span class=line><span class=cl><span class=nx>r</span><span class=p>.</span><span class=nf>GET</span><span class=p>(</span><span class=s>&#34;/users/:id&#34;</span><span class=p>,</span> <span class=kd>func</span><span class=p>(</span><span class=nx>c</span> <span class=o>*</span><span class=nx>gin</span><span class=p>.</span><span class=nx>Context</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=nx>c</span><span class=p>.</span><span class=nf>JSON</span><span class=p>(</span><span class=mi>200</span><span class=p>,</span> <span class=nx>gin</span><span class=p>.</span><span class=nx>H</span><span class=p>{</span><span class=s>&#34;id&#34;</span><span class=p>:</span> <span class=nx>c</span><span class=p>.</span><span class=nf>Param</span><span class=p>(</span><span class=s>&#34;id&#34;</span><span class=p>),</span> <span class=s>&#34;name&#34;</span><span class=p>:</span> <span class=s>&#34;Alice&#34;</span><span class=p>})</span>
+</span></span><span class=line><span class=cl><span class=p>})</span>
+</span></span></code></pre></td></tr></table></div></div><hr><h2 id=-graphql>🔍 GraphQL</h2><ul><li><p>Pros: client chooses fields, flexible queries.</p></li><li><p>Cons: complex server, N+1 query problem, caching harder.</p></li></ul><p>Example query:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-graphql data-lang=graphql><span class=line><span class=cl><span class=kd>query</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nc>user</span><span class=p>(</span><span class=py>id</span><span class=p>:</span><span class=w> </span><span class=s>&#34;123&#34;</span><span class=p>)</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nc>id</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=py>name</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=py>posts</span><span class=w> </span><span class=p>{</span><span class=w> </span><span class=py>title</span><span class=w> </span><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=p>}</span><span class=w>
+</span></span></span></code></pre></td></tr></table></div></div><hr><h2 id=-websocket>🔄 WebSocket</h2><ul><li><p>Pros: bidirectional, low-latency, real-time.</p></li><li><p>Cons: harder to scale, stateful connections.</p></li></ul><p>Example (Go):</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-go data-lang=go><span class=line><span class=cl><span class=nx>conn</span><span class=p>,</span> <span class=nx>_</span><span class=p>,</span> <span class=nx>_</span> <span class=o>:=</span> <span class=nx>websocket</span><span class=p>.</span><span class=nx>DefaultDialer</span><span class=p>.</span><span class=nf>Dial</span><span class=p>(</span><span class=s>&#34;ws://localhost:8080/ws&#34;</span><span class=p>,</span> <span class=kc>nil</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=nx>conn</span><span class=p>.</span><span class=nf>WriteMessage</span><span class=p>(</span><span class=nx>websocket</span><span class=p>.</span><span class=nx>TextMessage</span><span class=p>,</span> <span class=p>[]</span><span class=nb>byte</span><span class=p>(</span><span class=s>&#34;hello&#34;</span><span class=p>))</span>
+</span></span></code></pre></td></tr></table></div></div><hr><h2 id=-grpc>⚡ gRPC</h2><ul><li><p>Pros: fast, strongly typed, streaming support, efficient over HTTP/2.</p></li><li><p>Cons: tooling overhead, browser requires gRPC-Web.</p></li></ul><p>Example Go client:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-go data-lang=go><span class=line><span class=cl><span class=nx>resp</span><span class=p>,</span> <span class=nx>err</span> <span class=o>:=</span> <span class=nx>client</span><span class=p>.</span><span class=nf>GetUser</span><span class=p>(</span><span class=nx>ctx</span><span class=p>,</span> <span class=o>&amp;</span><span class=nx>pb</span><span class=p>.</span><span class=nx>UserRequest</span><span class=p>{</span><span class=nx>Id</span><span class=p>:</span> <span class=s>&#34;123&#34;</span><span class=p>})</span>
+</span></span></code></pre></td></tr></table></div></div><hr><h2 id=-visual-comparison>📊 Visual Comparison</h2><pre tabindex=0><code class=language-mermaid data-lang=mermaid>flowchart TB
+    REST[&#34;REST\n+ Simple\n+ Cacheable\n- Over/Under fetching&#34;]
+    GraphQL[&#34;GraphQL\n+ Flexible queries\n- Complex server&#34;]
+    WebSocket[&#34;WebSocket\n+ Real-time\n- Scaling issues&#34;]
+    gRPC[&#34;gRPC\n+ Fast, typed\n+ Streaming\n- Tooling overhead&#34;]
+
+    REST --- GraphQL --- WebSocket --- gRPC
+</code></pre><hr><h2 id=-testing-your-apis>🧪 Testing Your APIs</h2><ul><li>Robust APIs deserve robust tests. Here are practical workflows:</li></ul><p>🧰 Toolbox</p><ul><li><p>Contracts: OpenAPI/Swagger (REST), Protobuf (gRPC)</p></li><li><p>Manual: IntelliJ HTTP Client, IDEA gRPC Client</p></li><li><p>CLI: curl, grpcurl</p></li><li><p>GUI: Postman (supports REST, GraphQL, WebSocket, gRPC)</p></li></ul><h3 id=fail-fast-pattern>Fail-Fast Pattern</h3><p>When testing, adopt a fail-fast mindset:</p><ul><li><p>Detect invalid inputs and misconfigurations as early as possible.</p></li><li><p>Fail the request with clear error messages (e.g., 422 Unprocessable Entity) instead of letting bad data flow deeper.</p></li><li><p>In CI, stop the pipeline immediately when contract tests or smoke tests fail.</p></li></ul><p>This pattern prevents small mistakes (like missing fields, wrong types, expired tokens) from becoming production outages.</p><h2 id=mocking-external-dependencies>Mocking External Dependencies</h2><p>Your service rarely lives in isolation. It depends on:</p><ul><li><p>Databases</p></li><li><p>External APIs (e.g., payment gateways, identity providers)</p></li><li><p>Message queues / event buses</p></li></ul><p>For reliability, these dependencies should be:</p><ul><li><p>Mocked: fake servers responding to API requests (e.g., Prism for REST, fake gRPC server).</p></li><li><p>Stubbed: minimal hardcoded responses (fast for unit tests).</p></li><li><p>Real: integration environment with actual dependencies (used sparingly).</p></li></ul><p>👉 Testing pyramid for APIs:</p><ul><li><p>Unit tests → use stubs.</p></li><li><p>Integration tests → use mocks.</p></li><li><p>E2E tests → hit real dependencies (but keep scope small).</p></li></ul><h2 id=dependency-graph>Dependency Graph</h2><pre tabindex=0><code class=language-mermaid data-lang=mermaid>flowchart LR
+    subgraph Service[&#34;Your API Service&#34;]
+        A[&#34;Controller / Handler&#34;]
+        B[&#34;Application Logic&#34;]
+    end
+
+    subgraph Dependencies
+        DB[(&#34;Database&#34;)]
+        EXT1[&#34;External API\n(Payment Service)&#34;]
+        EXT2[&#34;External API\n(Identity Provider)&#34;]
+        MQ[&#34;Message Queue\n(Kafka/NATS)&#34;]
+    end
+
+    subgraph TestDoubles[&#34;Test Doubles&#34;]
+        M[&#34;Mocks\n(simulated servers)&#34;]
+        S[&#34;Stubs\n(fixed responses)&#34;]
+    end
+
+    A --&gt; B
+    B --&gt; DB
+    B --&gt; EXT1
+    B --&gt; EXT2
+    B --&gt; MQ
+
+    %% Test mapping
+    B -.-&gt; M
+    B -.-&gt; S
+</code></pre><p>✅ Use dependency injection in Go (pass interfaces, not concrete clients) → swap between real, mock, and stub implementations easily.</p><p>Example (Go interface for payment gateway):</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-go data-lang=go><span class=line><span class=cl><span class=kd>type</span> <span class=nx>PaymentGateway</span> <span class=kd>interface</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=nf>Charge</span><span class=p>(</span><span class=nx>ctx</span> <span class=nx>context</span><span class=p>.</span><span class=nx>Context</span><span class=p>,</span> <span class=nx>userID</span> <span class=kt>string</span><span class=p>,</span> <span class=nx>amount</span> <span class=kt>int</span><span class=p>)</span> <span class=kt>error</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><p>During tests:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-go data-lang=go><span class=line><span class=cl><span class=kd>type</span> <span class=nx>StubPayment</span> <span class=kd>struct</span><span class=p>{}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kd>func</span> <span class=p>(</span><span class=nx>s</span> <span class=nx>StubPayment</span><span class=p>)</span> <span class=nf>Charge</span><span class=p>(</span><span class=nx>ctx</span> <span class=nx>context</span><span class=p>.</span><span class=nx>Context</span><span class=p>,</span> <span class=nx>userID</span> <span class=kt>string</span><span class=p>,</span> <span class=nx>amount</span> <span class=kt>int</span><span class=p>)</span> <span class=kt>error</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=k>return</span> <span class=kc>nil</span> <span class=c1>// always succeed</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><hr><h2 id=-dependency-inversion-principle-dip-in-practice>🔁 Dependency Inversion Principle (DIP) in Practice</h2><p>DIP:</p><p>High-level modules (use cases, services) must not depend on low-level modules (DB clients, HTTP SDKs).</p><p>Both should depend on abstractions (interfaces).</p><p>Abstractions shouldn’t depend on details; details depend on abstractions.</p><p>In Go, that means you define interfaces close to the domain/use case (core), and make adapters (DB, external APIs) implement them. Your wiring (composition root) injects the concrete implementations.</p><p>DIP Diagram (who depends on whom)</p><pre tabindex=0><code class=language-mermaid data-lang=mermaid>flowchart LR
+    subgraph Core[&#34;Core (Domain + Application)&#34;]
+        S[&#34;Service / Use Case&#34;]
+        P[&#34;Port Interface\n(e.g., PaymentGateway, UserRepo)&#34;]
+    end
+
+    subgraph Adapters[&#34;Adapters (Infrastructure)&#34;]
+        A1[&#34;PostgresUserRepo\nimplements UserRepo&#34;]
+        A2[&#34;StripePayment\nimplements PaymentGateway&#34;]
+    end
+
+    subgraph Drivers[&#34;Drivers (Transport)&#34;]
+        H[&#34;HTTP/gRPC Handlers&#34;]
+    end
+
+    %% Dependencies point TOWARD abstractions
+    H --&gt; S
+    S --&gt; P
+    A1 --&gt; P
+    A2 --&gt; P
+</code></pre><ul><li><p>Handlers depend on services (core).</p></li><li><p>Services depend on ports (interfaces).</p></li><li><p>Adapters implement ports and therefore depend on the interfaces (not the other way around).</p></li></ul><h3 id=minimal-go-example-ports-in-core-adapters-implement>Minimal Go example (Ports in core, Adapters implement)</h3><p>File <code>internal/core/payment/port.go</code> (❗ abstraction lives in the core)</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-go data-lang=go><span class=line><span class=cl><span class=kn>package</span> <span class=nx>payment</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kn>import</span> <span class=s>&#34;context&#34;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kd>type</span> <span class=nx>Gateway</span> <span class=kd>interface</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=nf>Charge</span><span class=p>(</span><span class=nx>ctx</span> <span class=nx>context</span><span class=p>.</span><span class=nx>Context</span><span class=p>,</span> <span class=nx>userID</span> <span class=kt>string</span><span class=p>,</span> <span class=nx>amountCents</span> <span class=kt>int64</span><span class=p>,</span> <span class=nx>currency</span> <span class=kt>string</span><span class=p>)</span> <span class=p>(</span><span class=kt>string</span><span class=p>,</span> <span class=kt>error</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><p>File: <code>internal/core/checkout/service.go</code> (high-level depends on abstraction)</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-go data-lang=go><span class=line><span class=cl><span class=kn>package</span> <span class=nx>checkout</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kn>import</span> <span class=p>(</span>
+</span></span><span class=line><span class=cl>    <span class=s>&#34;context&#34;</span>
+</span></span><span class=line><span class=cl>    <span class=s>&#34;fmt&#34;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=s>&#34;yourapp/internal/core/payment&#34;</span>
+</span></span><span class=line><span class=cl><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kd>type</span> <span class=nx>Service</span> <span class=kd>struct</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=nx>pay</span> <span class=nx>payment</span><span class=p>.</span><span class=nx>Gateway</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kd>func</span> <span class=nf>NewService</span><span class=p>(</span><span class=nx>pg</span> <span class=nx>payment</span><span class=p>.</span><span class=nx>Gateway</span><span class=p>)</span> <span class=o>*</span><span class=nx>Service</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=k>return</span> <span class=o>&amp;</span><span class=nx>Service</span><span class=p>{</span><span class=nx>pay</span><span class=p>:</span> <span class=nx>pg</span><span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kd>func</span> <span class=p>(</span><span class=nx>s</span> <span class=o>*</span><span class=nx>Service</span><span class=p>)</span> <span class=nf>Purchase</span><span class=p>(</span><span class=nx>ctx</span> <span class=nx>context</span><span class=p>.</span><span class=nx>Context</span><span class=p>,</span> <span class=nx>userID</span> <span class=kt>string</span><span class=p>,</span> <span class=nx>cents</span> <span class=kt>int64</span><span class=p>)</span> <span class=p>(</span><span class=kt>string</span><span class=p>,</span> <span class=kt>error</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=k>if</span> <span class=nx>cents</span> <span class=o>&lt;=</span> <span class=mi>0</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=k>return</span> <span class=s>&#34;&#34;</span><span class=p>,</span> <span class=nx>fmt</span><span class=p>.</span><span class=nf>Errorf</span><span class=p>(</span><span class=s>&#34;invalid amount&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl>    <span class=k>return</span> <span class=nx>s</span><span class=p>.</span><span class=nx>pay</span><span class=p>.</span><span class=nf>Charge</span><span class=p>(</span><span class=nx>ctx</span><span class=p>,</span> <span class=nx>userID</span><span class=p>,</span> <span class=nx>cents</span><span class=p>,</span> <span class=s>&#34;USD&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><p>File: <code>internal/adapters/stripe/gateway.go</code> (detail depends on abstraction)</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-go data-lang=go><span class=line><span class=cl><span class=kn>package</span> <span class=nx>stripe</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kn>import</span> <span class=p>(</span>
+</span></span><span class=line><span class=cl>    <span class=s>&#34;context&#34;</span>
+</span></span><span class=line><span class=cl>    <span class=s>&#34;yourapp/internal/core/payment&#34;</span>
+</span></span><span class=line><span class=cl><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kd>type</span> <span class=nx>Client</span> <span class=kd>struct</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=nx>apiKey</span> <span class=kt>string</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kd>func</span> <span class=nf>New</span><span class=p>(</span><span class=nx>apiKey</span> <span class=kt>string</span><span class=p>)</span> <span class=o>*</span><span class=nx>Client</span> <span class=p>{</span> <span class=k>return</span> <span class=o>&amp;</span><span class=nx>Client</span><span class=p>{</span><span class=nx>apiKey</span><span class=p>:</span> <span class=nx>apiKey</span><span class=p>}</span> <span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1>// Ensure it implements the port</span>
+</span></span><span class=line><span class=cl><span class=kd>var</span> <span class=nx>_</span> <span class=nx>payment</span><span class=p>.</span><span class=nx>Gateway</span> <span class=p>=</span> <span class=p>(</span><span class=o>*</span><span class=nx>Client</span><span class=p>)(</span><span class=kc>nil</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kd>func</span> <span class=p>(</span><span class=nx>c</span> <span class=o>*</span><span class=nx>Client</span><span class=p>)</span> <span class=nf>Charge</span><span class=p>(</span><span class=nx>ctx</span> <span class=nx>context</span><span class=p>.</span><span class=nx>Context</span><span class=p>,</span> <span class=nx>userID</span> <span class=kt>string</span><span class=p>,</span> <span class=nx>amountCents</span> <span class=kt>int64</span><span class=p>,</span> <span class=nx>currency</span> <span class=kt>string</span><span class=p>)</span> <span class=p>(</span><span class=kt>string</span><span class=p>,</span> <span class=kt>error</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=c1>// call Stripe SDK/HTTP here...</span>
+</span></span><span class=line><span class=cl>    <span class=k>return</span> <span class=s>&#34;ch_123&#34;</span><span class=p>,</span> <span class=kc>nil</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><p>File: <code>cmd/api/main.go</code> (composition root: wire details into core)</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-go data-lang=go><span class=line><span class=cl><span class=kn>package</span> <span class=nx>main</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kn>import</span> <span class=p>(</span>
+</span></span><span class=line><span class=cl>    <span class=s>&#34;log&#34;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=s>&#34;yourapp/internal/adapters/stripe&#34;</span>
+</span></span><span class=line><span class=cl>    <span class=s>&#34;yourapp/internal/core/checkout&#34;</span>
+</span></span><span class=line><span class=cl><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kd>func</span> <span class=nf>main</span><span class=p>()</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=nx>stripeGW</span> <span class=o>:=</span> <span class=nx>stripe</span><span class=p>.</span><span class=nf>New</span><span class=p>(</span><span class=s>&#34;sk_test_...&#34;</span><span class=p>)</span>          <span class=c1>// detail</span>
+</span></span><span class=line><span class=cl>    <span class=nx>svc</span>      <span class=o>:=</span> <span class=nx>checkout</span><span class=p>.</span><span class=nf>NewService</span><span class=p>(</span><span class=nx>stripeGW</span><span class=p>)</span>      <span class=c1>// inject into core</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=c1>// pass svc into HTTP handlers (not shown)</span>
+</span></span><span class=line><span class=cl>    <span class=nx>log</span><span class=p>.</span><span class=nf>Println</span><span class=p>(</span><span class=s>&#34;api up&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><h3 id=testing-with-mocksstubs-dip-makes-this-trivial>Testing with mocks/stubs (DIP makes this trivial)</h3><p>File: <code>internal/core/payment/stub.go</code></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-go data-lang=go><span class=line><span class=cl><span class=kn>package</span> <span class=nx>payment</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kn>import</span> <span class=s>&#34;context&#34;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kd>type</span> <span class=nx>StubGateway</span> <span class=kd>struct</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=nx>ChargeFn</span> <span class=kd>func</span><span class=p>(</span><span class=nx>ctx</span> <span class=nx>context</span><span class=p>.</span><span class=nx>Context</span><span class=p>,</span> <span class=nx>userID</span> <span class=kt>string</span><span class=p>,</span> <span class=nx>amountCents</span> <span class=kt>int64</span><span class=p>,</span> <span class=nx>currency</span> <span class=kt>string</span><span class=p>)</span> <span class=p>(</span><span class=kt>string</span><span class=p>,</span> <span class=kt>error</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kd>func</span> <span class=p>(</span><span class=nx>s</span> <span class=nx>StubGateway</span><span class=p>)</span> <span class=nf>Charge</span><span class=p>(</span><span class=nx>ctx</span> <span class=nx>context</span><span class=p>.</span><span class=nx>Context</span><span class=p>,</span> <span class=nx>userID</span> <span class=kt>string</span><span class=p>,</span> <span class=nx>amountCents</span> <span class=kt>int64</span><span class=p>,</span> <span class=nx>currency</span> <span class=kt>string</span><span class=p>)</span> <span class=p>(</span><span class=kt>string</span><span class=p>,</span> <span class=kt>error</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=k>if</span> <span class=nx>s</span><span class=p>.</span><span class=nx>ChargeFn</span> <span class=o>!=</span> <span class=kc>nil</span> <span class=p>{</span> <span class=k>return</span> <span class=nx>s</span><span class=p>.</span><span class=nf>ChargeFn</span><span class=p>(</span><span class=nx>ctx</span><span class=p>,</span> <span class=nx>userID</span><span class=p>,</span> <span class=nx>amountCents</span><span class=p>,</span> <span class=nx>currency</span><span class=p>)</span> <span class=p>}</span>
+</span></span><span class=line><span class=cl>    <span class=k>return</span> <span class=s>&#34;stub_tx&#34;</span><span class=p>,</span> <span class=kc>nil</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><p>File: <code>internal/core/checkout/service_test.go</code></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-go data-lang=go><span class=line><span class=cl><span class=nx>svc</span> <span class=o>:=</span> <span class=nx>checkout</span><span class=p>.</span><span class=nf>NewService</span><span class=p>(</span><span class=nx>payment</span><span class=p>.</span><span class=nx>StubGateway</span><span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=nx>ChargeFn</span><span class=p>:</span> <span class=kd>func</span><span class=p>(</span><span class=nx>_</span> <span class=nx>context</span><span class=p>.</span><span class=nx>Context</span><span class=p>,</span> <span class=nx>_</span> <span class=kt>string</span><span class=p>,</span> <span class=nx>amount</span> <span class=kt>int64</span><span class=p>,</span> <span class=nx>_</span> <span class=kt>string</span><span class=p>)</span> <span class=p>(</span><span class=kt>string</span><span class=p>,</span> <span class=kt>error</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=k>if</span> <span class=nx>amount</span> <span class=p>&gt;</span> <span class=mi>100_00</span> <span class=p>{</span> <span class=k>return</span> <span class=s>&#34;&#34;</span><span class=p>,</span> <span class=nx>fmt</span><span class=p>.</span><span class=nf>Errorf</span><span class=p>(</span><span class=s>&#34;limit&#34;</span><span class=p>)</span> <span class=p>}</span>
+</span></span><span class=line><span class=cl>        <span class=k>return</span> <span class=s>&#34;ok&#34;</span><span class=p>,</span> <span class=kc>nil</span>
+</span></span><span class=line><span class=cl>    <span class=p>},</span>
+</span></span><span class=line><span class=cl><span class=p>})</span>
+</span></span></code></pre></td></tr></table></div></div><h3 id=dip-checklist>DIP Checklist</h3><ul><li><p>Define ports (interfaces) in core (domain/application), not in infra.</p></li><li><p>Adapters implement ports; they import core, not vice versa.</p></li><li><p>Keep the composition root (wiring) at the edge (e.g., cmd/api/main.go).</p></li><li><p>In tests, replace adapters with stubs/mocks by injecting port implementations.</p></li><li><p>Enforce with var _ Port = (*Adapter)(nil) compile-time checks.</p></li><li><p>Avoid handlers or services importing vendor SDKs—that’s a DIP smell.</p></li></ul><p>This approach aligns perfectly with API-First and your mock/stub strategy: the contract (OpenAPI/Protobuf) defines shapes at the boundary, while DIP ensures your core stays independent from transport and vendor details.</p><hr><h2 id=-when-to-use-mock-vs-stub>🧪 When to Use Mock vs Stub</h2><p>Use stubs for deterministic data, mocks for interaction/behavior verification.</p><table><thead><tr><th>Test level</th><th>Primary goal</th><th>Prefer Stub when…</th><th>Prefer Mock when…</th></tr></thead><tbody><tr><td>Unit</td><td>Pure logic correctness</td><td>You just need canned data (happy/unhappy cases)</td><td>You must assert a call happened (args, order, count)</td></tr><tr><td>Integration</td><td>Adapter correctness (DB/API/Queue)</td><td>You want fast, local tests without spinning dependencies</td><td>You need to simulate network errors, timeouts, retries</td></tr><tr><td>E2E / Contract</td><td>End-to-end flows & schema compatibility</td><td>—</td><td>Use mock servers from OpenAPI/Protobuf for contract fit</td></tr></tbody></table><p>Stub (deterministic data for unit tests):</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span><span class=lnt>8
+</span><span class=lnt>9
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-go data-lang=go><span class=line><span class=cl><span class=kd>type</span> <span class=nx>StubPayment</span> <span class=kd>struct</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=nx>ResultTx</span> <span class=kt>string</span>
+</span></span><span class=line><span class=cl>    <span class=nx>Err</span>      <span class=kt>error</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kd>func</span> <span class=p>(</span><span class=nx>s</span> <span class=nx>StubPayment</span><span class=p>)</span> <span class=nf>Charge</span><span class=p>(</span><span class=nx>ctx</span> <span class=nx>context</span><span class=p>.</span><span class=nx>Context</span><span class=p>,</span> <span class=nx>userID</span> <span class=kt>string</span><span class=p>,</span> <span class=nx>amountCents</span> <span class=kt>int64</span><span class=p>,</span> <span class=nx>currency</span> <span class=kt>string</span><span class=p>)</span> <span class=p>(</span><span class=kt>string</span><span class=p>,</span> <span class=kt>error</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=k>if</span> <span class=nx>s</span><span class=p>.</span><span class=nx>Err</span> <span class=o>!=</span> <span class=kc>nil</span> <span class=p>{</span> <span class=k>return</span> <span class=s>&#34;&#34;</span><span class=p>,</span> <span class=nx>s</span><span class=p>.</span><span class=nx>Err</span> <span class=p>}</span>
+</span></span><span class=line><span class=cl>    <span class=k>return</span> <span class=nx>s</span><span class=p>.</span><span class=nx>ResultTx</span><span class=p>,</span> <span class=kc>nil</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><p>Mock (verify interaction):</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-go data-lang=go><span class=line><span class=cl><span class=kd>type</span> <span class=nx>MockPayment</span> <span class=kd>struct</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=nx>Calls</span> <span class=p>[]</span><span class=kd>struct</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=nx>UserID</span> <span class=kt>string</span>
+</span></span><span class=line><span class=cl>        <span class=nx>Amount</span> <span class=kt>int64</span>
+</span></span><span class=line><span class=cl>        <span class=nx>Curr</span>   <span class=kt>string</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl>    <span class=nx>ReturnTx</span> <span class=kt>string</span>
+</span></span><span class=line><span class=cl>    <span class=nx>ReturnErr</span> <span class=kt>error</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kd>func</span> <span class=p>(</span><span class=nx>m</span> <span class=o>*</span><span class=nx>MockPayment</span><span class=p>)</span> <span class=nf>Charge</span><span class=p>(</span><span class=nx>ctx</span> <span class=nx>context</span><span class=p>.</span><span class=nx>Context</span><span class=p>,</span> <span class=nx>userID</span> <span class=kt>string</span><span class=p>,</span> <span class=nx>amountCents</span> <span class=kt>int64</span><span class=p>,</span> <span class=nx>currency</span> <span class=kt>string</span><span class=p>)</span> <span class=p>(</span><span class=kt>string</span><span class=p>,</span> <span class=kt>error</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=nx>m</span><span class=p>.</span><span class=nx>Calls</span> <span class=p>=</span> <span class=nb>append</span><span class=p>(</span><span class=nx>m</span><span class=p>.</span><span class=nx>Calls</span><span class=p>,</span> <span class=kd>struct</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=nx>UserID</span> <span class=kt>string</span><span class=p>;</span> <span class=nx>Amount</span> <span class=kt>int64</span><span class=p>;</span> <span class=nx>Curr</span> <span class=kt>string</span>
+</span></span><span class=line><span class=cl>    <span class=p>}{</span><span class=nx>userID</span><span class=p>,</span> <span class=nx>amountCents</span><span class=p>,</span> <span class=nx>currency</span><span class=p>})</span>
+</span></span><span class=line><span class=cl>    <span class=k>return</span> <span class=nx>m</span><span class=p>.</span><span class=nx>ReturnTx</span><span class=p>,</span> <span class=nx>m</span><span class=p>.</span><span class=nx>ReturnErr</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1>// test</span>
+</span></span><span class=line><span class=cl><span class=nx>mp</span> <span class=o>:=</span> <span class=o>&amp;</span><span class=nx>MockPayment</span><span class=p>{</span><span class=nx>ReturnTx</span><span class=p>:</span> <span class=s>&#34;tx_ok&#34;</span><span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=nx>svc</span> <span class=o>:=</span> <span class=nx>checkout</span><span class=p>.</span><span class=nf>NewService</span><span class=p>(</span><span class=nx>mp</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=nx>_</span><span class=p>,</span> <span class=nx>_</span> <span class=p>=</span> <span class=nx>svc</span><span class=p>.</span><span class=nf>Purchase</span><span class=p>(</span><span class=nx>ctx</span><span class=p>,</span> <span class=s>&#34;u1&#34;</span><span class=p>,</span> <span class=mi>499</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=nx>require</span><span class=p>.</span><span class=nf>Len</span><span class=p>(</span><span class=nx>t</span><span class=p>,</span> <span class=nx>mp</span><span class=p>.</span><span class=nx>Calls</span><span class=p>,</span> <span class=mi>1</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=nx>require</span><span class=p>.</span><span class=nf>Equal</span><span class=p>(</span><span class=nx>t</span><span class=p>,</span> <span class=nb>int64</span><span class=p>(</span><span class=mi>499</span><span class=p>),</span> <span class=nx>mp</span><span class=p>.</span><span class=nx>Calls</span><span class=p>[</span><span class=mi>0</span><span class=p>].</span><span class=nx>Amount</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=nx>require</span><span class=p>.</span><span class=nf>Equal</span><span class=p>(</span><span class=nx>t</span><span class=p>,</span> <span class=s>&#34;USD&#34;</span><span class=p>,</span> <span class=nx>mp</span><span class=p>.</span><span class=nx>Calls</span><span class=p>[</span><span class=mi>0</span><span class=p>].</span><span class=nx>Curr</span><span class=p>)</span>
+</span></span></code></pre></td></tr></table></div></div><h3 id=tips>Tips</h3><ul><li><p>Start with stubs for 80% of unit tests (fast, simple).</p></li><li><p>Use mocks where behavior matters (retry, circuit breaker, idempotency, audit).</p></li><li><p>In integration tests, you can run a mock server (Prism for REST, test gRPC server) to simulate realistic failures: 429/503, timeouts, malformed payloads.</p></li></ul><hr><h2 id=-code-to-an-interface-not-an-implementation>🧭 Code to an Interface, Not an Implementation</h2><ul><li>Keep your core independent from frameworks and vendors. Depend on ports (interfaces) you own; inject adapters (details) at the edge.</li></ul><p>Principles</p><ul><li><p>Define interfaces in the core (domain/application).</p></li><li><p>Adapters implement those interfaces and import the core (not vice versa).</p></li><li><p>Wire everything in a composition root (cmd/*/main.go).</p></li><li><p>Prefer narrow, behavior-based interfaces (only what the use case needs).</p></li><li><p>Enforce compile-time checks: var _ Port = (*Adapter)(nil).</p></li></ul><p>Bad (leaky) – core depends on vendor:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-go data-lang=go><span class=line><span class=cl><span class=c1>// core/checkout/service.go</span>
+</span></span><span class=line><span class=cl><span class=kd>type</span> <span class=nx>Service</span> <span class=kd>struct</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=nx>stripe</span> <span class=o>*</span><span class=nx>stripe</span><span class=p>.</span><span class=nx>Client</span> <span class=c1>// ❌ vendor in core</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><p>Good (DIP + interface) – core depends on abstraction:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span><span class=lnt>8
+</span><span class=lnt>9
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-go data-lang=go><span class=line><span class=cl><span class=c1>// core/payment/port.go</span>
+</span></span><span class=line><span class=cl><span class=kd>type</span> <span class=nx>Gateway</span> <span class=kd>interface</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=nf>Charge</span><span class=p>(</span><span class=nx>ctx</span> <span class=nx>context</span><span class=p>.</span><span class=nx>Context</span><span class=p>,</span> <span class=nx>userID</span> <span class=kt>string</span><span class=p>,</span> <span class=nx>amountCents</span> <span class=kt>int64</span><span class=p>,</span> <span class=nx>currency</span> <span class=kt>string</span><span class=p>)</span> <span class=p>(</span><span class=kt>string</span><span class=p>,</span> <span class=kt>error</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1>// core/checkout/service.go</span>
+</span></span><span class=line><span class=cl><span class=kd>type</span> <span class=nx>Service</span> <span class=kd>struct</span><span class=p>{</span> <span class=nx>pay</span> <span class=nx>payment</span><span class=p>.</span><span class=nx>Gateway</span> <span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kd>func</span> <span class=nf>NewService</span><span class=p>(</span><span class=nx>gw</span> <span class=nx>payment</span><span class=p>.</span><span class=nx>Gateway</span><span class=p>)</span> <span class=o>*</span><span class=nx>Service</span> <span class=p>{</span> <span class=k>return</span> <span class=o>&amp;</span><span class=nx>Service</span><span class=p>{</span><span class=nx>pay</span><span class=p>:</span> <span class=nx>gw</span><span class=p>}</span> <span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><p>Adapter implements the port:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span><span class=lnt>8
+</span><span class=lnt>9
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-go data-lang=go><span class=line><span class=cl><span class=c1>// adapters/stripe/gateway.go</span>
+</span></span><span class=line><span class=cl><span class=kd>var</span> <span class=nx>_</span> <span class=nx>payment</span><span class=p>.</span><span class=nx>Gateway</span> <span class=p>=</span> <span class=p>(</span><span class=o>*</span><span class=nx>Client</span><span class=p>)(</span><span class=kc>nil</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kd>type</span> <span class=nx>Client</span> <span class=kd>struct</span> <span class=p>{</span> <span class=nx>apiKey</span> <span class=kt>string</span> <span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kd>func</span> <span class=p>(</span><span class=nx>c</span> <span class=o>*</span><span class=nx>Client</span><span class=p>)</span> <span class=nf>Charge</span><span class=p>(</span><span class=nx>ctx</span> <span class=nx>context</span><span class=p>.</span><span class=nx>Context</span><span class=p>,</span> <span class=nx>userID</span> <span class=kt>string</span><span class=p>,</span> <span class=nx>amountCents</span> <span class=kt>int64</span><span class=p>,</span> <span class=nx>currency</span> <span class=kt>string</span><span class=p>)</span> <span class=p>(</span><span class=kt>string</span><span class=p>,</span> <span class=kt>error</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=c1>// call Stripe SDK / HTTP</span>
+</span></span><span class=line><span class=cl>    <span class=k>return</span> <span class=s>&#34;ch_123&#34;</span><span class=p>,</span> <span class=kc>nil</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><p>Composition root wires details:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-go data-lang=go><span class=line><span class=cl><span class=c1>// cmd/api/main.go</span>
+</span></span><span class=line><span class=cl><span class=nx>stripeGW</span> <span class=o>:=</span> <span class=nx>stripe</span><span class=p>.</span><span class=nf>New</span><span class=p>(</span><span class=nx>os</span><span class=p>.</span><span class=nf>Getenv</span><span class=p>(</span><span class=s>&#34;STRIPE_KEY&#34;</span><span class=p>))</span>
+</span></span><span class=line><span class=cl><span class=nx>svc</span>      <span class=o>:=</span> <span class=nx>checkout</span><span class=p>.</span><span class=nf>NewService</span><span class=p>(</span><span class=nx>stripeGW</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=nx>router</span>   <span class=o>:=</span> <span class=nx>http</span><span class=p>.</span><span class=nf>NewRouter</span><span class=p>(</span><span class=nx>svc</span><span class=p>)</span>
+</span></span></code></pre></td></tr></table></div></div><h3 id=interface-design-checklist>Interface design checklist</h3><ul><li><p>✅ Define in core (where it’s used), not in infra (where it’s implemented).</p></li><li><p>✅ Keep it minimal (YAGNI): expose only methods your use case truly needs.</p></li><li><p>✅ Return domain errors or wrap vendor errors at the boundary.</p></li><li><p>✅ Make it mock/stub-friendly (simple method signatures, context first arg).</p></li><li><p>✅ Avoid leaking transport types (no *http.Request or *sql.DB in ports).</p></li></ul><hr><ol><li><p>IntelliJ IDEA HTTP Client</p><p>Create file <code>api_tests.http</code>:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-text data-lang=text><span class=line><span class=cl>### Get user
+</span></span><span class=line><span class=cl>GET http://localhost:8080/v1/users/123
+</span></span><span class=line><span class=cl>Authorization: Bearer {{TOKEN}}
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>### Create user
+</span></span><span class=line><span class=cl>POST http://localhost:8080/v1/users
+</span></span><span class=line><span class=cl>Content-Type: application/json
+</span></span><span class=line><span class=cl>Authorization: Bearer {{TOKEN}}
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>{
+</span></span><span class=line><span class=cl>  &#34;name&#34;: &#34;Alice&#34;,
+</span></span><span class=line><span class=cl>  &#34;email&#34;: &#34;alice@example.com&#34;
+</span></span><span class=line><span class=cl>}
+</span></span></code></pre></td></tr></table></div></div><p>GraphQL request:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-text data-lang=text><span class=line><span class=cl>POST http://localhost:8080/graphql
+</span></span><span class=line><span class=cl>Content-Type: application/json
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>{
+</span></span><span class=line><span class=cl>  &#34;query&#34;: &#34;query($id: ID!) { user(id: $id) { id name posts { title } } }&#34;,
+</span></span><span class=line><span class=cl>  &#34;variables&#34;: { &#34;id&#34;: &#34;123&#34; }
+</span></span><span class=line><span class=cl>}
+</span></span></code></pre></td></tr></table></div></div><p>WebSocket request:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-text data-lang=text><span class=line><span class=cl>WEBSOCKET ws://localhost:8080/ws
+</span></span><span class=line><span class=cl>Sec-WebSocket-Protocol: chat
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>&lt; { &#34;type&#34;: &#34;hello&#34;, &#34;payload&#34;: &#34;Hi&#34; }
+</span></span><span class=line><span class=cl>&lt; { &#34;type&#34;: &#34;subscribe&#34;, &#34;channel&#34;: &#34;notifications&#34; }
+</span></span></code></pre></td></tr></table></div></div><p>gRPC request:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-text data-lang=text><span class=line><span class=cl>GRPC localhost:50051 com.example.user.UserService/GetUser
+</span></span><span class=line><span class=cl>Content-Type: application/json
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>{
+</span></span><span class=line><span class=cl>  &#34;id&#34;: &#34;123&#34;
+</span></span><span class=line><span class=cl>}
+</span></span></code></pre></td></tr></table></div></div></li><li><p><code>curl</code> & <code>grpcurl</code></p><p>REST:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-shell data-lang=shell><span class=line><span class=cl>curl -sS -H <span class=s2>&#34;Authorization: Bearer </span><span class=nv>$TOKEN</span><span class=s2>&#34;</span> <span class=se>\
+</span></span></span><span class=line><span class=cl><span class=se></span>  http://localhost:8080/v1/users/123 <span class=p>|</span> jq
+</span></span></code></pre></td></tr></table></div></div><p>GraphQL:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-shell data-lang=shell><span class=line><span class=cl>curl -sS -H <span class=s2>&#34;Content-Type: application/json&#34;</span> <span class=se>\
+</span></span></span><span class=line><span class=cl><span class=se></span>  -d <span class=s1>&#39;{&#34;query&#34;:&#34;{ user(id:\&#34;123\&#34;){ id name } }&#34;}&#39;</span> <span class=se>\
+</span></span></span><span class=line><span class=cl><span class=se></span>  http://localhost:8080/graphql <span class=p>|</span> jq
+</span></span></code></pre></td></tr></table></div></div><p>gRPC:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-shell data-lang=shell><span class=line><span class=cl>grpcurl -plaintext -d <span class=s1>&#39;{&#34;id&#34;:&#34;123&#34;}&#39;</span> <span class=se>\
+</span></span></span><span class=line><span class=cl><span class=se></span>  localhost:50051 com.example.user.UserService.GetUser
+</span></span></code></pre></td></tr></table></div></div></li><li><p><code>Postman</code></p><ul><li><p>Import OpenAPI → REST collections.</p></li><li><p>Import .proto → gRPC methods.</p></li><li><p>Use GraphQL tab for queries.</p></li><li><p>Use WebSocket request for real-time testing.</p></li></ul></li><li><p>Contract-First Workflows</p><ul><li><p>OpenAPI (REST): generate Go stubs with oapi-codegen.</p></li><li><p>Protobuf (gRPC): generate Go code with protoc.</p></li><li><p>Use mock servers (Prism, grpcurl) to test against the contract.</p></li><li><p>Add contract tests in CI to catch drift early.</p></li></ul></li><li><p>Testing Patterns</p><ul><li><p>Environments: manage tokens/URLs in IDEA http-client.env.json or Postman environments.</p></li><li><p>Negative tests: invalid payloads, auth errors, rate limiting.</p></li><li><p>Automation: run .http files or Postman collections in CI pipelines.</p></li></ul></li><li><p>Quick Decision Matrix</p><table><thead><tr><th>Style</th><th>Manual Tool</th><th>CLI</th><th>Contract</th><th>Best For</th></tr></thead><tbody><tr><td>REST</td><td>IDEA HTTP, Postman</td><td>curl</td><td>OpenAPI/Swagger</td><td>✅ CRUD, ✅ public APIs, ✅ caching</td></tr><tr><td>GraphQL</td><td>IDEA HTTP, Postman</td><td>curl</td><td>SDL (schema)</td><td>✅ Complex clients, ✅ flexible reads, ⚠️ caching harder</td></tr><tr><td>WebSocket</td><td>IDEA HTTP, Postman</td><td>websocat</td><td>(none)</td><td>✅ Real-time, ✅ chat, ✅ dashboards, ⚠️ scaling challenges</td></tr><tr><td>gRPC</td><td>IDEA gRPC, Postman</td><td>grpcurl</td><td>Protobuf</td><td>✅ Service-to-service, ✅ high perf, ✅ streaming, ⚠️ tooling overhead</td></tr></tbody></table></li></ol><hr><h2 id=-when-to-use-which>🎯 When to Use Which?</h2><ul><li><p>REST → CRUD, public APIs, cache-friendly.</p></li><li><p>GraphQL → client-driven queries, mobile apps.</p></li><li><p>WebSocket → chat, dashboards, real-time collab.</p></li><li><p>gRPC → service-to-service, high-performance internal APIs.</p></li></ul><hr><h2 id=conclusion>Conclusion</h2><ul><li><p>First APIs were manual and error-prone.</p></li><li><p>OpenAPI/Swagger made REST self-documented.</p></li><li><p>Protobuf powers gRPC with strong contracts.</p></li><li><p>No silver bullet — choose API style based on domain, scale, and performance needs.</p></li></ul><hr><p>🚀 Follow me on <a href=https://norbix.dev>norbix.dev</a> for more insights on Go, Python, AI, system design, and engineering wisdom.</p></div><div class=post-subscribe><style>.subscribe-form{display:flex;gap:.5rem;margin-top:1rem;align-items:center}.subscribe-form input[type=email]{padding:.5rem;border-radius:6px;border:1px solid #ccc;background-color:#1f1f1f;color:#fff}.subscribe-form input[type=submit],.subscribe-form button{padding:.5rem 1rem;border-radius:6px;background-color:#facc15;color:#000;border:none;cursor:pointer;font-weight:700}.subscribe-form input[type=submit]:hover{background-color:#fcd34d}</style><form action=https://buttondown.email/api/emails/embed-subscribe/norbix method=post target=popupwindow onsubmit='window.open("https://buttondown.email/norbix","popupwindow")' class=subscribe-form><input type=email name=email placeholder="Enter your email" required>
+<input type=submit value=Subscribe></form><p style=font-size:.875rem;opacity:.6>Powered by Buttondown.</p></div><div class=post-comments><script src=https://giscus.app/client.js data-repo=norbix/norbix.dev data-repo-id=R_kgDOOV_xMQ data-category=Announcements data-category-id=DIC_kwDOOV_xMc4CpF5M data-mapping=pathname data-strict=0 data-reactions-enabled=1 data-emit-metadata=0 data-input-position=bottom data-theme=dark data-lang=en crossorigin=anonymous async></script></div><nav class=paginav><a class=prev href=https://norbix.dev/posts/architectural-patterns/><span class=title>« Prev</span><br><span>Architectural Patterns in Go: MVC, Hexagonal, CQRS, and Microservices</span></a></nav></article></main></main><footer class=footer><span>&copy; 2025 <a href=https://norbix.dev/>norbix.dev - The log of my journey through code & software systems architecture</a></span> ·
+<span>Powered by
+<a href=https://gohugo.io/ rel="noopener noreferrer" target=_blank>Hugo</a> &
+        <a href=https://github.com/adityatelange/hugo-PaperMod/ rel=noopener target=_blank>PaperMod</a></span></footer><a href=#top aria-label="go to top" title="Go to Top (Alt + G)" class=top-link id=top-link accesskey=g><svg viewBox="0 0 12 6" fill="currentcolor"><path d="M12 6H0l6-6z"/></svg>
+</a><script>let menu=document.getElementById("menu");menu&&(menu.scrollLeft=localStorage.getItem("menu-scroll-position"),menu.onscroll=function(){localStorage.setItem("menu-scroll-position",menu.scrollLeft)}),document.querySelectorAll('a[href^="#"]').forEach(e=>{e.addEventListener("click",function(e){e.preventDefault();var t=this.getAttribute("href").substr(1);window.matchMedia("(prefers-reduced-motion: reduce)").matches?document.querySelector(`[id='${decodeURIComponent(t)}']`).scrollIntoView():document.querySelector(`[id='${decodeURIComponent(t)}']`).scrollIntoView({behavior:"smooth"}),t==="top"?history.replaceState(null,null," "):history.pushState(null,null,`#${t}`)})})</script><script>var mybutton=document.getElementById("top-link");window.onscroll=function(){document.body.scrollTop>800||document.documentElement.scrollTop>800?(mybutton.style.visibility="visible",mybutton.style.opacity="1"):(mybutton.style.visibility="hidden",mybutton.style.opacity="0")}</script><script>document.getElementById("theme-toggle").addEventListener("click",()=>{document.body.className.includes("dark")?(document.body.classList.remove("dark"),localStorage.setItem("pref-theme","light")):(document.body.classList.add("dark"),localStorage.setItem("pref-theme","dark"))})</script><script src=https://platform.linkedin.com/badges/js/profile.js async defer type=text/javascript></script></body></html>
