@@ -138,6 +138,73 @@ Any type that implements Read, Write, and Close automatically satisfies Conn.
 
 **✅ This pattern keeps Go code clean, DRY, and testable.**
 
+### 🔍 5.2 Type Assertions
+
+When working with interfaces, you often need to access the concrete type stored inside.
+
+Type assertion syntax:
+
+```go
+value, ok := i.(T)
+```
+
+- `i` → the interface value
+
+- `T` → the type you expect
+
+- `ok` → boolean (true if successful, false if not)
+
+Example:
+
+```go
+var x interface{} = "hello"
+
+s, ok := x.(string)
+if ok {
+    fmt.Println("string value:", s)
+}
+```
+
+**⚠️ Without ok, a failed assertion will panic:**
+
+```go
+i := interface{}(42)
+s := i.(string) // panic: interface {} is int, not string
+```
+
+✅ Common Use Case: Generic Maps
+
+```go
+data := map[string]interface{}{
+    "id":   123,
+    "name": "Alice",
+}
+
+id := data["id"].(int)
+name := data["name"].(string)
+```
+
+🔄 Type Switch
+
+```go
+switch v := i.(type) {
+case string:
+    fmt.Println("string:", v)
+case int:
+    fmt.Println("int:", v)
+default:
+    fmt.Println("unknown type")
+}
+```
+
+#### Best Practices:
+
+- Prefer narrow interfaces (avoid interface{} unless really needed).
+
+- Always use the ok idiom unless you are 100% sure of the type.
+
+- Use type switches for clean multi-branch logic.
+
 ---
 
 ## 🧰 6. Tooling Makes You Better
