@@ -93,6 +93,51 @@ type Storer interface {
 
 Don’t write interfaces for everything — only where mocking or substitution matters (e.g. storage, HTTP clients, etc.).
 
+### 🔗 5.1 Interface Embedding (Composing Behaviors)
+
+In Go, it’s common to see interfaces inside other interfaces — this is called interface embedding.
+
+Example from the standard library:
+
+```go
+type Reader interface {
+    Read(p []byte) (n int, err error)
+}
+
+type Writer interface {
+    Write(p []byte) (n int, err error)
+}
+
+type ReadWriter interface {
+    Reader
+    Writer
+}
+```
+
+Instead of repeating method signatures, Go lets you compose small interfaces into bigger ones.
+
+Why it matters:
+
+- Encourages small, focused interfaces (e.g. io.Reader, io.Writer)
+
+- Avoids “fat interfaces” that are harder to mock/test
+
+- Makes code more reusable and flexible
+
+Example in practice (net.Conn):
+
+```go
+type Conn interface {
+    Reader
+    Writer
+    Closer
+}
+```
+
+Any type that implements Read, Write, and Close automatically satisfies Conn.
+
+**✅ This pattern keeps Go code clean, DRY, and testable.**
+
 ---
 
 ## 🧰 6. Tooling Makes You Better
