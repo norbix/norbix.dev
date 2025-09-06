@@ -315,6 +315,62 @@ SonarQube works great alongside golangci-lint, giving you both quick feedback lo
 - Use channels, but don’t abuse goroutines
 - Benchmark with go test -bench
 
+### 9.1 Cache vs Memoization
+
+These two terms are often confused, but they solve slightly different problems:
+
+| Concept       | Definition                                                                 | Example in Go                                         | Best For                                |
+|---------------|-----------------------------------------------------------------------------|-------------------------------------------------------|-----------------------------------------|
+| **Cache**     | General-purpose store that saves results for reuse, often across requests   | `map[string][]byte` holding responses from an API     | Web servers, database queries, heavy I/O |
+| **Memoization** | Caching applied to a function call — same inputs, same output            | Store Fibonacci results in a local map inside a func  | Pure functions, recursive computations   |
+
+Example: Memoizing Fibonacci
+
+```go
+var memo = map[int]int{}
+
+func fib(n int) int {
+    if n <= 1 {
+        return n
+    }
+    if v, ok := memo[n]; ok {
+        return v
+    }
+    res := fib(n-1) + fib(n-2)
+    memo[n] = res
+    return res
+}
+```
+
+#### Key differences:
+
+- Cache can be global, cross-service, even distributed (e.g., Redis).
+
+- Memoization is function-scoped, purely about optimization of repeated calls with identical input.
+
+#### ⚖️ Comparison
+
+| Feature   | Cache                                   | Memoization                          |
+|-----------|-----------------------------------------|---------------------------------------|
+| **Scope** | System-wide (data, responses, etc)      | Function-local (results of calls)     |
+| **Key**   | Anything (URLs, queries, objects)       | Function arguments                    |
+| **Policy**| TTL, eviction (LRU, LFU, etc.)          | None (grows with unique inputs)       |
+| **Use Cases** | DB queries, API responses, assets   | Fibonacci, factorial, DP problems     |
+
+
+#### 👉 Rule of thumb:
+
+- Use memoization when optimizing pure functions.
+
+- Use a cache when optimizing data retrieval/storage across systems or layers.
+
+
+#### ✅ Best Practice: 
+
+- Use memoization for pure CPU-bound functions,
+
+- Use cache for I/O-heavy or cross-request data.
+
 ---
 
 ## 🧠 10. Readability > Cleverness
