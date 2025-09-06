@@ -78,6 +78,64 @@ And don’t forget the twin brother: **DRY** (Don’t Repeat Yourself).
 
 ---
 
+## 🧹 Clean Code Principles
+
+Clean Code is about writing software that humans can easily **read, maintain, and evolve**. It was popularized by Robert C. Martin (*Uncle Bob*) and remains a foundation for professional craftsmanship.
+
+### Core Principles
+
+- **Meaningful Names** → variables, functions, and classes should reveal intent.
+  
+ ```go
+  // Bad
+  func d(n int) int { return n * (n - 1) }
+
+  // Good
+  func factorial(n int) int { return n * (n - 1) }
+  ```
+
+- Small Functions → each function should do one thing and do it well.
+
+- Avoid Duplication (DRY) → reuse abstractions instead of repeating code.
+
+- Comments for "Why", not "What" → code should be self-explanatory.
+
+- Error Handling Is Logic → fail fast, return meaningful errors.
+
+- Keep It Simple (KISS) → no unnecessary complexity.
+
+- Consistent Style → formatting, naming, and structure should feel uniform.
+
+### Example (Go)
+
+Messy:
+
+```go
+func H(u string) {
+    if u == "" {
+        fmt.Println("err")
+        return
+    }
+    fmt.Println("Hello " + u)
+}
+```
+
+Clean:
+
+```go
+func GreetUser(username string) error {
+    if username == "" {
+        return fmt.Errorf("username cannot be empty")
+    }
+    fmt.Printf("Hello %s\n", username)
+    return nil
+}
+```
+
+**✅ Together with SOLID, Clean Code ensures your architecture is not only well-structured, but also pleasant to read, test, and extend**
+
+---
+
 ## 🛰️ Communication Styles
 
 - **REST**, **gRPC**, **GraphQL**, **WebSocket**
