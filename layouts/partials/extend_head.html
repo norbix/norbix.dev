@@ -55,7 +55,16 @@
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         if (window.mermaid) {
+            // Convert fenced blocks: <pre><code class="language-mermaid">...</code></pre>
+            document.querySelectorAll('code.language-mermaid').forEach(function(code){
+                var pre = code.parentElement;
+                var div = document.createElement('div');
+                div.className = 'mermaid';
+                div.textContent = code.textContent;
+                pre.replaceWith(div);
+            });
             mermaid.initialize({ startOnLoad: true });
         }
     });
 </script>
+
