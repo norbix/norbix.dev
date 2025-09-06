@@ -44,6 +44,65 @@ Go is intentionally minimal — embrace it.
 - Use plain interfaces and simple data structures.
 - Don’t abstract too early — write the concrete code first.
 
+### 🔑 1.1 Keys in a Map
+
+Go maps are incredibly powerful, but not all types can be used as keys.
+
+Allowed as keys ✅:
+
+- `string`, `int`, `bool`, `float64` (comparable primitives)
+
+- Structs and arrays (if all their fields/elements are comparable)
+
+Not allowed ❌:
+
+- `slices`, `maps`, `functions` (they’re not comparable)
+
+Example:
+
+```go
+m := map[string]int{
+    "alice": 1,
+    "bob":   2,
+}
+
+fmt.Println(m["alice"]) // 1
+```
+
+If you try to use a slice as a key:
+
+```go
+bad := map[[]int]string{} // ❌ compile error
+```
+
+Another important property: map iteration order is random.
+
+Never rely on a fixed order when looping:
+
+```go
+for k, v := range m {
+    fmt.Println(k, v) // order is not guaranteed
+}
+```
+
+#### ✅ Best practices:
+
+- Use maps for lookups, not ordered data.
+
+- If you need order, collect keys into a slice and sort
+
+    ```go
+    keys := make([]string, 0, len(m))
+    for k := range m {
+        keys = append(keys, k)
+    }
+    sort.Strings(keys)
+    
+    for _, k := range keys {
+        fmt.Println(k, m[k])
+    }
+    ```
+
 ---
 
 ## 🧱 2. Project Structure Matters
