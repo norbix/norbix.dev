@@ -101,6 +101,9 @@ LIMIT 3;
 
 Joins combine rows from two or more tables based on related columns.
 
+A SQL JOIN doesn’t permanently merge tables; it builds a wider result set at query time by pairing rows whose keys match your condition. 
+Think of it as a lookup that produces a new, temporary table.
+
 ```sql
 -- All books with author info
 SELECT b.title, a.name AS author, a.country, b.year, b.price_usd
