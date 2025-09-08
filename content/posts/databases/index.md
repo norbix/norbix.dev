@@ -287,10 +287,11 @@ Concurrent transactions shouldn’t step on each other. Postgres uses MVCC (mult
 
 Postgres isolation levels (default READ COMMITTED):
 
-Level	Phenomena prevented	Notes
-READ COMMITTED	Dirty reads	Each statement sees a fresh snapshot. Rows changed by concurrent txns may appear/disappear between statements.
-REPEATABLE READ	Dirty + non-repeatable reads; most phantoms	Snapshot fixed for the whole txn (a.k.a. snapshot isolation). Can still have write skew.
-SERIALIZABLE	All above + write skew	Detects anomalies (SSI) and may abort with 40001 serialization_failure — you must retry.
+| Level           | Phenomena prevented                              | Notes                                                                                                                                      |
+|-----------------|---------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------|
+| READ COMMITTED  | Dirty reads                                       | Each statement sees a fresh snapshot. Rows changed by concurrent transactions may appear/disappear between statements.                     |
+| REPEATABLE READ | Dirty + non-repeatable reads; most phantoms       | Snapshot fixed for the whole transaction (aka snapshot isolation). Can still have write skew.                                             |
+| SERIALIZABLE    | All above + write skew                            | Detects anomalies (SSI) and may abort with `40001 serialization_failure` — you must retry.                                                |
 
 Locking primitives (pair with MVCC when needed):
 
