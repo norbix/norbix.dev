@@ -49,6 +49,143 @@ Popular SQL databases: PostgreSQL, MySQL, MariaDB, Microsoft SQL Server.
 
 🔹 **Tip:** Master `JOIN` operations and subqueries to unlock SQL's full power.
 
+
+### 🔰 PostgreSQL quick start (copy–paste)
+
+```sql
+-- One-time sandbox
+CREATE SCHEMA learnsql;
+SET search_path TO learnsql;
+
+CREATE TABLE authors (
+  author_id BIGSERIAL PRIMARY KEY,
+  name      TEXT NOT NULL,
+  country   TEXT NOT NULL
+);
+
+CREATE TABLE books (
+  book_id    BIGSERIAL PRIMARY KEY,
+  author_id  BIGINT NOT NULL REFERENCES authors(author_id),
+  title      TEXT NOT NULL,
+  year       INT,
+  price_usd  NUMERIC(6,2) CHECK (price_usd >= 0)
+);
+
+INSERT INTO authors (name, country) VALUES
+ ('Alicja Kowalska','PL'), ('Bartosz Nowak','PL'),
+ ('Chloe Schneider','DE'), ('Diego García','ES');
+
+INSERT INTO books (author_id,title,year,price_usd) VALUES
+ (1,'SQL for Starters',2023,29.99),
+ (1,'Advanced SQL Patterns',2025,39.50),
+ (2,'Data Modeling 101',2022,24.00),
+ (2,'PostgreSQL Cookbook',2024,35.00),
+ (3,'Window Functions in Practice',2024,32.00),
+ (4,'Indexing and Performance',2021,27.50),
+ (4,'JSON in Postgres',2025,31.00);
+```
+
+#### Select & filter
+
+```sql
+SELECT title, price_usd
+FROM books
+WHERE price_usd > 30
+ORDER BY price_usd DESC
+LIMIT 3;
+```
+
+#### Joins
+
+```sql
+-- All books with author info
+SELECT b.title, a.name AS author, a.country, b.year, b.price_usd
+FROM books b
+JOIN authors a ON a.author_id = b.author_id
+ORDER BY a.name, b.year;
+```
+
+#### Aggregation
+
+```sql
+-- Avg price by country; only countries with ≥2 books
+SELECT a.country,
+       ROUND(AVG(b.price_usd), 2) AS avg_price,
+       COUNT(*) AS books
+FROM books b
+JOIN authors a ON a.author_id = b.author_id
+GROUP BY a.country
+HAVING COUNT(*) >= 2
+ORDER BY avg_price DESC;
+```
+
+#### Useful operators 
+
+```sql
+-- Case-insensitive search
+SELECT title FROM books WHERE title ILIKE '%sql%';
+
+-- Categorize with CASE
+SELECT title,
+       CASE WHEN price_usd >= 35 THEN 'premium'
+            WHEN price_usd >= 30 THEN 'mid'
+            ELSE 'budget' END AS price_tier
+FROM books;
+
+-- Distinct values
+SELECT DISTINCT country FROM authors ORDER BY country;
+```
+
+#### CTEs (WITH) & subqueries
+
+CTE (Common Table Expression) example:
+
+```sql
+-- Authors whose average book price > $30
+WITH avg_price AS (
+  SELECT author_id, AVG(price_usd) AS avg_price
+  FROM books
+  GROUP BY author_id
+)
+SELECT a.name, ap.avg_price
+FROM avg_price ap
+JOIN authors a ON a.author_id = ap.author_id
+WHERE ap.avg_price > 30;
+```
+
+#### Window functions (analytics without collapsing rows)
+
+```sql
+-- Rank the most expensive book per author
+SELECT a.name, b.title, b.price_usd,
+       RANK() OVER (PARTITION BY a.author_id ORDER BY b.price_usd DESC) AS rnk
+FROM books b
+JOIN authors a ON a.author_id = b.author_id
+ORDER BY a.name, rnk;
+```
+
+#### Indexes & EXPLAIN (performance mindset)
+
+```sql
+CREATE INDEX idx_books_author_year ON books(author_id, year);
+EXPLAIN ANALYZE
+SELECT * FROM books WHERE author_id = 2 AND year >= 2024 ORDER BY year;
+```
+
+If you see a sequential scan on a large table, consider whether your index matches the filter and order columns (and their order).
+
+### Common pitfalls (Postgres)
+
+- Strings use single quotes ('PL'). Double quotes are identifiers.
+
+- NULL logic: use IS NULL / IS NOT NULL; = NULL is never true.
+
+- Integer division: 1/2 = 0. Cast for rates: sum(x)::numeric / nullif(count(*),0).
+
+- All non-aggregated SELECT columns must appear in GROUP BY.
+
+- Prefer window functions for “top-k per group” and “rolling” metrics.
+
 ---
 
 ## 🔄 NoSQL: Flexibility at Scale
