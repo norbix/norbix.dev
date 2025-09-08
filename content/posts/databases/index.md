@@ -158,7 +158,6 @@ FROM authors a
 CROSS JOIN (VALUES (2024), (2025)) AS y(year);
 ```
 
-
 ##### Semi/anti joins (idiomatic filters)
 
 EXISTS (semi-join): return authors who have at least one book.
