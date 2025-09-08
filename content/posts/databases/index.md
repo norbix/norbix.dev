@@ -223,7 +223,6 @@ NoSQL systems often prioritize availability and partition tolerance (CAP theorem
 
 🔹 **Tip:** Choose NoSQL when your application requires high write throughput, horizontal scaling, or flexible schemas.
 
-
 NoSQL systems were built to handle massive scale, high write throughput, global availability, and flexible schemas. Instead of one relational model, NoSQL offers several data models optimized for different access patterns.
 
 ### Why teams pick NoSQL
@@ -236,9 +235,7 @@ NoSQL systems were built to handle massive scale, high write throughput, global 
 
 - Built-in sharding & replication (varies by engine).
 
-
 **⚖️ Trade-off: You often give up rich joins, multi-table transactions, or strict relational constraints in exchange for scale and simplicity of operations.**
-
 
 ### The landscape at a glance
 
@@ -250,15 +247,11 @@ NoSQL systems were built to handle massive scale, high write throughput, global 
 
 - Graph (Neo4j, Neptune) — first-class relationships and traversals.
 
-
-
 ### CAP & BASE in one minute
 
 - `CAP`: Under partitions you can choose at most two of {Consistency, Availability, Partition tolerance}. Distributed systems must tolerate partitions, so engines lean C or A.
 
 - `BASE`: Basically Available, Soft state, Eventually consistent — a pragmatic stance for internet-scale systems. Some engines offer tunable consistency per request.
-
-
 
 ### Consistency menu (common options):
 
@@ -269,7 +262,6 @@ NoSQL systems were built to handle massive scale, high write throughput, global 
 - Causal / session (reads respect causality) — MongoDB readConcern: "local" + sessions; Cosmos DB offers session consistency.
 
 - Tunable (Cassandra): choose QUORUM, ONE, ALL per operation.
-
 
 ### Modeling by data model (practical patterns)
 
