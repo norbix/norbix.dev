@@ -127,6 +127,14 @@ HAVING COUNT(*) >= 2                           -- 5) keep only countries with 2+
 ORDER BY avg_price DESC;                       -- 6) sort by avg price, highest first
 ```
 
+**Hint: `GROUP BY` vs `ORDER BY`**
+
+- `GROUP BY` partitions rows into groups and reduces them (with aggregates like COUNT, AVG, SUM).
+
+- `ORDER BY` sorts the final rows (whatever they are—raw or aggregated).
+
+They do different jobs and often appear together.
+
 #### Useful operators 
 
 ```sql
