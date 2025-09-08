@@ -228,6 +228,164 @@ Relational databases excel at enforcing ACID properties, which are critical for 
 
 🔹 **Tip:** In distributed systems, understand when relaxing ACID is acceptable for performance gains (e.g., eventual consistency).
 
+`ACID` describes how a database should execute transactions so your data stays correct even under failures and concurrency.
+
+### A — Atomicity (all-or-nothing)
+
+A transaction’s changes are applied entirely or not at all.
+
+- In Postgres: BEGIN … COMMIT applies; ROLLBACK undoes all.
+
+- Errors inside a txn put it into an aborted state; either ROLLBACK or use savepoints to recover part-way.
+
+- DDL is transactional in Postgres (rare in other DBs): schema changes roll back too.
+
+```sql
+-- Example: money transfer with a savepoint
+BEGIN;
+SAVEPOINT before_debit;
+UPDATE accounts SET balance = balance - 100 WHERE id = 1;
+-- if a check fails, we can rollback to the savepoint instead of the whole txn
+-- ROLLBACK TO SAVEPOINT before_debit;
+UPDATE accounts SET balance = balance + 100 WHERE id = 2;
+COMMIT;
+```
+
+### C — Consistency (valid state → valid state)
+
+A transaction must move the database from one valid state to another, according to constraints you define.
+
+- Use PRIMARY KEY, FOREIGN KEY, UNIQUE, CHECK, and EXCLUSION constraints to encode invariants.
+
+- Postgres can defer some checks to the end of the transaction: `DEFERRABLE INITIALLY DEFERRED`.
+
+```sql
+CREATE TABLE orders (
+id BIGSERIAL PRIMARY KEY,
+customer_id BIGINT REFERENCES customers(id) DEFERRABLE INITIALLY DEFERRED,
+status TEXT CHECK (status IN ('new','paid','shipped','cancelled'))
+);
+-- All FKs are checked at COMMIT time; useful for multi-row upserts.
+```
+
+**Consistency ≠ “business correctness” by itself. The DB enforces what you encode; model your rules as constraints/triggers to get real guarantees.**
+
+
+### I — Isolation (concurrent safety)
+
+Concurrent transactions shouldn’t step on each other. Postgres uses MVCC (multi-version concurrency control): readers don’t block writers; writers don’t block readers (most of the time).
+
+Postgres isolation levels (default READ COMMITTED):
+
+Level	Phenomena prevented	Notes
+READ COMMITTED	Dirty reads	Each statement sees a fresh snapshot. Rows changed by concurrent txns may appear/disappear between statements.
+REPEATABLE READ	Dirty + non-repeatable reads; most phantoms	Snapshot fixed for the whole txn (a.k.a. snapshot isolation). Can still have write skew.
+SERIALIZABLE	All above + write skew	Detects anomalies (SSI) and may abort with 40001 serialization_failure — you must retry.
+
+Locking primitives (pair with MVCC when needed):
+
+```sql
+-- Claim a job row without blocking others
+UPDATE jobs
+SET claimed_by = :worker, claimed_at = now()
+WHERE id = (
+SELECT id FROM jobs
+WHERE claimed_at IS NULL
+ORDER BY priority DESC, created_at
+FOR UPDATE SKIP LOCKED
+LIMIT 1
+)
+RETURNING *;
+
+
+-- Protect a row you will update soon
+SELECT * FROM accounts WHERE id = 1 FOR UPDATE NOWAIT; -- error if locked
+```
+
+### D — Durability (it sticks)
+
+Once COMMITTED, data survives crashes.
+
+- Postgres writes to the WAL (Write-Ahead Log) and fsyncs to disk.
+
+- synchronous_commit = on (default) waits for WAL flush; remote_apply can wait for replicas.
+
+- Turning off fsync or using synchronous_commit = off risks data loss on crash — OK for throwaway dev, not prod.
+
+```sql
+-- Visibility knobs (know what they do before changing)
+SHOW synchronous_commit; -- on by default
+SHOW wal_level; -- replica/logical for replication/CDC
+```
+
+### Putting ACID together: a safe pattern
+
+```sql
+-- Pattern: retry on serialization/conflict
+DO $$
+DECLARE
+tries int := 0;
+BEGIN
+<<retry>>
+BEGIN
+tries := tries + 1;
+-- choose isolation level suitable for invariants
+SET TRANSACTION ISOLATION LEVEL SERIALIZABLE;
+
+
+-- business logic here
+UPDATE inventory SET stock = stock - 1 WHERE sku = 'A' AND stock > 0;
+IF NOT FOUND THEN RAISE EXCEPTION 'Out of stock'; END IF;
+
+
+COMMIT;
+EXCEPTION WHEN serialization_failure THEN
+ROLLBACK;
+IF tries < 3 THEN PERFORM pg_sleep(0.01 * tries); GOTO retry; END IF;
+RAISE; -- give up
+WHEN OTHERS THEN
+ROLLBACK; RAISE;
+END;
+END$$;
+```
+
+Guidelines
+
+- Default to READ COMMITTED; use REPEATABLE READ for consistent analytical reads; use SERIALIZABLE to protect complex invariants (and be ready to retry).
+
+- Keep transactions short to reduce contention and bloat.
+
+- Prefer idempotent writes (e.g., INSERT … ON CONFLICT DO NOTHING/UPDATE) to handle retries safely.
+
+### ACID in distributed systems
+
+A single-node ACID DB can’t make a network reliable. Across services you typically trade strict ACID for availability/latency.
+
+Common patterns:
+
+- Outbox/Inbox: write domain change + message to an outbox atomically; a relay publishes from the DB. Consumers write to an inbox table to get idempotency.
+
+- Sagas: break a business txn into steps with compensations (undo actions) — eventual consistency.
+
+- 2PC (Two-Phase Commit): strong consistency across resources but operationally fragile; avoid unless you fully control all participants.
+
+- Idempotency keys: ensure retried requests don’t duplicate side effects.
+
+Rule of thumb: keep ACID for your core DB boundary; use idempotent, retryable workflows between services and accept eventual consistency where user experience allows.
+
+
+### Quick ACID checklist (Postgres)
+
+- Wrap multi-statement changes in `BEGIN … COMMIT`.
+
+- Encode invariants as constraints; use DEFERRABLE when needed.
+
+- Use proper isolation; retry on 40001 at SERIALIZABLE.
+
+- Use `SELECT … FOR UPDATE [SKIP LOCKED|NOWAIT]` for queues/contention hotspots.
+
+- Monitor WAL/replication; don’t disable `fsync` in prod.
+
 ---
 
 ## 📝 Database Normalization: Design for Integrity
