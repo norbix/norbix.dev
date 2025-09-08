@@ -194,7 +194,7 @@ SELECT * FROM books WHERE author_id = 2 AND year >= 2024 ORDER BY year;
 
 If you see a sequential scan on a large table, consider whether your index matches the filter and order columns (and their order).
 
-### Common pitfalls (Postgres)
+#### Common pitfalls (Postgres)
 
 - Strings use single quotes ('PL'). Double quotes are identifiers.
 
@@ -205,6 +205,119 @@ If you see a sequential scan on a large table, consider whether your index match
 - All non-aggregated SELECT columns must appear in GROUP BY.
 
 - Prefer window functions for “top-k per group” and “rolling” metrics.
+
+### 🔒 Transactions (PostgreSQL): writing safely
+
+A transaction groups multiple statements so they succeed all together or not at all.
+
+#### Quick start
+
+```sql
+BEGIN;                                   -- start a transaction
+  INSERT INTO orders(customer_id) VALUES (42) RETURNING id;
+  INSERT INTO order_items(order_id, product_id, qty) VALUES (currval('orders_id_seq'), 7, 2);
+COMMIT;                                   -- make changes durable
+-- ROLLBACK;                              -- undo everything (if something went wrong)
+```
+
+- Postgres is autocommit by default (each statement = its own transaction).
+
+- Inside a transaction, an error aborts the txn until you ROLLBACK (or use a SAVEPOINT).
+
+#### Savepoints (recover from a partial failure)
+
+```sql
+BEGIN;
+  SAVEPOINT s1;
+  UPDATE accounts SET balance = balance - 100 WHERE id = 1;
+  -- if a check fails you can roll back just this part:
+  -- ROLLBACK TO SAVEPOINT s1;
+
+  UPDATE accounts SET balance = balance + 100 WHERE id = 2;
+COMMIT;
+```
+
+#### Idempotent upsert (avoid duplicates, safe retries)
+
+Use a unique constraint and `ON CONFLICT`:
+
+```sql
+-- setup once:
+-- CREATE UNIQUE INDEX ux_inventory_sku ON inventory(sku);
+
+INSERT INTO inventory(sku, stock)
+VALUES ('A-001', 10)
+ON CONFLICT (sku) DO UPDATE
+SET stock = inventory.stock + EXCLUDED.stock
+RETURNING *;
+```
+
+This is retry-safe if your app repeats the insert after a crash.
+
+#### Claim-a-job queue (locking without blocking the world)
+
+```sql
+-- One worker atomically claims the highest-priority unclaimed job.
+UPDATE jobs
+SET claimed_by = 'worker-1', claimed_at = now()
+WHERE id = (
+  SELECT id FROM jobs
+  WHERE claimed_by IS NULL
+  ORDER BY priority DESC, created_at
+  FOR UPDATE SKIP LOCKED
+  LIMIT 1
+)
+RETURNING *;
+```
+
+- `FOR UPDATE` locks the chosen row;
+
+- `SKIP LOCKED` makes other workers skip locked rows (great for parallel consumers);
+
+- Add `NOWAIT` if you prefer to error instead of waiting.
+
+#### Consistent reads (isolation level quick use)
+
+Default is READ COMMITTED. For a stable snapshot during an analytical read:
+
+```sql
+BEGIN;
+  SET TRANSACTION ISOLATION LEVEL REPEATABLE READ;
+  -- all SELECTs below see the same snapshot
+  SELECT COUNT(*) FROM orders WHERE status = 'paid';
+  SELECT SUM(total_cents) FROM orders WHERE status = 'paid';
+COMMIT;
+```
+
+For cross-row invariants, use SERIALIZABLE and be ready to retry on 40001.
+
+#### Keep invariants in the database (constraints)
+
+```sql
+CREATE TABLE orders (
+  id BIGSERIAL PRIMARY KEY,
+  customer_id BIGINT NOT NULL REFERENCES customers(id),
+  status TEXT NOT NULL CHECK (status IN ('new','paid','shipped','cancelled'))
+);
+```
+
+Constraints + transactions = fewer data bugs than app-only checks.
+
+#### DDL is transactional in Postgres
+
+```sql
+BEGIN;
+  ALTER TABLE orders ADD COLUMN shipped_at timestamptz;
+ROLLBACK;   -- schema change undone too
+```
+
+#### Handy patterns
+
+- Return data you just wrote: `INSERT ... RETURNING *`
+
+- Short transactions win: keep them brief to reduce contention & bloat.
+
+- Deterministic ordering: add unique tiebreakers in `ORDER BY` inside write paths.
 
 ---
 
