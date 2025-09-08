@@ -119,13 +119,12 @@ Aggregate functions summarize data: `COUNT()`, `SUM()`, `AVG()`, `MIN()`, `MAX()
 ```sql
 -- Avg price by country; only countries with ≥2 books
 SELECT a.country,                              -- 1) grouping key (country)
-       ROUND(AVG(b.price_usd), 2) AS avg_price,-- 2) average book price, 2 decimals
-       COUNT(*) AS books                        -- 3) number of books in that country
+       ROUND(AVG(b.price_usd), 2) AS avg_price -- 2) average book price, 2 decimals
 FROM books b
-JOIN authors a ON a.author_id = b.author_id    -- 4) attach each book to its author's country
-GROUP BY a.country                             -- 5) aggregate per country
-HAVING COUNT(*) >= 2                           -- 6) keep only countries with 2+ books
-ORDER BY avg_price DESC;                       -- 7) sort by avg price, highest first
+JOIN authors a ON a.author_id = b.author_id    -- 3) attach each book to its author's country
+GROUP BY a.country                             -- 4) aggregate per country
+HAVING COUNT(*) >= 2                           -- 5) keep only countries with 2+ books
+ORDER BY avg_price DESC;                       -- 6) sort by avg price, highest first
 ```
 
 #### Useful operators 
