@@ -104,6 +104,10 @@ Joins combine rows from two or more tables based on related columns.
 A SQL JOIN doesn’t permanently merge tables; it builds a wider result set at query time by pairing rows whose keys match your condition. 
 Think of it as a lookup that produces a new, temporary table.
 
+##### Inner join (most common)
+
+Keep matching rows from both tables.
+
 ```sql
 -- All books with author info
 SELECT b.title, a.name AS author, a.country, b.year, b.price_usd
@@ -111,6 +115,99 @@ FROM books b
 JOIN authors a ON a.author_id = b.author_id
 ORDER BY a.name, b.year;
 ```
+
+##### Left join
+
+Keep all rows from the left table, even if there’s no match on the right.
+
+```sql
+--- Only authors with their books (if any)
+SELECT a.name, b.title
+FROM authors a
+LEFT JOIN books b ON b.author_id = a.author_id
+ORDER BY a.name, b.title;
+```
+
+##### Right join
+
+Keep all rows from the right table, even if there’s no match on the left.
+
+```sql
+SELECT a.name, b.title
+FROM books b
+RIGHT JOIN authors a ON a.author_id = b.author_id;
+```
+
+##### Full outer join
+
+Keep all rows from both tables, matching where possible.
+
+```sql
+SELECT COALESCE(a.name, '[no author]') AS author, b.title
+FROM authors a
+FULL JOIN books b ON b.author_id = a.author_id;
+```
+
+##### Cross join
+
+Produces the Cartesian product of two tables (every row from A with every row from B).
+
+```sql
+SELECT a.name, y.year
+FROM authors a
+CROSS JOIN (VALUES (2024), (2025)) AS y(year);
+```
+
+
+##### Semi/anti joins (idiomatic filters)
+
+EXISTS (semi-join): return authors who have at least one book.
+
+```sql
+SELECT a.*
+FROM authors a
+WHERE EXISTS (SELECT 1 FROM books b WHERE b.author_id = a.author_id);
+```
+
+LEFT + IS NULL (anti-join): return authors without books.
+
+```sql
+SELECT a.*
+FROM authors a
+LEFT JOIN books b ON b.author_id = a.author_id
+WHERE b.author_id IS NULL;
+```
+
+**(You can also write WHERE NOT EXISTS (...).)**
+
+##### USING vs ON (syntax sugar)
+
+If join columns share the same name, USING(column) saves typing and removes duplicate columns in the result:
+
+```sql
+-- If both tables have column author_id
+SELECT *
+FROM books
+JOIN authors USING (author_id);
+```
+
+##### Nulls & duplicates gotchas
+
+- `INNER JOIN` drops non-matching rows; LEFT JOIN keeps them with NULLs on the right.
+
+- Aggregates on left joins: count only matched rows with `COUNT(b.book_id)` (not COUNT(*)), since `COUNT(*)` counts the left row even when unmatched.
+
+- If the right side can have multiple matches, rows duplicate (one per match). Use `DISTINCT` or aggregate if you need one row per left.
+
+##### Choosing the right join (rule of thumb)
+
+- Need only matched pairs? → INNER.
+
+- Keep everything from A, optional B? → LEFT.
+
+- Symmetric “show all, mark gaps”? → FULL OUTER.
+
+- Filtering presence/absence? → EXISTS / LEFT … IS NULL (semi/anti).
 
 #### Aggregation
 
