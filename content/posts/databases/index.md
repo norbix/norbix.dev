@@ -87,6 +87,8 @@ INSERT INTO books (author_id,title,year,price_usd) VALUES
 
 #### Select & filter
 
+Select specific columns, filter with `WHERE`, sort with `ORDER BY`, and limit results with `LIMIT`.
+
 ```sql
 SELECT title, price_usd
 FROM books
@@ -97,6 +99,8 @@ LIMIT 3;
 
 #### Joins
 
+Joins combine rows from two or more tables based on related columns.
+
 ```sql
 -- All books with author info
 SELECT b.title, a.name AS author, a.country, b.year, b.price_usd
@@ -106,6 +110,8 @@ ORDER BY a.name, b.year;
 ```
 
 #### Aggregation
+
+Aggregate functions summarize data: `COUNT()`, `SUM()`, `AVG()`, `MIN()`, `MAX()`.
 
 ```sql
 -- Avg price by country; only countries with ≥2 books
@@ -155,6 +161,8 @@ WHERE ap.avg_price > 30;
 
 #### Window functions (analytics without collapsing rows)
 
+Functions like `ROW_NUMBER()`, `RANK()`, `SUM() OVER()`, etc., operate over a set of rows related to the current row.
+
 ```sql
 -- Rank the most expensive book per author
 SELECT a.name, b.title, b.price_usd,
@@ -165,6 +173,8 @@ ORDER BY a.name, rnk;
 ```
 
 #### Indexes & EXPLAIN (performance mindset)
+
+Indexes speed up lookups but slow down writes and take space. Use them wisely.
 
 ```sql
 CREATE INDEX idx_books_author_year ON books(author_id, year);
@@ -233,6 +243,193 @@ Key normal forms:
 While normalization ensures clean data design, sometimes selective denormalization is necessary for performance reasons in read-heavy systems.
 
 🔹 **Tip:** Normalize for clarity, denormalize for performance — based on access patterns.
+
+### 📝 Database Normalization: Design for Integrity
+
+Normalization is the discipline of structuring tables so each fact is stored once and in the right place. Done well, it prevents data anomalies (bugs) and keeps writes simple and safe.
+
+Why normalize? To avoid:
+
+- Update anomaly – you change a product’s name in one row but forget others.
+
+- Insert anomaly – you can’t add a new product until an order exists.
+
+- Delete anomaly – removing the last order for a product also erases the only copy of the product’s data.
+
+
+#### Functional dependencies (intuitive view)
+
+If knowing X lets you determine Y, we write X → Y.
+Examples:
+
+- customer_id → {customer_name, email}
+
+- product_id → {product_name, unit_price}
+
+- (order_id, product_id) → {qty}
+
+Normalization applies these rules to table design.
+
+#### 1NF — First Normal Form
+
+Rows are unique, columns are atomic (no arrays/CSV-in-a-cell), and order doesn’t matter.
+
+- Fix: move repeating groups to their own rows.
+
+- Smelly design (repeating groups):
+
+```scss
+orders(order_id, customer_id, items_sku_csv, items_qty_csv, ... )
+```
+
+`1NF` shape (atomic rows):
+
+```scss
+orders(order_id, customer_id, ordered_at, status)
+order_items(order_id, product_id, qty)
+```
+
+#### 2NF — Second Normal Form
+
+- Applies when a table’s key is composite (e.g., (order_id, product_id)).
+
+- Every non-key column must depend on the whole key, not just part of it.
+
+Smelly design:
+
+```scss
+order_items(order_id, product_id, qty, product_name, unit_price_current)
+-- product_* depend only on product_id (part of the key) → violates 2NF
+```
+
+`2NF` fix: split product attributes out:
+
+```scss
+products(product_id PRIMARY KEY, product_name, unit_price_current)
+order_items(order_id, product_id, qty, PRIMARY KEY(order_id, product_id))
+```
+
+#### 3NF — Third Normal Form
+
+- Non-key columns must depend only on the key (no transitive dependencies).
+
+- If order_id → customer_id and customer_id → customer_email, then order_id → customer_email is transitive and shouldn’t live in orders.
+
+Smelly design:
+
+```scss
+orders(order_id, customer_id, customer_email, ordered_at)
+```
+
+`3NF` fix:
+
+```scss
+customers(customer_id PRIMARY KEY, name, email)
+orders(order_id PRIMARY KEY, customer_id REFERENCES customers, ordered_at)
+```
+
+#### (Bonus) BCNF, 4NF, 5NF — when things get tricky
+
+- `BCNF`: a stronger 3NF; whenever a dependency X → Y holds, X must be a key. Use when multiple candidate keys create odd dependencies.
+
+- `4NF`: eliminates multi-valued dependencies (e.g., artist has multiple instruments and multiple genres → use two separate link tables).
+
+- `5NF`: decomposes tables so all joins are lossless; rarely needed outside complex M:N:N relationships.
+
+#### Worked example (from “all-in-one” to normalized)
+
+Start (denormalized facts mixed together):
+
+```scss
+orders_flat(
+  order_id, ordered_at,
+  customer_id, customer_name, customer_email,
+  product_id, product_name, unit_price_current, qty
+)
+```
+
+Normalize → canonical OLTP model:
+
+```scss
+CREATE TABLE customers(
+  customer_id BIGINT PRIMARY KEY,
+  name TEXT NOT NULL,
+  email TEXT NOT NULL UNIQUE
+);
+
+CREATE TABLE products(
+  product_id BIGINT PRIMARY KEY,
+  name TEXT NOT NULL,
+  unit_price_cents INT NOT NULL CHECK (unit_price_cents >= 0)
+);
+
+CREATE TABLE orders(
+  order_id BIGINT PRIMARY KEY,
+  customer_id BIGINT NOT NULL REFERENCES customers(customer_id),
+  ordered_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  status TEXT NOT NULL CHECK (status IN ('new','paid','shipped','cancelled'))
+);
+
+CREATE TABLE order_items(
+  order_id BIGINT NOT NULL REFERENCES orders(order_id) ON DELETE CASCADE,
+  product_id BIGINT NOT NULL REFERENCES products(product_id),
+  qty INT NOT NULL CHECK (qty > 0),
+  unit_price_cents INT NOT NULL,           -- snapshot at purchase time
+  PRIMARY KEY(order_id, product_id)
+);
+```
+
+**Why the unit_price_cents copy in order_items?**
+
+Normalization doesn’t forbid capturing a historical snapshot. Prices change; you still need the price that applied at checkout to compute totals later. This is a legit denormalization for history, not a smell.
+
+#### Postgres tools that help enforce normalization
+
+- Foreign keys with actions: ON DELETE CASCADE/RESTRICT, DEFERRABLE INITIALLY DEFERRED for multi-row transactions.
+
+- Unique constraints / composite keys to model natural identities.
+
+- CHECK constraints for business rules (status IN (...), positive amounts).
+
+- Partial unique indexes to scope rules (e.g., unique SKU per active catalog).
+
+- Exclusion constraints for scheduling overlaps (via btree_gist).
+
+#### When (and how) to denormalize safely
+
+Normalize your write path, then denormalize your read path when profiling shows hot queries need it.
+
+Common, safe patterns:
+
+- Materialized views: precompute aggregates; refresh on schedule.
+
+- Summary tables updated by jobs/triggers (e.g., daily revenue per product).
+
+- Star schema in analytics (facts + dimensions) while OLTP remains 3NF.
+
+- Selective duplication (e.g., orders.total_cents) maintained by trigger or app logic.
+
+- JSONB columns for truly sparse, non-relational attributes—but index extracted fields you query (CREATE INDEX ... ( (props->>'color') )).
+
+Trade-offs: faster reads vs. risk of drift. Always document the single source of truth and how denormalized fields are refreshed.
+
+#### One-minute normalization checklist
+
+- `Key`: What uniquely identifies a row? (Write it down.)
+
+- `FDs`: List obvious dependencies (e.g., product_id → name, price).
+
+- `1NF`: Any arrays/CSV/duplicate groups in a row? Split to rows.
+
+- `2NF`: With composite keys, does every non-key depend on the whole key?
+
+- `3NF`: Any non-key depending on another non-key? Move it out.
+
+- `Integrity`: Add PKs, FKs, UNIQUE, CHECKs.
+
+- `Performance`: Add indexes that match your most common WHERE/JOIN/ORDER BY.
+
+Normalize for correctness; denormalize deliberately for speed with clear ownership and refresh logic.
 
 ---
 
