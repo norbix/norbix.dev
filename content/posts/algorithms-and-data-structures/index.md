@@ -1063,6 +1063,138 @@ This guide covers the four most common tree traversal algorithms:
 
 ---
 
+## ➗ The Modulo Operator (%)
+
+The modulo operator is often underestimated, but it’s a fundamental tool in both algorithm design and real-world programming.
+
+### What Is Modulo?
+
+`a % b` returns the remainder after dividing `a` by `b`.
+
+   ```matlab
+   a = b × q + r where 0 ≤ r < b
+   ```
+
+- Example: `5 % 2 = 1`
+
+- Example: `12 % 5 = 2`
+
+- Example: `20 % 5 = 0`
+
+👉 If `a < b`, then `a % b = a`.
+
+### When Do We Use Modulo?
+
+1. Checking Divisibility
+
+   It is used to check if a number is even or odd.
+
+   Go implementation:
+
+   ```go
+   if n%2 == 0 {
+       fmt.Println("Even")
+   } else {
+       fmt.Println("Odd")
+   }
+   ```
+
+   Python implementation:
+
+   ```python
+   if n % 2 == 0:
+       print("Even")
+   else:
+       print("Odd")
+   ```
+
+1. Cyclic Patterns (wrap-around
+
+   Go implementation:
+
+   ```go
+   days := []string{"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"}
+   dayIndex := (currentDay + offset) % 7
+   fmt.Println(days[dayIndex])
+   ```
+
+   Python implementation:
+
+   ```python
+   days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
+   day_index = (current_day + offset) % 7
+   print(days[day_index])
+   ```
+
+1. Rotating Arrays
+
+   It is often used in problems involving rotations or circular shifts.
+
+    Go implementation:
+    
+    ```go
+    func rotate(arr []int, k int) []int {
+         n := len(arr)
+         k = k % n // handle k > n
+         return append(arr[n-k:], arr[:n-k]...)
+    }
+    ```
+    
+    Python implementation:
+    
+    ```python
+    def rotate(arr, k):
+          n = len(arr)
+          k = k % n  # handle k > n
+          return arr[-k:] + arr[:-k]
+    ```
+
+1. Hashing
+
+   It is commonly used in hash functions to ensure values fit within a fixed range.
+
+    Go implementation:
+    
+    ```go
+    hash := (key % tableSize + tableSize) % tableSize // handle negative keys
+    ```
+    
+    Python implementation:
+    
+    ```python
+    hash = (key % table_size + table_size) % table_size  # handle negative keys
+    ```
+
+1. Circular Buffers
+
+   It is used to wrap indices around when they exceed the buffer size.
+
+    Go implementation:
+    
+    ```go
+    nextIndex := (currentIndex + 1) % bufferSize
+    ```
+    
+    Python implementation:
+    
+    ```python
+    next_index = (current_index + 1) % buffer_size
+    ```
+
+### Key Insights
+
+Modulo is the perfect operator when dealing with:
+
+- Repetition (time, days, rotations)
+
+- Bounded ranges (array indices, hash maps)
+
+- Divisibility checks
+
+Think of % as the wrap-around operator — it keeps numbers within limits.
+
+---
+
 ## 🧠 Tips for Learning DSA with Go
 
 - Practice problems: Use platforms like [LeetCode](https://leetcode.com/), [HackerRank](https://www.hackerrank.com/), or [Exercism](https://exercism.org/).
