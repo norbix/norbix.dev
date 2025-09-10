@@ -182,7 +182,7 @@ Together, DSA provides the backbone for high-performance applications.
     }
     ```
 
-   Example:
+   Example: The factorial of 4 is `4 * 3 * 2 * 1 = 24`.
 
     ```matlab
     factorial(4)
@@ -207,7 +207,7 @@ Together, DSA provides the backbone for high-performance applications.
     }
     ```
 
-   Example:
+   Example: The sequence starts as: 0, 1, 1, 2, 3, 5, 8, 13, ...
 
     ```matlab
     fibonacci(5)
@@ -237,7 +237,7 @@ Together, DSA provides the backbone for high-performance applications.
     }
     ```
 
-   Example:
+   Example: The number 11 is prime, while 12 is not.
 
     ```matlab
     isPrime(11)
