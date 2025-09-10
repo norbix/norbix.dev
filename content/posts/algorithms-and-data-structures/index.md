@@ -147,6 +147,8 @@ Together, DSA provides the backbone for high-performance applications.
 
 1. Sorting (`Bubble Sort` Example)
 
+   Video explanation: [Bubble Sort Algorithm](https://www.youtube.com/watch?v=yIQuKSwPlro)
+
     ```go
     func bubbleSort(arr []int) {
         n := len(arr)
