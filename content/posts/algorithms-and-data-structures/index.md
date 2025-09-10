@@ -2,9 +2,9 @@
 date = '2025-07-24T18:10:25+02:00'
 draft = false
 title = 'DSA - Data Structures and Algorithms'
-tags = ["go", "golang", "algorithms", "data-structures"]
-categories = ["backend", "golang"]
-summary = "A deep dive into Data Structures and Algorithms (DSA) using Go, covering essential concepts, implementations, and best practices."
+tags = ["go", "golang", "python", "algorithms", "data-structures"]
+categories = ["backend", "golang", "python"]
+summary = "A deep dive into Data Structures and Algorithms (DSA) using Go and its Python counterpart, covering essential concepts, implementations, and best practices."
 comments = true
 ShowToc = true
 TocOpen = true
@@ -16,11 +16,11 @@ weight = 6
 
 ---
 
-## 🧠 Mastering Data Structures and Algorithms (DSA) with Go
+## 🧠 Mastering Data Structures and Algorithms (DSA) with `Go` and  its `Python` Counterpart 
 
 Whether you're preparing for technical interviews, optimizing backend systems, or simply sharpening your problem-solving chops, Data Structures and Algorithms (DSA) are foundational to your success as a developer.
 
-In this article, I’ll walk you through core DSA concepts using Golang, a language praised for its simplicity, performance, and concurrency model. You'll see how Go makes understanding DSA both intuitive and powerful.
+In this article, I’ll walk you through core DSA concepts using `Golang` and `Python`, a language praised for its simplicity, performance, and concurrency model. You'll see how Go makes understanding DSA both intuitive and powerful.
 
 ---
 
@@ -32,9 +32,11 @@ Together, DSA provides the backbone for high-performance applications.
 
 ---
 
-## 📦 Essential Data Structures in Go
+## 📦 Essential Data Structures in `Go` and its `Python` Counterpart
 
 1. Arrays & Slices
+
+    Go implementation:
 
     ```go
     arr := [5]int{1, 2, 3, 4, 5} // Fixed-size array
@@ -44,11 +46,21 @@ Together, DSA provides the backbone for high-performance applications.
     fmt.Println(slice) // [1 2 3 4]
     ```
 
+   Python implementation:
+
+   ```python
+    arr = [1, 2, 3, 4, 5]  # Dynamic array (list in Python)
+    arr.append(6)
+    print(arr)  # [1, 2, 3, 4, 5, 6]
+   ```
+
     Slices are the idiomatic way to work with collections in Go. They offer flexibility while leveraging arrays under the hood.
 
 1. Linked List
 
    Go doesn’t have a built-in linked list, but the container/list package provides one.
+
+   Go implementation:
 
     ```go
     package main
@@ -69,9 +81,45 @@ Together, DSA provides the backbone for high-performance applications.
     }
     ```
 
+   Python implementation:
+
+   ```python
+    class Node:
+        def __init__(self, data):
+            self.data = data
+            self.next = None
+    
+    class LinkedList:
+        def __init__(self):
+            self.head = None
+    
+        def append(self, data):
+            new_node = Node(data)
+            if not self.head:
+                self.head = new_node
+                return
+            last = self.head
+            while last.next:
+                last = last.next
+            last.next = new_node
+    
+        def print_list(self):
+            current = self.head
+            while current:
+                print(current.data)
+                current = current.next
+    
+    ll = LinkedList()
+    ll.append("Python")
+    ll.append("DSA")
+    ll.print_list()
+   ```
+
 1. Stack (`LIFO`)
 
     A stack can be easily implemented using slices.
+
+    Go implementation:
 
     ```go
     type Stack []int
@@ -88,9 +136,27 @@ Together, DSA provides the backbone for high-performance applications.
     }
     ```
 
+   Python implementation:
+
+   ```python
+    class Stack:
+          def __init__(self):
+                self.stack = []
+    
+          def push(self, item):
+                self.stack.append(item)  # append to the end (like Go's append)
+    
+          def pop(self):
+                if not self.stack:
+                 raise IndexError("pop from empty stack")
+                return self.stack.pop()  # pop from the end (like Go's slice)
+    ```
+
 1. Queue (`FIFO`)
 
     Queues can also be implemented using slices.
+
+    Go implementation:
 
     ```go
     type Queue []int
@@ -106,7 +172,29 @@ Together, DSA provides the backbone for high-performance applications.
     }
     ```
 
+   Python implementation:
+
+   ```python
+   class Queue:
+        def __init__(self):
+            self.queue = []
+   
+        def enqueue(self, item):
+            # append to the end (like Go's append)
+            self.queue.append(item)
+   
+        def dequeue(self):
+            if not self.queue:
+                raise IndexError("dequeue from empty queue")
+            # take from the front (like q[0] in Go)
+            val = self.queue[0]
+            self.queue = self.queue[1:]  # shrink list (like Go slice)
+            return val
+   ```
+
 1. Hash Map (`Go's map`)
+
+   Go implementation:
 
     ```go
     m := map[string]int{
@@ -116,16 +204,28 @@ Together, DSA provides the backbone for high-performance applications.
     fmt.Println(m["apple"]) // 5
     ```
 
+   Python implementation:
+
+   ```python
+    m = {
+        "apple": 5,
+        "banana": 3,
+    }
+    print(m["apple"])  # 5
+   ```
+
     **Hint:**
    Go’s built-in map is a powerful hash table implementation for key-value pairs.
 
 ---
 
-## 🧩 Must-Know Algorithms in Go
+## 🧩 Must-Know Algorithms in `Go`
 
 1. Binary Search
 
     Efficient O(log n) search on sorted arrays.
+
+    Go implementation:
 
     ```go
     func binarySearch(arr []int, target int) int {
@@ -145,9 +245,27 @@ Together, DSA provides the backbone for high-performance applications.
     }
     ```
 
+   Python implementation:
+
+   ```python
+    def binary_search(arr, target):
+         low, high = 0, len(arr) - 1
+         while low <= high:
+              mid = (low + high) // 2
+              if arr[mid] == target:
+                   return mid
+              elif arr[mid] < target:
+                   low = mid + 1
+              else:
+                   high = mid - 1
+         return -1
+   ```
+
 1. Sorting (`Bubble Sort` Example)
 
    Video explanation: [Bubble Sort Algorithm](https://www.youtube.com/watch?v=yIQuKSwPlro)
+
+   Go implementation:
 
     ```go
     func bubbleSort(arr []int) {
@@ -162,6 +280,17 @@ Together, DSA provides the backbone for high-performance applications.
     }
     ```
 
+    Python implementation:
+    
+   ```python
+    def bubble_sort(arr):
+        n = len(arr)
+        for i in range(n):
+            for j in range(0, n-i-1):
+                if arr[j] > arr[j+1]:
+                    arr[j], arr[j+1] = arr[j+1], arr[j]
+    ```
+
     For real projects, use Go’s built-in sorting:
 
     ```go
@@ -172,6 +301,8 @@ Together, DSA provides the backbone for high-performance applications.
 
    Factorial of `n` (n!) is the product of all positive integers up to `n`.
 
+    Go implementation:
+
     ```go
     func factorial(n int) int {
         if n == 0 {
@@ -181,6 +312,15 @@ Together, DSA provides the backbone for high-performance applications.
         return n * factorial(n-1)
     }
     ```
+
+   Python implementation:
+
+   ```python
+    def factorial(n):
+         if n == 0:
+              return 1
+         return n * factorial(n-1)
+   ```
 
    Example: The factorial of 4 is `4 * 3 * 2 * 1 = 24`.
 
@@ -198,6 +338,8 @@ Together, DSA provides the backbone for high-performance applications.
 
    Fibonacci numbers are the sum of the two preceding ones, starting from 0 and 1.
 
+   Go implementation:
+
     ```go
     func fibonacci(n int) int {
         if n <= 1 {
@@ -205,6 +347,15 @@ Together, DSA provides the backbone for high-performance applications.
         }
         return fibonacci(n-1) + fibonacci(n-2)
     }
+    ```
+
+   Python implementation:
+
+   ```python
+    def fibonacci(n):
+         if n <= 1:
+              return n
+         return fibonacci(n-1) + fibonacci(n-2)
     ```
 
    Example: The sequence starts as: 0, 1, 1, 2, 3, 5, 8, 13, ...
@@ -223,6 +374,8 @@ Together, DSA provides the backbone for high-performance applications.
 
    Prime numbers are greater than 1 and only divisible by 1 and themselves.
 
+    `Go` implementation:
+
     ```go
     func isPrime(n int) bool {
         if n <= 1 {
@@ -237,6 +390,20 @@ Together, DSA provides the backbone for high-performance applications.
     }
     ```
 
+    `Python` implementation:
+
+   ```python
+    from math import sqrt
+   
+    def is_prime(n):
+         if n <= 1:
+              return False
+         for i in range(2, int(sqrt(n)) + 1):
+              if n % i == 0:
+                return False
+         return True
+   ```
+
    Example: The number 11 is prime, while 12 is not.
 
     ```matlab
@@ -250,6 +417,8 @@ Together, DSA provides the backbone for high-performance applications.
 1. FizzBuzz :)
 
    A classic programming challenge.
+
+   `Go` implementation:
 
     ```go
     func fizzBuzz(n int) {
@@ -267,6 +436,21 @@ Together, DSA provides the backbone for high-performance applications.
     }
     ```
    
+    `Python` implementation:
+
+   ```python
+   def fizz_buzz(n):
+       for i in range(1, n + 1):
+           if i % 3 == 0 and i % 5 == 0:
+               print("FizzBuzz")
+           elif i % 3 == 0:
+               print("Fizz")
+           elif i % 5 == 0:
+               print("Buzz")
+           else:
+               print(i)
+   ```
+
    Example: For `n = 15` print the numbers from 1 to 15. For multiples of 3, print "Fizz" instead of the number. For multiples of 5, print "Buzz". For numbers which are multiples of both 3 and 5, print "FizzBuzz".
     
    ```matlab
@@ -291,6 +475,8 @@ Together, DSA provides the backbone for high-performance applications.
 
     For binary trees, you define custom structures.
 
+    Go implementation:
+
     ```go
    type Node struct {
 	Value int
@@ -299,7 +485,19 @@ Together, DSA provides the backbone for high-performance applications.
     }
     ```
 
+   Python implementation:
+    
+   ```python
+    class Node:
+          def __init__(self, value):
+                self.value = value
+                self.left = None
+                self.right = None
+     ```
+
     Depth-first traversal:
+
+    Go implementation:
 
     ```go
     func dfs(n *Node) {
@@ -312,6 +510,24 @@ Together, DSA provides the backbone for high-performance applications.
         dfs(n.Right)
     }
     ```
+
+   Python implementation:
+
+   ```python
+   class Node:
+    def __init__(self, value):
+        self.value = value
+        self.left = None
+        self.right = None
+
+   def dfs(node):
+        if node is None:
+            return
+   
+       print(node.value)      # Preorder: visit root
+       dfs(node.left)         # Traverse left subtree
+       dfs(node.right)        # Traverse right subtree
+   ```
 
 ---
 
