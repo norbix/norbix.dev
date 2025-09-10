@@ -247,6 +247,46 @@ Together, DSA provides the backbone for high-performance applications.
     = false (12 is divisible by 1, 2, 3, 4, 6, and 12)
     ```
 
+1. FizzBuzz :)
+
+   A classic programming challenge.
+
+    ```go
+    func fizzBuzz(n int) {
+        for i := 1; i <= n; i++ {
+            if i%3 == 0 && i%5 == 0 {
+                fmt.Println("FizzBuzz")
+            } else if i%3 == 0 {
+                fmt.Println("Fizz")
+            } else if i%5 == 0 {
+                fmt.Println("Buzz")
+            } else {
+                fmt.Println(i)
+            }
+        }
+    }
+    ```
+   
+   Example: For `n = 15` print the numbers from 1 to 15. For multiples of 3, print "Fizz" instead of the number. For multiples of 5, print "Buzz". For numbers which are multiples of both 3 and 5, print "FizzBuzz".
+    
+   ```matlab
+    1
+    2
+    Fizz
+    4
+    Buzz
+    Fizz
+    7
+    8
+    Fizz
+    Buzz
+    11
+    Fizz
+    13
+    14
+    FizzBuzz
+    ```
+
 1. Graph and Trees
 
     For binary trees, you define custom structures.
