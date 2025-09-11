@@ -68,6 +68,10 @@ Platform engineers often build and maintain:
 
 - Platform engineers abstract that complexity into reusable modules and templates.
 
+#### AWS Networking
+
+![aws_networking](aws_networking.PNG)
+
 **Platform Engineering = DevOps + SRE + Cloud + DX (Developer Experience)**
 
 ---
