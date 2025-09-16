@@ -295,6 +295,8 @@ To connect theory with practice, let’s look at a simplified architecture for a
 
 ![mobile_banking_ai_assistant_arch](mobile_banking_ai_assistant_arch.png)
 
+[![AI Assistant Architecture](mobile_banking_ai_assistant_arch.png)](mobile_banking_ai_assistant_arch.png){ data-lightbox="ai-post" }
+
 Behind the scenes, the assistant relies on a retrieval-augmented generation (RAG) pipeline:
 
 - Sources – PDFs, lecture notes, articles, and other documents.
