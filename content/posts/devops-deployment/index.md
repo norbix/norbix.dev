@@ -219,6 +219,99 @@ kubectl delete namespace my-namespace
 
 ---
 
+## `DORA` Metrics for DevOps Success
+
+DORA (DevOps Research and Assessment) metrics help measure software delivery performance. Focus on:
+
+
+```mermaid
+flowchart LR
+    subgraph Speed["⚡ Speed"]
+        DF["Deployment Frequency<br/>(How often do you deploy?)"]
+        LT["Lead Time for Changes<br/>(Commit → Production time)"]
+    end
+
+    subgraph Stability["🛡️ Stability"]
+        CFR["Change Failure Rate<br/>(% of deployments causing failures)"]
+        MTTR["Mean Time to Restore<br/>(Time to recover from incidents)"]
+    end
+
+    DF -->|frequent releases| Speed
+    LT -->|fast feedback loop| Speed
+    CFR -->|fewer failures| Stability
+    MTTR -->|quick recovery| Stability
+```
+
+1. Deployment Frequency `DF`
+
+    ➡️ How often code is deployed to production.
+    
+    - High-performing teams: deploy on-demand, multiple times a day.
+    
+    - Low-performing teams: deploy monthly or less.
+    
+    - Goal: Ship value quickly and iteratively.
+
+1. Lead Time for Changes `LT`
+
+    ➡️ Time from code commit → successfully running in production.
+    
+    - Measures delivery speed.
+    
+    - Elite performers: <1 day.
+    
+    - Low performers: >1 month.
+    
+    - Goal: Shorter lead times = faster feedback loops.
+
+1. Change Failure Rate `CFR`
+
+    ➡️ Percentage of deployments that cause failures (bugs, outages, rollbacks).
+    
+    - Elite teams: 0–15% failure rate.
+    
+    - Goal: Keep failure rates low, even with high deployment frequency.
+
+1. Mean Time to Restore `MTTR`
+
+    ➡️ How long it takes to recover from a failure in production.
+    
+    - Elite teams: <1 hour.
+    
+    - Goal: Detect issues quickly and restore service fast.
+
+### 📊 Why They Matter
+
+- They provide objective data on DevOps maturity.
+
+- Balance speed vs reliability (no point deploying daily if systems keep breaking).
+
+- Help teams focus on outcomes, not vanity metrics (like “number of commits”).
+
+
+### ⚙️ How to Track DORA Metrics
+
+- Version Control (GitHub/GitLab): commits & PR timestamps.
+
+- CI/CD pipelines (Jenkins, GitHub Actions, ArgoCD): deployment events.
+
+- Monitoring/Observability (Prometheus, Grafana, Datadog): incidents, MTTR.
+
+- Incident management (PagerDuty, OpsGenie): failure tracking.
+
+### 🏆 Benchmarks (from Google’s 2022 DevOps Report)
+
+| Metric                | Elite Performers        | Low Performers          |
+|------------------------|-------------------------|-------------------------|
+| Deployment Frequency   | On-demand (daily/more) | Fewer than once/month   |
+| Lead Time for Changes  | <1 day                 | >1 month                |
+| Change Failure Rate    | 0–15%                  | 46–60%                  |
+| MTTR (Time to Restore) | <1 hour                | >6 months               |
+
+👉 In short: DORA metrics are the KPIs of DevOps — they tell you how fast you deliver and how resilient you are.
+
+---
+
 ## 🎯 Final Thoughts
 
 By combining Docker, Kubernetes, and Helm, you get:
