@@ -275,7 +275,7 @@ Tools in the ecosystem:
 
 To connect theory with practice, let’s look at a simplified architecture for a Mobile Teaching AI Assistant — a system designed to answer student questions, retrieve information, and provide context-aware explanations.
 
-![mobile_banking_ai_assistant](mobile_banking_ai_assistant.png)
+[![Mobile AI Assistant](mobile_banking_ai_assistant.png)](mobile_banking_ai_assistant.png){ data-lightbox="ai-post" }
 
 ### 🔄 Interaction Flow
 
@@ -292,8 +292,6 @@ To connect theory with practice, let’s look at a simplified architecture for a
 1. Feedback Loop – Students can provide feedback (e.g., was the answer helpful?), improving the system over time.
 
 ### 🏗️ Architecture Layer
-
-![mobile_banking_ai_assistant_arch](mobile_banking_ai_assistant_arch.png)
 
 [![AI Assistant Architecture](mobile_banking_ai_assistant_arch.png)](mobile_banking_ai_assistant_arch.png){ data-lightbox="ai-post" }
 
