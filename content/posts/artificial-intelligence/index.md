@@ -195,6 +195,14 @@ Methods: regression, decision trees, clustering, reinforcement learning.
 
 👉 Key interview takeaway:“Underfitting is when the model is too simple. To fix it, I increase model complexity, add better features, or train longer.”
 
+### 🧠 Connecting the Dots
+
+- Imbalanced classes: The data distribution is skewed → accuracy is misleading.
+
+- Overfitting: The model is too complex → memorizes instead of generalizing.
+
+- Underfitting: The model is too simple → fails to learn meaningful patterns.
+
 ---
 
 ## 🤖 Deep Learning: The Neural Revolution
