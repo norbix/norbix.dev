@@ -238,6 +238,39 @@ That shift will redefine software, business processes, and even how humans colla
 
 ---
 
+## 🔧 MLOps: Making Machine Learning Production-Ready
+
+Building a machine learning model in a notebook is one thing. Running it safely, reliably, and at scale in the real world is another. That’s where MLOps (Machine Learning Operations) comes in.
+
+MLOps applies DevOps practices (automation, CI/CD, monitoring) to the machine learning lifecycle:
+
+1. Data management – version datasets, track quality.
+
+1. Experimentation – manage models, hyperparameters, metrics.
+
+1. Continuous training (CT) – retrain as data changes.
+
+1. Deployment – push models into production APIs or batch pipelines.
+
+1. Monitoring – detect drift, bias, and performance degradation.
+
+1. Governance – ensure compliance, reproducibility, and audit trails.
+
+
+Tools in the ecosystem:
+
+- Pipelines: `Kubeflow`, `Airflow`, `Metaflow`
+
+- Experiment tracking: `MLflow`, Weights & Biases
+
+- Deployment: `Docker`, `Kubernetes`, `Seldon`
+
+- Monitoring: `EvidentlyAI`, `Prometheus`, `Grafana`
+
+👉 If `ML` is about building models, `MLOps` is about keeping them alive and useful in production.
+
+---
+
 ## 🔄 Wrapping Up
 
 - **AI** = vision (smart systems)
