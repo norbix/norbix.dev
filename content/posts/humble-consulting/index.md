@@ -82,7 +82,7 @@ Every gatekeeper won over can unlock hidden revenue streams.
 
 It is a language of the executives and decision-makers who control budgets.
 
-More can be found under this fantastic podcast with Pini Reznik: [The Rause of Cloud Native](https://www.youtube.com/live/VsEyN7yoSQY?si=hUUVNNShTg89LKYb&t=6109)
+More can be found under this fantastic podcast with Pini Reznik: [The Rise of Cloud Native](https://www.youtube.com/live/VsEyN7yoSQY?si=hUUVNNShTg89LKYb&t=6109)
 
 ---
 
