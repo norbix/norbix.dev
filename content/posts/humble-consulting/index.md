@@ -78,6 +78,12 @@ Humble consulting helps companies do both:
 Every hour spent listening with humility can save weeks of rework.  
 Every gatekeeper won over can unlock hidden revenue streams.
 
+## What is `Money Language`?
+
+It is a language of the executives and decision-makers who control budgets.
+
+More can be found under this fantastic podcast with Pini Reznik: [The Rause of Cloud Native](https://www.youtube.com/live/VsEyN7yoSQY?si=hUUVNNShTg89LKYb&t=6109)
+
 ---
 
 ## 🔍 How to Apply Humble Consulting in Tech Projects
