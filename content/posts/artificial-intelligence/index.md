@@ -460,6 +460,8 @@ Deep Learning (DL) is a subset of ML that relies on artificial neural networks (
 
 #### 🧩 What Are Neural Networks?
 
+Please watch this  6minute video for a great visual intro: [Neural Networks Explained](https://www.youtube.com/watch?v=bfmFfD2RIcg) 
+
 - Inspired by biology – loosely modeled after neurons in the human brain.
 
 - Structure – input layer (data), hidden layers (transformations), output layer (prediction).
