@@ -29,6 +29,13 @@ Whether you’re building microservices, SaaS platforms, or cloud-native applica
 A **direct connection** between two systems.  
 Good for simplicity, but becomes a **spaghetti mess** as integrations grow (n² problem).
 
+- Just one-way delivery from A to B.
+    - Think of it as “I send you data, and I don’t care if you reply.”
+
+    - Often implemented with messaging systems (e.g., a producer sends to a queue consumed by exactly one consumer).
+
+    - Example: Service A sends “new invoice” to Service B — no response expected.
+
 ```mermaid
 flowchart LR
     A[Service A] --> B[Service B]
@@ -111,6 +118,14 @@ nc.Publish("orders.created", []byte("Order#123"))
 Classic synchronous API call.
 Go’s net/http or grpc are common implementations.
 
+- Classic `REST` / `gRPC` / `HTTP` style.
+
+    - Client sends a request, waits for a response.
+
+    - Synchronous, one-to-one.
+
+    - Example: GET /users/42 → {"id":42,"name":"Norbert"}.
+
 ```mermaid
 sequenceDiagram
     Client->>Service: Request
@@ -166,13 +181,19 @@ writer.WriteMessages(context.Background(),
 
 ## 🏗️ Advanced Architectural Patterns
 
-### 1. CQRS (Command Query Responsibility Segregation) with Kafka
+### 1. `CQRS` (Command Query Responsibility Segregation) with `Kafka`
 
 CQRS separates responsibilities into a **write side (Commands)** and a **read side (Queries)**.  
 Instead of a single API serving both reads and writes, CQRS allows you to optimize each:
 
 - **Writes (Commands):** exposed as REST APIs for simple, synchronous commands.
-- **Reads (Queries):** exposed as GraphQL for flexible queries, or WebSockets for real-time updates.
+- **Reads (Queries):** exposed as GraphQL for flexible queries, or `WebSockets` for real-time updates.
+
+- `WebSocket` is a different beast: it creates a persistent, bidirectional channel.
+
+    - Can carry request–reply messages inside it, or stream events point-to-point.
+
+    - So WebSockets are more like a transport that can implement either pattern.
 
 In event-driven architectures, CQRS is often combined with **Kafka**:
 - the **Write side** publishes events,
