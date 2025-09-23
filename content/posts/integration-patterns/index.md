@@ -60,6 +60,16 @@ defer resp.Body.Close()
 
 A producer sends messages to a queue, and consumers process them asynchronously.
 
+- Model: 1 producer → 1 consumer (though you can scale multiple consumers in a competing consumers pattern).
+
+- Order: Typically guarantees FIFO order per queue (but once you add multiple consumers, strict order across all messages isn’t guaranteed).
+
+- Delivery: Each message is consumed by exactly one consumer.
+
+- Use case: Background jobs, task processing.
+
+- Examples: RabbitMQ (classic queue), AWS SQS, ActiveMQ.
+
 ```mermaid
 flowchart LR
     P[Producer] --> Q[(Queue)]
@@ -85,6 +95,16 @@ ch.Publish("", q.Name, false, false,
 ### 3. Publish–Subscribe (Pub/Sub)
 
 A publisher emits events to a broker; multiple subscribers consume independently.
+
+- Model: 1 publisher → many subscribers.
+
+- Order: Delivery order depends on the broker. Some systems (like Kafka) guarantee ordering within a partition, others (like NATS) focus more on speed/availability than global ordering.
+
+- Delivery: Each message is delivered to all interested subscribers.
+
+- Use case: Broadcasting events (e.g., “user signed up” → notify billing, analytics, emails).
+
+- Examples: Kafka, NATS, Google Pub/Sub.
 
 ```mermaid
 flowchart LR
