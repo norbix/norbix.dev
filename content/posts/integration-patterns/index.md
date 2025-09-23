@@ -44,8 +44,8 @@ if err != nil {
 defer resp.Body.Close()
 ```
 
-✅ Simple, fast
-⚠️ Tight coupling, doesn’t scale
+- ✅ Simple, fast
+- ⚠️ Tight coupling, doesn’t scale
 
 ---
 
@@ -69,9 +69,9 @@ ch.Publish("", q.Name, false, false,
     amqp.Publishing{ContentType: "text/plain", Body: []byte("task data")})
 ```
 
-✅ Decouples producer & consumer
-✅ Smooths traffic spikes, supports retry
-⚠️ Adds latency, requires broker
+- ✅ Decouples producer & consumer
+- ✅ Smooths traffic spikes, supports retry
+- ⚠️ Adds latency, requires broker
 
 ---
 
@@ -100,9 +100,9 @@ nc.Subscribe("orders.created", func(m *nats.Msg) {
 nc.Publish("orders.created", []byte("Order#123"))
 ```
 
-✅ Decouples producers/consumers
-✅ Scales horizontally
-⚠️ Delivery/order guarantees require tuning
+- ✅ Decouples producers/consumers
+- ✅ Scales horizontally
+- ⚠️ Delivery/order guarantees require tuning
 
 ---
 
@@ -128,8 +128,8 @@ resp, _ := client.GetUser(ctx, &pb.GetUserRequest{Id: "42"})
 fmt.Println(resp.Name)
 ```
 
-✅ Familiar, widely supported
-⚠️ Tight coupling, fragile if callee is down
+- ✅ Familiar, widely supported
+- ⚠️ Tight coupling, fragile if callee is down
 
 ---
 
@@ -158,9 +158,9 @@ writer.WriteMessages(context.Background(),
 )
 ```
 
-✅ Full audit log, replay possible
-✅ Decoupled, scalable
-⚠️ Requires careful schema/versioning strategy
+- ✅ Full audit log, replay possible
+- ✅ Decoupled, scalable
+- ⚠️ Requires careful schema/versioning strategy
 
 ---
 
@@ -307,8 +307,8 @@ cancelEvent := OrderCancelled{OrderID: "123", Reason: "Out of stock"}
 publish(cancelEvent)
 ```
 
-✅ Benefits: Handles long-running, multi-service transactions without 2PC.
-⚠️ Challenges: Requires careful design of compensating actions.
+- ✅ Benefits: Handles long-running, multi-service transactions without 2PC.
+- ⚠️ Challenges: Requires careful design of compensating actions.
 
 ---
 
@@ -340,8 +340,8 @@ if err != nil {
 }
 ```
 
-✅ Benefits: Prevents cascading failures, improves stability.
-⚠️ Challenges: Needs good fallback strategies.
+- ✅ Benefits: Prevents cascading failures, improves stability.
+- ⚠️ Challenges: Needs good fallback strategies.
 
 ---
 
@@ -370,8 +370,8 @@ func AggregateOrderData(orderID string) OrderView {
 }
 ```
 
-✅ Benefits: Simplifies client logic, centralizes auth/routing.
-⚠️ Challenges: Gateway can become a bottleneck if overloaded.
+- ✅ Benefits: Simplifies client logic, centralizes auth/routing.
+- ⚠️ Challenges: Gateway can become a bottleneck if overloaded.
 
 ---
 
