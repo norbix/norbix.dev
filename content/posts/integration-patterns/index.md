@@ -104,7 +104,7 @@ A publisher emits events to a broker; multiple subscribers consume independently
 
 - Use case: Broadcasting events (e.g., “user signed up” → notify billing, analytics, emails).
 
-- Examples: Kafka, NATS, Google Pub/Sub.
+- Examples: Kafka, NATS, AWS SNS, Google Pub/Sub.
 
 ```mermaid
 flowchart LR
