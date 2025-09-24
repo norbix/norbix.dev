@@ -103,6 +103,64 @@ for k, v := range m {
     }
     ```
 
+### 🔍 1.2 Understanding nil in Go
+
+In Go, nil is the zero value for reference types. It means “no value” or “points to nothing,” similar to null in other languages — but more strictly typed.
+
+✅ Types that can be nil:
+
+  - Pointers
+
+  - Slices
+
+  - Maps
+
+  - Channels
+
+  - Functions
+
+  - Interfaces
+
+❌ Value types like int, float64, bool, and struct cannot be nil. Their zero values are 0, 0.0, `false`, or an empty struct.
+
+Example:
+
+```go
+// nil slice
+var s []int
+fmt.Println(s == nil) // true
+fmt.Println(len(s))   // 0
+
+// nil map
+var m map[string]int
+fmt.Println(m == nil) // true
+// m["key"] = 1 // panic: assignment to entry in nil map
+
+// nil interface
+var i interface{}
+fmt.Println(i == nil) // true
+```
+
+⚠️ Gotcha:
+
+An interface holding a `nil` pointer is not itself `nil`:
+
+```go
+var p *int = nil
+var x interface{} = p
+fmt.Println(x == nil) // false (x holds a *int that is nil)
+```
+
+✅ Best practices:
+
+- Check for nil before using maps, channels, or pointers.
+
+- Initialize maps with make before assigning keys.
+
+- Differentiate `nil` vs empty slices (nil slice is len=0 cap=0, empty slice is not nil).
+
+- Be careful with nil interfaces — they can lead to subtle bugs.
+
 ---
 
 ## 🧱 2. Project Structure Matters
