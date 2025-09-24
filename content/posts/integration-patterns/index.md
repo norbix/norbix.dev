@@ -199,6 +199,25 @@ writer.WriteMessages(context.Background(),
 - ✅ Decoupled, scalable
 - ⚠️ Requires careful schema/versioning strategy
 
+#### 🔄 Event-Driven vs. Pub/Sub
+
+While they often overlap, there are important distinctions:
+
+| Aspect       | Pub/Sub                                                | Event-Driven / Event Sourcing                          |
+|--------------|--------------------------------------------------------|-------------------------------------------------------|
+| What it is   | A messaging pattern — publishers broadcast messages, subscribers consume | An architecture + storage model — all state changes are recorded as a stream of events |
+| Focus        | Routing and delivering messages to many consumers | Persisting immutable events as the source of truth      |
+| Ordering    | Delivery order may or may not be guaranteed (depends on broker: Kafka partitions vs. SNS best-effort) | Events are always stored in append-only order, enabling replay |
+| Persistence | Messages are often transient (delivered then gone, unless persisted separately) | Event log itself is durable and replayable          |
+| Use cases   | Broadcasting notifications (e.g., SNS → SQS + Lambda) | Systems needing audit trails, state reconstruction, or CQRS (Command Query Responsibility) |
+
+
+- ✅ In short:
+
+  - Pub/Sub is about who gets the message (fan-out delivery).
+
+  - Event-driven/event sourcing is about how events define state (system of record + replay).
+
 ---
 
 ## 🏗️ Advanced Architectural Patterns
