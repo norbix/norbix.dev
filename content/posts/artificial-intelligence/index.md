@@ -780,7 +780,7 @@ To connect theory with practice, let’s look at a simplified architecture for a
 
 1. Feedback Loop – Students can provide feedback (e.g., was the answer helpful?), improving the system over time.
 
-### 🏗️ Architecture Layer
+### 🏗️ `RAG` Architecture Layer
 
 [![AI Assistant Architecture](mobile_banking_ai_assistant_arch.png)](mobile_banking_ai_assistant_arch.png){ data-lightbox="ai-post" }
 
