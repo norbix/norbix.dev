@@ -18,7 +18,7 @@ weight = 6
 
 ## 🧠 Mastering Data Structures and Algorithms (DSA) with `Go` and  its `Python` Counterpart 
 
-Whether you're preparing for technical interviews, optimizing backend systems, or simply sharpening your problem-solving chops, Data Structures and Algorithms (DSA) are foundational to your success as a developer.
+Whether you're preparing for technical interviews, optimizing backend systems, or simply sharpening your problem-solving chops, Data Structures and Algorithms (`DSA`) are foundational to your success as a developer.
 
 In this article, I’ll walk you through core DSA concepts using `Golang` and `Python`, a language praised for its simplicity, performance, and concurrency model. You'll see how Go makes understanding DSA both intuitive and powerful.
 
@@ -216,6 +216,72 @@ Together, DSA provides the backbone for high-performance applications.
 
     **Hint:**
    Go’s built-in map is a powerful hash table implementation for key-value pairs.
+
+   🔑 What types can be keys in a Go map?
+   
+   - A map key must be comparable (Go requires == and != operators to be defined).
+   
+   - ✅ Allowed key types:
+   
+     - Booleans (bool)
+   
+     - Numbers (int, float64, etc.)
+   
+     - Strings
+   
+     - Pointers
+   
+     - Channels
+   
+     - Interfaces (if the underlying type is comparable)
+   
+     - Structs (if all their fields are comparable)
+   
+     - Arrays (fixed-size, if elements are comparable)
+   
+   - ❌ Not allowed as keys:
+   
+     - Slices
+   
+     - Maps
+   
+     - Functions
+   
+   These types are not comparable in Go, so they cannot be used as map keys.
+
+   Example:
+
+   ```go
+   // Valid keys
+   m1 := map[int]string{1: "one", 2: "two"}
+   m2 := map[bool]string{true: "yes", false: "no"}
+   m3 := map[[2]int]string{{1, 2}: "coords"} // array key
+   m4 := map[struct{ID int}]string{{ID: 1}: "first"} // struct key
+   
+   fmt.Println(m1[1]) // "one"
+   fmt.Println(m2[false]) // "no"
+   fmt.Println(m3[[2]int{1, 2}]) // "coords"
+   ```
+
+   If you try with a slice:
+
+   ```go
+   m := map[[]int]string{}
+   ```
+
+   👉 You’ll get a compile-time error:
+
+   ```go
+   invalid map key type []int
+   ```
+
+   ✅ Summary:
+   
+   - Go maps work with keys of any type that is comparable.
+   
+   - Commonly: string, int, bool, structs, and arrays.
+   
+   - Not allowed: slices, maps, functions.
 
 ---
 
