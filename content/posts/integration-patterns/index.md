@@ -92,7 +92,7 @@ ch.Publish("", q.Name, false, false,
 
 ---
 
-#### 2b. Durable Queues & Backpressure
+#### 2.1 Durable Queues & Backpressure
 
 When systems communicate asynchronously, it’s critical to handle:
 
