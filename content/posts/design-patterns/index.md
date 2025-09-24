@@ -240,7 +240,7 @@ In this article, we'll explore some of the most widely used design patterns in G
 
    Allows incompatible interfaces to work together.
 
-   An **Adapter** is a design construct that adapts an existing interface **X** to conform to the required interface **Y**. It acts as a translator or bridge between two systems that otherwise couldn’t work together.
+   An **Adapter** is a design construct that adapts an existing interface **SpecificRequest** to conform to the required interface **Request**. It acts as a translator or bridge between two systems that otherwise couldn’t work together.
 
    🧭 To implement an adapter in Go:
 
@@ -262,6 +262,7 @@ In this article, we'll explore some of the most widely used design patterns in G
     
     type Adaptee struct{}
     
+    // Existing interface with a different method
     func (a Adaptee) SpecificRequest() string {
             return "Specific behavior"
     }
@@ -270,6 +271,7 @@ In this article, we'll explore some of the most widely used design patterns in G
         Adaptee Adaptee
     }
     
+	// Adapter implements the Target interface by translating the Request call to SpecificRequest
     func (a Adapter) Request() string {
         return a.Adaptee.SpecificRequest()
     }
@@ -289,8 +291,7 @@ In this article, we'll explore some of the most widely used design patterns in G
        adaptee := adapter.Adaptee{}
        adapterInstance := adapter.Adapter{Adaptee: adaptee}
    
-       var target adapter.Target = adapterInstance
-       fmt.Println(target.Request()) // Output: Specific behavior
+       fmt.Println(adapterInstance.Request()) // Output: Specific behavior
    }
    ```
 
