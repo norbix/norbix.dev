@@ -204,16 +204,6 @@ Together, DSA provides the backbone for high-performance applications.
     fmt.Println(m["apple"]) // 5
     ```
 
-   Python implementation:
-
-   ```python
-    m = {
-        "apple": 5,
-        "banana": 3,
-    }
-    print(m["apple"])  # 5
-   ```
-
     **Hint:**
    Go’s built-in map is a powerful hash table implementation for key-value pairs.
 
@@ -282,6 +272,70 @@ Together, DSA provides the backbone for high-performance applications.
    - Commonly: string, int, bool, structs, and arrays.
    
    - Not allowed: slices, maps, functions.
+
+   Python implementation:
+   
+      ```python
+       m = {
+           "apple": 5,
+           "banana": 3,
+       }
+       print(m["apple"])  # 5
+      ```
+
+   🔑 What types can be keys in a Python dict?
+   
+   - A key must be hashable → meaning it has a valid __hash__() and does not change during its lifetime.
+   
+   - ✅ Allowed key types:
+   
+     - Immutable built-ins: str, int, float, bool, bytes
+   
+     - Tuples (if all elements are hashable)
+   
+     - **frozenset** (immutable version of set`)
+   
+     - User-defined classes (if they implement __hash__ and __eq__)
+   
+   - ❌ Not allowed as keys:
+   
+     - Mutable types like list, dict, and set
+   
+     - These can change after being used as a key, which would break hash table invariants.
+
+   Example:
+
+   ```python
+   # Valid keys
+   m1 = {1: "one", 2: "two"}                 # int keys
+   m2 = {True: "yes", False: "no"}           # bool keys
+   m3 = {(1, 2): "coords"}                   # tuple key
+   m4 = {frozenset([1, 2]): "frozen set"}    # frozenset key
+   
+   print(m1[1])         # "one"
+   print(m2[False])     # "no"
+   print(m3[(1, 2)])    # "coords"
+   ```
+
+   If you try with a list:
+
+   ```python
+   m = { [1, 2]: "coords" }
+   ```
+
+   👉 You’ll get a runtime error:
+
+   ```python
+   TypeError: unhashable type: 'list'
+   ```
+
+   ✅ Summary:
+   
+   - Python dicts require keys to be hashable.
+   
+   - Commonly: strings, numbers, booleans, tuples of immutables, frozensets.
+   
+   - Not allowed: lists, dicts, sets (mutable types).
 
 ---
 
