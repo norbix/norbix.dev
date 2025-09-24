@@ -104,6 +104,8 @@ A publisher emits events to a broker; multiple subscribers consume independently
 
 - Use case: Broadcasting events (e.g., “user signed up” → notify billing, analytics, emails).
 
+- Queue vs Pub/Sub explanation [video](https://www.youtube.com/watch?v=ac2zC2YsXnI)
+
 - Examples: Kafka, NATS, AWS SNS, Google Pub/Sub.
 
 ```mermaid
