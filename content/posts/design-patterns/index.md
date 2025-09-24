@@ -480,11 +480,18 @@ In this article, we'll explore some of the most widely used design patterns in G
     📦 Example usage:
 
     ```go
-    func main() {
-    file1 := Leaf{name: "FileA.txt"}
-    file2 := Leaf{name: "FileB.txt"}
+    package main
+
+    import (
+        "fmt"
+        "composite"
+    )
    
-        folder := &Composite{}
+    func main() {
+        file1 := composite.Leaf{name: "FileA.txt"}
+        file2 := composite.Leaf{name: "FileB.txt"}
+   
+        folder := &composite.Composite{}
         folder.Add(file1)
         folder.Add(file2)
    
