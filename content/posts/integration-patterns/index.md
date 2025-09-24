@@ -174,6 +174,24 @@ fmt.Println(resp.Name)
 
 State changes are represented as immutable events. Consumers react asynchronously.
 
+- Examples
+
+  - Pub/Sub:
+
+    - AWS SNS → SQS queues (fan-out notifications)
+
+    - Google Pub/Sub → notify multiple microservices of an event
+
+    - NATS → lightweight, high-speed broadcasts (e.g., IoT sensors → multiple consumers)
+
+  - Event-Driven / Event Sourcing:
+
+    - Kafka + Kafka Streams → keep an immutable log of user actions, replay to rebuild projections
+
+    - EventStoreDB → store business events like OrderPlaced, PaymentProcessed, OrderShipped
+
+    - CQRS system → commands change state by emitting events; queries rebuild state from those events
+
 ```mermaid
 flowchart LR
     A[Service A] -->|Event| E[(Event Log)]
@@ -210,6 +228,8 @@ While they often overlap, there are important distinctions:
 | Ordering    | Delivery order may or may not be guaranteed (depends on broker: Kafka partitions vs. SNS best-effort) | Events are always stored in append-only order, enabling replay |
 | Persistence | Messages are often transient (delivered then gone, unless persisted separately) | Event log itself is durable and replayable          |
 | Use cases   | Broadcasting notifications (e.g., SNS → SQS + Lambda) | Systems needing audit trails, state reconstruction, or CQRS (Command Query Responsibility) |
+
+
 
 
 - ✅ In short:
