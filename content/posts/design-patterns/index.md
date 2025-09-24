@@ -65,14 +65,13 @@ In this article, we'll explore some of the most widely used design patterns in G
     type singleton struct{
         Value string
     }
-       
-    func GetInstance() *singleton {
-        once.Do(func() {
-            instance = &singleton{Value: "I am the only one"}
+	
+   func GetInstance(value string) *singleton {
+    once.Do(func() {
+        instance = &singleton{Value: value}
     })
-   
     return instance
-    }
+   }
     ```
 
    🧪 Usage
@@ -86,11 +85,12 @@ In this article, we'll explore some of the most widely used design patterns in G
    )
    
    func main() {
-      a := singleton.GetInstance()
-      b := singleton.GetInstance()
-   
-	  fmt.Println(a.Value) // Output: I am the only one
-   
+      a := singleton.GetInstance("First")
+      b := singleton.GetInstance("Second")
+      
+      fmt.Println(a.Value) // Output: First
+      fmt.Println(b.Value) // Output: First
+	  
 	  // Confirm both variables point to the same instance by using pointer equality. If they point to different objects, the comparison will return false.
 	  fmt.Println(a == b) // Output: true
    }
