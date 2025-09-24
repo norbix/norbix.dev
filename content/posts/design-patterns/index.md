@@ -57,6 +57,8 @@ In this article, we'll explore some of the most widely used design patterns in G
     
     var (
         instance *singleton
+        // Ensures that a function is executed only once during the lifetime of a program, 
+		// no matter how many times you call it, and no matter how many goroutines are calling it at the same time
         once     sync.Once
     )
 
