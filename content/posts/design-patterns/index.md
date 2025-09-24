@@ -351,9 +351,19 @@ In this article, we'll explore some of the most widely used design patterns in G
    }
    ```
 
-1. 🛡 Proxy
+1. 🛡 Proxy (aka Virtual Proxy)
 
-   Provides a surrogate or placeholder.
+   Provides a surrogate or placeholder shows the “virtual proxy” pattern (lazy-loading the real object only when needed).
+
+   How it works?
+   
+    - Image → the interface clients depend on (Display()).
+   
+    - RealImage → the heavy or expensive object to create.
+   
+    - ProxyImage → wraps RealImage and delays its creation until the first Display() call.
+   
+   This is a proxy because clients don’t know if they’re talking to RealImage or a ProxyImage.
 
    🧑‍💻 Example: 
 
@@ -379,7 +389,8 @@ In this article, we'll explore some of the most widely used design patterns in G
     
     func (p *ProxyImage) Display() string {
         if p.realImage == nil {
-        p.realImage = &RealImage{filename: p.filename}
+            // Lazy initialization
+            p.realImage = &RealImage{filename: p.filename}
         }
     
         return p.realImage.Display()
