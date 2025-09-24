@@ -267,11 +267,11 @@ In this article, we'll explore some of the most widely used design patterns in G
     }
     
     type Adapter struct {
-        adaptee Adaptee
+        Adaptee Adaptee
     }
     
     func (a Adapter) Request() string {
-        return a.adaptee.SpecificRequest()
+        return a.Adaptee.SpecificRequest()
     }
    ```
 
