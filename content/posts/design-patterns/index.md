@@ -60,11 +60,13 @@ In this article, we'll explore some of the most widely used design patterns in G
         once     sync.Once
     )
 
-    type singleton struct{}
+    type singleton struct{
+        Value string
+    }
        
     func GetInstance() *singleton {
         once.Do(func() {
-            instance = &singleton{}
+            instance = &singleton{Value: "I am the only one"}
     })
    
     return instance
@@ -87,7 +89,7 @@ In this article, we'll explore some of the most widely used design patterns in G
    
 	  fmt.Println(a.Value) // Output: I am the only one
    
-	  // Confirm both variables point to the same instance
+	  // Confirm both variables point to the same instance by using pointer equality. If they point to different objects, the comparison will return false.
 	  fmt.Println(a == b) // Output: true
    }
    ```
