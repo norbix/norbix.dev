@@ -442,34 +442,39 @@ In this article, we'll explore some of the most widely used design patterns in G
     ```go
    package composite
 
-    type Component interface {
+   import "strings"
+   
+   // Component defines the common interface
+   type Component interface {
         Operation() string
-    }
-    
-    type Leaf struct {
+   }
+   
+   // Leaf is a single object (no children)
+   type Leaf struct {
         name string
-    }
-    
-    func (l Leaf) Operation() string {
+   }
+   
+   func (l Leaf) Operation() string {
         return l.name
-    }
-    
-    type Composite struct {
+   }
+   
+   // Composite is a container that can hold children
+   type Composite struct {
         children []Component
-    }
-    
-    func (c *Composite) Add(child Component) {
+   }
+   
+   func (c *Composite) Add(child Component) {
         c.children = append(c.children, child)
-    }
-    
-    func (c *Composite) Operation() string {
-        result := ""
+   }
+   
+   func (c *Composite) Operation() string {
+        results := []string{}
         for _, child := range c.children {
-            result += child.Operation() + " "
+            results = append(results, child.Operation())
         }
-    
-        return result
-    }
+   
+        return strings.Join(results, " ")
+   }
     ```
 
     📦 Example usage:
