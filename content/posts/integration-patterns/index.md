@@ -92,6 +92,71 @@ ch.Publish("", q.Name, false, false,
 
 ---
 
+#### 2b. Durable Queues & Backpressure
+
+When systems communicate asynchronously, it’s critical to handle:
+
+- Durability → ensuring messages aren’t lost if a consumer is down.
+
+- Backpressure → preventing fast producers from overwhelming slower consumers.
+
+##### Durable Queues
+
+A durable queue persists messages until they’re successfully processed.
+
+- SQS (AWS) → messages survive consumer crashes; FIFO queues add ordering + exactly-once processing.
+
+- RabbitMQ → queues and messages can be declared durable so they survive broker restarts.
+
+- Kafka → events are stored in a log on disk, retained for a configurable time, replayable.
+
+- ✅ Guarantees reliability, at the cost of storage and throughput.
+
+##### ⚖️ Backpressure
+
+Backpressure protects your system when consumers can’t keep up with producers.
+
+Strategies:
+
+- Buffering (temporarily store extra messages)
+
+- Dropping (discard excess messages when full — useful for metrics/logging)
+
+- Throttling (slow down producers when consumers lag)
+
+- Scaling consumers (auto-scaling workers to drain the queue)
+
+- Example with Go channels (bounded buffer):
+
+```go
+queue := make(chan string, 10) // max capacity 10
+
+// Producer
+go func() {
+    for i := 0; i < 100; i++ {
+        queue <- fmt.Sprintf("msg-%d", i) // blocks if channel is full
+    }
+}()
+
+// Consumer
+for msg := range queue {
+    fmt.Println("Processing:", msg)
+    time.Sleep(100 * time.Millisecond) // simulate slow consumer
+}
+```
+
+Here, if the consumer is slow, the producer blocks once the channel is full — a built-in form of backpressure.
+
+##### ✅ Takeaways:
+
+Durable queues ensure no data loss.
+
+Backpressure ensures system stability under load.
+
+Together, they make distributed systems resilient and predictable.
+
+---
+
 ### 3. Publish–Subscribe (Pub/Sub)
 
 A publisher emits events to a broker; multiple subscribers consume independently.
