@@ -462,33 +462,120 @@ publish(cancelEvent)
 ### 3. Circuit Breaker (Resilience)
 
 A Circuit Breaker protects your system from cascading failures.
-When a dependency fails repeatedly, the breaker “opens” and stops calls until recovery is detected.
+When a dependency fails repeatedly, the breaker “opens” and short-circuits calls, giving the failing service time to recover and protecting your system from resource exhaustion.
 
 ```mermaid
 flowchart LR
-    A[Service A] -->|Request| B[Service B]
-    B -- success --> A
-    B -- failure x N --> CB[Circuit Breaker]
-    CB -.->|Fallback| A
+    A[Service A] --> CB[Circuit Breaker]
+    CB -->|Allowed| B[Service B]
+    CB -.->|Open / Fallback| A
+    B -->|Success| CB
+    B -.->|Failure| CB
+
 ```
+
+⚡ How it works
+
+The circuit breaker has three states:
+
+  1. Closed ✅
+
+      - Normal operation.
+
+      - Requests flow through, failures are counted.
+
+      - If failures exceed a threshold → breaker opens.
+
+  1. Open ❌
+
+      - Requests fail immediately (or trigger fallback).
+
+      - Prevents hammering a dependency that’s already down.
+
+      - After a timeout, breaker moves to half-open.
+
+  1. Half-Open 🔄
+
+      - A limited number of requests are allowed through.
+
+      - If they succeed → breaker closes (normal operation resumes).
+
+      - If they fail → breaker reopens.
 
 🧑‍💻 Example with Go + resilience library (pseudo-code):
 
 ```go
-cb := gobreaker.NewCircuitBreaker(gobreaker.Settings{
-    Name: "PaymentService",
-})
+package main
 
-result, err := cb.Execute(func() (interface{}, error) {
-    return callPaymentService()
-})
-if err != nil {
-    log.Println("Fallback: return cached response or error")
+import (
+    "fmt"
+    "log"
+    "time"
+
+    "github.com/sony/gobreaker"
+)
+
+func callPaymentService() (string, error) {
+  // Simulate external dependency
+  return "", fmt.Errorf("timeout") // always failing
+}
+
+func main() {
+    cb := gobreaker.NewCircuitBreaker(gobreaker.Settings{
+    Name:        "PaymentService",
+    MaxRequests: 3,               // allowed in half-open state
+    Interval:    60 * time.Second, // reset failure counter window
+    Timeout:     5 * time.Second,  // wait before trying half-open
+  })
+
+for i := 0; i < 5; i++ {
+  _, err := cb.Execute(func() (interface{}, error) {
+        return callPaymentService()
+    })
+
+    if err != nil {
+        log.Println("Fallback: returning cached response")
+    }
+    time.Sleep(1 * time.Second)
+  }
 }
 ```
 
-- ✅ Benefits: Prevents cascading failures, improves stability.
-- ⚠️ Challenges: Needs good fallback strategies.
+🔄 Fallback Strategies
+
+- Return cached data (last known good response).
+
+- Use a degraded mode (serve partial functionality).
+
+- Queue requests for later retry (if acceptable).
+
+- Fail fast with a clear error to the client.
+
+
+🌍 Real-world use cases
+
+- Payment APIs: prevent an outage in a payment gateway from blocking the whole checkout flow.
+
+- Third-party APIs: stop retry storms when an external service is down.
+
+- Microservices: isolate failures in one service from taking down the whole system.
+
+
+✅ Benefits
+
+- Prevents cascading failures.
+
+- Improves stability under load.
+
+- Gives failing services time to recover.
+
+⚠️ Challenges
+
+- Requires careful tuning of thresholds (failure count, timeout).
+
+- Fallback logic can be tricky — wrong defaults may cause bad UX.
+
+- Risk of false positives (breaker opening too aggressively).
 
 ---
 
