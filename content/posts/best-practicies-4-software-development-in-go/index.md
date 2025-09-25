@@ -181,6 +181,111 @@ Stick to convention. Tools like [`golang-standards/project-layout`](https://gith
 
 ---
 
+## 🧩 2.1 Composition vs Aggregation vs Association in Go
+
+When structuring relationships between objects, Go favors **composition** over inheritance. But it’s also useful to understand the difference between **association**, **aggregation**, and **composition**, especially if you’re coming from UML or other OOP-heavy backgrounds.
+
+- **Association** → A loose link: one object *knows about* or *uses* another, but neither depends on the other’s lifecycle.
+- **Aggregation** → Whole–part, but the part can live independently.
+- **Composition** → Whole–part, but the part’s lifecycle depends on the whole.
+
+```mermaid
+classDiagram
+    class Teacher {
+      +Name string
+      +Teach(Student)
+    }
+    class Student {
+      +Name string
+    }
+    Teacher --> Student : association
+
+    class Department {
+      +Name string
+      +Professors []Professor
+    }
+    class Professor {
+      +Name string
+    }
+    Department o-- Professor : aggregation
+
+    class House {
+      +Address string
+      +Rooms []Room
+    }
+    class Room {
+      +Number int
+    }
+    House *-- Room : composition
+```
+
+### Example: Association
+
+```go
+type Student struct {
+    Name string
+}
+
+type Teacher struct {
+    Name string
+}
+
+// association: Teacher *uses* Student, but doesn’t own it
+func (t Teacher) Teach(s Student) {
+    fmt.Printf("%s teaches %s\n", t.Name, s.Name)
+}
+```
+
+### Example: Aggregation
+
+```go
+type Professor struct {
+    Name string
+}
+
+type Department struct {
+    Name       string
+    Professors []Professor // aggregation: professors exist independently
+}
+```
+
+Here, Professor can exist outside of any Department. Destroying the department doesn’t destroy professors.
+
+### Example: Composition
+
+```go
+type Room struct {
+    Number int
+}
+
+type House struct {
+    Address string
+    Rooms   []Room // composition: rooms belong only to this house
+}
+
+func NewHouse(addr string, n int) House {
+    rooms := make([]Room, n)
+    for i := range rooms {
+        rooms[i] = Room{Number: i + 1}
+    }
+    return House{Address: addr, Rooms: rooms}
+}
+```
+
+Here, Rooms only make sense inside a House. If the house is destroyed, the rooms vanish too.
+
+✅ Rule of Thumb in Go:
+
+- Use association when objects only need to call or reference each other (e.g., Teacher teaching a Student).
+
+- Use aggregation when objects have independent meaning (e.g., a User belonging to a Team).
+
+- Use composition when parts are tightly bound to the whole (e.g., Order with its OrderLines).
+
+Go’s emphasis on composition over inheritance makes this distinction practical — you model real-world relationships explicitly instead of relying on class hierarchies.
+
+---
+
 ## 🧪 3. Tests Are Not Optional
 
 - Use table-driven tests
