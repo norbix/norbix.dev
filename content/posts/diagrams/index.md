@@ -14,9 +14,9 @@ weight = 3
 
 ![banner](banner.jpg)
 
-## 🧭 Mermaid Syntax Highlights
+# 🧭 Mermaid Syntax Highlights
 
-### 🔄 Flowcharts
+## 🔄 Flowcharts
 
 Direction:
 
@@ -54,7 +54,79 @@ flowchart LR;
 
 ---
 
-### 🧱 Graph Diagrams (UML-style)
+## 🧩 Class Diagrams (UML-style)
+
+Great for `OOP` design documentation.
+
+```mermaid
+classDiagram
+    class Order {
+        +OrderStatus status
+    }
+    class OrderStatus {
+        <<enumeration>>
+        FAILED
+        PENDING
+        PAID
+    }
+    class PaymentProcessor {
+        <<interface>>
+        -String apiKey
+        +processPayment(Order order) OrderStatus
+    }
+    class Customer {
+        +String name
+    }
+    Order o-- Customer : aggregation
+    Car *-- Engine : composition
+    PaymentProcessor <|-- StripePaymentProcessor
+```
+
+🧩 UML Relationships
+
+Mermaid also supports association, aggregation, and composition, which are common in UML.
+
+```mermaid
+classDiagram
+    class Teacher {
+      +Name string
+      +Teach(Student)
+    }
+    class Student {
+      +Name string
+    }
+    Teacher --> Student : association
+
+    class Department {
+      +Name string
+      +Professors []Professor
+    }
+    class Professor {
+      +Name string
+    }
+    Department o-- Professor : aggregation
+
+    class House {
+      +Address string
+      +Rooms []Room
+    }
+    class Room {
+      +Number int
+    }
+    House *-- Room : composition
+```
+
+- Association → plain arrow (-->)
+
+- Aggregation → hollow diamond (o--)
+
+- Composition → filled diamond (*--)
+
+This makes it easy to visually document relationships in Go codebases.
+
+---
+
+## 🧱 Graph Diagrams (UML-style)
 
 ```mermaid
 graph TD
@@ -81,7 +153,7 @@ graph TD
 
 ---
 
-### 🥧 Pie Charts
+## 🥧 Pie Charts
 
 ```mermaid
 pie
@@ -93,7 +165,7 @@ pie
 
 ---
 
-### 🧭 Journey Diagrams
+## 🧭 Journey Diagrams
 
 Track progress or workflows using narrative sections:
 
@@ -109,7 +181,7 @@ journey
 
 ---
 
-### 🧩 Class Diagrams
+## 🧩 Class Diagrams
 
 Great for OOP design documentation.
 
@@ -139,7 +211,7 @@ classDiagram
 
 ---
 
-### 📜 Sequence Diagrams
+## 📜 Sequence Diagrams
 
 ```mermaid
 sequenceDiagram
@@ -159,7 +231,7 @@ sequenceDiagram
 
 ---
 
-### ✅ Why Use Mermaid in Your Codebase?
+## ✅ Why Use Mermaid in Your Codebase?
 
 - 📖 Self-documenting code and architecture
 - 👥 Team-wide clarity on workflows and design
@@ -168,7 +240,7 @@ sequenceDiagram
 
 ---
 
-### 📦 Resources
+## 📦 Resources
 
 - 📚 [Official Repo (mermaid-js/mermaid)](https://github.com/mermaid-js/mermaid)
 - 🎓 [YouTube Course](https://www.youtube.com/watch?v=-XV1JBfhgWo&list=PLw5h0DiJ-9PC49ItLKBQlWSMH1zolOCXS)
