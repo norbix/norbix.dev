@@ -150,6 +150,65 @@ Add `t.Log()` and use `-v` for more visibility.
 
 ---
 
+## 📝 `Postmortems`: Learning From Bugs in Production
+
+Even with the best debugging practices, some bugs will inevitably make it to production. What separates good teams from great ones is **how they learn from failures**. This is where **postmortems** (or retrospectives) come in.
+
+A postmortem is a structured analysis written after an incident, focusing on *what happened*, *why it happened*, and *how to prevent it from happening again*.
+
+### 🔑 Key Elements of a Good Postmortem
+
+- **Timeline** → When was the bug introduced? When was it detected? How long did it take to fix?
+- **Root Cause** → What was the actual bug (code, logic, configuration, external dependency)?
+- **Impact** → Which users, systems, or services were affected?
+- **Detection** → How was the bug discovered (monitoring, logs, customer reports)?
+- **Resolution** → How was it fixed?
+- **Prevention** → What changes will ensure it doesn’t happen again?
+
+```mermaid
+timeline
+    title Postmortem Workflow
+    section Incident
+      Bug occurs : Alert/Logs
+    section Detection
+      Monitoring triggers : Prometheus/Grafana
+      User reports issue : Support ticket
+    section Resolution
+      Fix deployed : Hotfix/Patch
+    section Prevention
+      Tests added : Unit/Integration
+      Monitoring improved : Alerts refined
+      Knowledge shared : Postmortem doc
+```
+
+### 📋 Example Postmortem Template
+
+```text
+Incident: User login service panic in production
+Date: 2025-04-20
+Duration: 37 minutes
+Impact: 23% of login requests failed
+Root Cause: Nil pointer dereference in JWT parsing code
+Detection: Alert from Prometheus error rate dashboard
+Resolution: Hotfix deployed with nil-check
+Prevention: Added unit test for malformed tokens + panic recovery middleware
+---
+```
+
+🚨 Best Practices
+
+- Keep `postmortems` blameless — focus on systems and processes, not individuals.
+
+- Share them widely inside the organization.
+
+- Turn learnings into action items (tests, monitoring, lint rules).
+
+- Review past postmortems regularly to spot recurring patterns.
+
+👉 Debugging teaches you how to fix today’s bugs. Postmortems teach you how to prevent tomorrow’s.
+
+---
+
 ## 🔁 Summary
 
 - Use `fmt.Println()` and logging for quick insights
