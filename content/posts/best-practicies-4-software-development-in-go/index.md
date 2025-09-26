@@ -536,6 +536,149 @@ func fib(n int) int {
 
 ---
 
+### 9.2 Profiling Applications in Go
+
+Before you optimize, measure. Profiling is the process of analyzing how your program uses CPU, memory, I/O, and goroutines at runtime.
+
+- CPU profiling → see which functions consume the most CPU.
+
+- Memory profiling → track allocations, leaks, GC pressure.
+
+- Block/goroutine profiling → detect contention and deadlocks.
+
+- I/O profiling → understand bottlenecks in file and network operations.
+
+
+🛠️ Tools:
+
+- pprof → built into Go (import _ "net/http/pprof" or go test -cpuprofile).
+
+- go tool trace → visualize goroutines, scheduler, and syscalls.
+
+- Flamegraphs → for intuitive hotspot analysis.
+
+
+Example (benchmark with profiling):
+
+```shell
+go test -bench . -benchmem -cpuprofile=cpu.prof
+go tool pprof cpu.prof
+```
+
+### 9.3 Writing Performant Go Applications
+
+Performance in Go is about simplicity, memory discipline, and concurrency done right. Here are the key principles, expanded with practical guidance:
+
+#### 🧭 Keep It Simple
+
+Go’s runtime is optimized for clarity and straightforward patterns. Complex abstractions can hurt performance more than help.
+
+Avoid deep inheritance-like structures or overuse of interfaces.
+
+Inline small helper functions if they are critical hot paths.
+
+Write concrete implementations first, introduce abstractions only if necessary.
+
+#### 📊 Choose Data Structures Wisely
+
+Selecting the right structure saves time and memory.
+
+Maps → great for fast lookups (O(1) average).
+
+Slices → ideal for sequential or indexed data. Preallocate with make([]T, 0, n) when size is known.
+
+Arrays → better when the size is fixed and performance is critical.
+
+Avoid sync.Map unless you have high contention with many goroutines.
+
+Example:
+
+```go
+// Preallocate slice for performance
+items := make([]string, 0, 1000)
+```
+
+#### 🧩 Reduce Allocations
+
+Every allocation puts pressure on the garbage collector.
+
+Pre-size slices and maps.
+
+Reuse buffers with sync.Pool for short-lived objects.
+
+Avoid creating temporary strings with repeated concatenations (strings.Builder is better).
+
+```go
+var bufPool = sync.Pool{New: func() any { return new(bytes.Buffer) }}
+```
+
+#### ⚡ Concurrency Done Right
+
+Goroutines are cheap but not free. Overspawning leads to memory pressure and scheduler overhead.
+
+Use worker pools to control concurrency.
+
+For counters, prefer sync/atomic over mutex when safe.
+
+Don’t use channels as queues unless you need synchronization.
+
+```go
+var counter int64
+atomic.AddInt64(&counter, 1)
+```
+
+#### 📡 Efficient I/O
+
+I/O is often the real bottleneck.
+
+Use bufio.Reader / Writer for file and network operations.
+
+Stream large files instead of loading them all at once.
+
+Batch database or API operations where possible.
+
+```go
+scanner := bufio.NewScanner(file)
+for scanner.Scan() {
+    process(scanner.Text())
+}
+```
+
+#### 🔍 Escape Analysis
+
+Go decides whether a variable lives on the stack or heap. Heap allocations are slower and trigger GC.
+
+- Inspect with:
+
+```shell
+go build -gcflags="-m"
+```
+
+- Avoid unnecessary heap escapes by keeping variables local and avoiding interface conversions.
+
+#### 📏 Measure > Guess
+
+Never assume where the bottleneck is. Use Go’s profiling tools:
+
+- pprof → CPU, memory, goroutine profiling.
+
+- go test -bench → benchmarking.
+
+- go tool trace → concurrency visualization.
+
+```shell
+go test -bench . -benchmem -cpuprofile=cpu.prof
+go tool pprof cpu.prof
+```
+
+✅ Rule of Thumb:
+
+- Correctness first → Profile → Optimize the real hot paths → Measure again.
+
+This cycle ensures you spend time on data-driven optimizations, not micro-optimizing code that doesn’t matter.
+
+---
+
 ## 🧠 10. Readability > Cleverness
 
 Your code will be read 10x more than it’s written.
