@@ -190,10 +190,111 @@ case msg2 := <-ch2:
 
 2. Worker Pool
 
-You can create a pool of workers that handle jobs concurrently with limited resources.
+A worker pool is one of the most common and practical concurrency patterns in Go. It helps you:
 
-✅ Use buffered channels and `sync.WaitGroup` for coordination.
+- Control concurrency → avoid spawning too many goroutines.
 
+- Reuse workers → instead of creating a goroutine per job.
+
+- Prevent resource exhaustion → e.g. database connections, network sockets.
+
+Think of it like a factory line: jobs come in, a fixed number of workers handle them, results are collected.
+
+
+Basic Worker Pool Example:
+
+```go
+package main
+
+import (
+	"fmt"
+	"sync"
+	"time"
+)
+
+func worker(id int, jobs <-chan int, results chan<- int, wg *sync.WaitGroup) {
+	defer wg.Done()
+	for j := range jobs {
+		fmt.Printf("Worker %d started job %d\n", id, j)
+		time.Sleep(time.Second) // simulate work
+		fmt.Printf("Worker %d finished job %d\n", id, j)
+		results <- j * 2
+	}
+}
+
+func main() {
+	const numJobs = 5
+	const numWorkers = 3
+
+	jobs := make(chan int, numJobs)
+	results := make(chan int, numJobs)
+	var wg sync.WaitGroup
+
+	// start workers
+	for w := 1; w <= numWorkers; w++ {
+		wg.Add(1)
+		go worker(w, jobs, results, &wg)
+	}
+
+	// send jobs
+	for j := 1; j <= numJobs; j++ {
+		jobs <- j
+	}
+	close(jobs)
+
+	// wait for workers to finish
+	go func() {
+		wg.Wait()
+		close(results)
+	}()
+
+	// collect results
+	for r := range results {
+		fmt.Println("Result:", r)
+	}
+}
+```
+
+🧠 Key Observations
+
+- `numWorkers` controls parallelism (not number of jobs).
+
+- Jobs are pushed into a channel → workers pull them at their own pace.
+
+- `sync.WaitGroup` ensures all workers finish before closing results.
+
+⚡ Variations in Production
+
+- Dynamic Pools → adjust number of workers depending on load.
+
+- Error Handling → use an errChan to collect errors from workers.
+
+- Context-Aware Pools → cancel all workers if one fails or timeout occurs.
+
+```go
+ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+defer cancel()
+```
+
+📊 When to Use Worker Pools
+
+✅ Best for:
+
+- CPU-bound tasks (e.g., image processing).
+
+- I/O-bound tasks (e.g., HTTP requests, DB queries).
+
+- Batch jobs and pipelines.
+
+❌ Not needed for:
+
+- Small scripts.
+
+- Lightweight goroutine fan-out without backpressure.
+
+👉 Rule of Thumb:
+
+Start with goroutines + channels. If you notice too many goroutines or unbounded resource use, switch to a worker pool.
 
 3. Timeout with select
 
