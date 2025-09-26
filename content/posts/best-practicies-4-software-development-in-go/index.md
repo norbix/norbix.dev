@@ -677,6 +677,74 @@ go tool pprof cpu.prof
 
 This cycle ensures you spend time on data-driven optimizations, not micro-optimizing code that doesn’t matter.
 
+
+### 9.4 Garbage Collection in Go
+
+Go’s runtime includes a concurrent garbage collector (GC) that automatically reclaims unused memory. While convenient, GC can introduce latency if your program allocates excessively or creates short-lived objects too frequently.
+
+🛠 How Go’s GC Works
+
+Concurrent → runs alongside your program with minimal “stop-the-world” pauses.
+
+Generational-like behavior → favors reclaiming short-lived objects quickly.
+
+Trigger → activated when heap size has grown relative to live data.
+
+You can observe GC activity by running with:
+
+```shell
+GODEBUG=gctrace=1 ./your-app
+```
+
+This prints information about each GC cycle: heap size, pause time, live objects.
+
+#### ⚡ Best Practices to Reduce GC Pressure
+
+- Minimize allocations → reuse buffers with sync.Pool, preallocate slices/maps.
+
+- Avoid unnecessary boxing → don’t convert values to interfaces unless needed.
+
+- Batch work → instead of allocating thousands of tiny objects, reuse larger chunks.
+
+- Watch escape analysis → variables that escape to the heap create GC load.
+
+Example:
+
+```go
+var bufPool = sync.Pool{
+    New: func() any { return new(bytes.Buffer) },
+}
+
+func handler() {
+    buf := bufPool.Get().(*bytes.Buffer)
+    buf.Reset()
+    defer bufPool.Put(buf)
+
+    // use buf...
+}
+```
+
+#### 📊 Profiling GC
+
+Use memory profiling (pprof) to understand allocations:
+
+```shell
+go test -bench . -benchmem -memprofile=mem.prof
+go tool pprof mem.prof
+```
+
+You’ll see which functions are allocating most memory and putting pressure on the GC.
+
+✅ Rule of Thumb
+
+- Write simple, clear code first.
+
+- Profile memory before attempting optimizations.
+
+- Reduce GC work only in hot paths or high-throughput services.
+
+👉 GC isn’t something to fear — but being mindful of allocations can make the difference between a system that works and one that scales.
+
 ---
 
 ## 🧠 10. Readability > Cleverness
