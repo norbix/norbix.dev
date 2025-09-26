@@ -419,7 +419,81 @@ default:
 }
 ```
 
-#### Best Practices:
+### 🔑 5.3 Define Interfaces Where They Are Consumed
+
+One of the most important Go idioms:
+
+Interfaces belong where they are consumed, not where they are implemented.
+
+The consumer knows which methods it actually needs. The implementer just provides concrete behavior. Defining interfaces at the consumer keeps them small, precise, and easier to test.
+
+#### ❌ Bad Practice (interface declared at implementation)
+
+```go
+// db.go
+type Database interface {
+    Save(user User) error
+    Find(id string) (User, error)
+}
+
+type PostgresDB struct{}
+
+func (p *PostgresDB) Save(user User) error   { /* ... */ return nil }
+func (p *PostgresDB) Find(id string) (User, error) { /* ... */ return User{}, nil }
+```
+
+Here, the implementation (PostgresDB) dictates the contract.
+
+Problem: every consumer must accept both Save and Find, even if it only needs one of them.
+
+#### ✅ Good Practice (interface declared at consumer)
+
+```go
+// user_service.go
+type UserStore interface {
+    Save(user User) error
+}
+
+type UserService struct {
+    store UserStore
+}
+
+func (s *UserService) CreateUser(u User) error {
+    return s.store.Save(u)
+}
+
+// postgres.go
+type PostgresDB struct{}
+
+func (p *PostgresDB) Save(user User) error {
+// insert into DB...
+return nil
+}
+```
+
+- UserService defines the UserStore interface it needs.
+
+- PostgresDB happens to implement it because it provides Save.
+
+- For testing, you can swap in a MockStore without touching production code.
+
+📖 This practice reflects both:
+
+- The Dependency Inversion Principle (DIP) → high-level code depends on abstractions, not implementations.
+
+- The Ports & Adapters (Hexagonal Architecture) style → the interface is the port, and the database or mock is just an adapter.
+
+#### ✅ Benefits
+
+- Interfaces stay small (often a single method, like io.Reader).
+
+- Consumers don’t depend on methods they don’t use.
+
+- Easier to create mocks/stubs for testing.
+
+- Concrete types can satisfy multiple consumer-defined interfaces naturally.
+
+### Best Practices:
 
 - Prefer narrow interfaces (avoid interface{} unless really needed).
 
