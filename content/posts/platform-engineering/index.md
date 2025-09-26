@@ -92,6 +92,23 @@ In complex environments — multiple teams, microservices, polyglot stacks — p
 
 ---
 
+## 🌍 The 6 R’s of Cloud Migration
+
+Platform engineering often intersects with **cloud migration strategies**. When modernizing workloads, organizations typically choose from the **6 R’s** framework:
+
+1. **Rehost (Lift and Shift)** → Move applications “as-is” into the cloud. Fast but not cloud-optimized.
+2. **Replatform (Lift, Tinker, and Shift)** → Minor tweaks for optimization (e.g., managed DBs, autoscaling).
+3. **Refactor** → Fully re-architect to leverage cloud-native design (microservices, serverless).
+4. **Repurchase** → Replace with SaaS solutions (e.g., Salesforce, Workday).
+5. **Retire** → Decommission redundant applications.
+6. **Retain** → Keep some workloads on-prem due to compliance or cost.
+
+![6R Migration](6r_migration.jpg)
+
+👉 Platform teams help organizations **navigate the 6 R’s** by providing reusable infrastructure, migration tooling, and golden paths. Instead of one-off migrations, they turn cloud adoption into a repeatable, scalable process.
+
+---
+
 ## 🛤️ Golden Paths: The Secret Sauce
 
 Platform engineering isn’t just about tools — it’s about opinionated defaults. The best platforms offer "golden paths":
