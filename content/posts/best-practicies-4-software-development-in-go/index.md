@@ -689,6 +689,61 @@ Stick to idiomatic Go — use golangci-lint to enforce consistency, and always c
 
 ---
 
+## 🐹 vs 🐍 11. Go vs Python: When to Choose What
+
+Both Go and Python are fantastic languages — but they shine in different domains. Understanding their trade-offs helps you choose the right tool for the job.
+
+### ⚡ Performance
+
+Go: Compiled, statically typed, and optimized for concurrency. Excels at backend services, APIs, and systems programming.
+
+Python: Interpreted, dynamically typed. Slower for CPU-bound tasks, but excellent for scripting, prototyping, and data analysis.
+
+### 🧩 Concurrency
+
+Go: Goroutines and channels make concurrent programming first-class. Easy to scale I/O-heavy workloads.
+
+Python: GIL (Global Interpreter Lock) limits true parallel threads. AsyncIO helps with concurrency, but not as seamless as Go.
+
+### 🔨 Ecosystem
+
+Go: Strong in cloud-native, networking, and backend systems. Kubernetes, Docker, Terraform are written in Go.
+
+Python: Dominates data science, AI/ML, and automation. Rich ecosystem (NumPy, Pandas, TensorFlow, FastAPI).
+
+### 📦 Tooling
+
+Go: Built-in tools (go test, go fmt, go vet, pprof) — batteries included, opinionated.
+
+Python: Huge package index (PyPI) but fragmented tooling. Requires picking/testing frameworks and linters.
+
+### 🧑‍🤝‍🧑 Developer Experience
+
+Go: Minimal language, strict compiler, fewer surprises at runtime. Great for teams that value simplicity and maintainability.
+
+Python: Expressive, flexible, and concise. Ideal for rapid prototyping and exploratory coding.
+
+### ⚖️ Rule of Thumb
+
+- Choose Go for: APIs, microservices, SaaS backends, cloud-native infra, systems software.
+
+- Choose Python for: AI/ML, data engineering, quick scripts, scientific computing.
+
+👉 Many companies use both: Go for production backends, Python for data pipelines and machine learning.
+
+### 🗂️ Quick Comparison Table
+
+| Feature          | Go 🐹                            | Python 🐍                           |
+|------------------|----------------------------------|-------------------------------------|
+| **Performance**  | Fast (compiled, static typing)   | Slower (interpreted, dynamic)       |
+| **Concurrency**  | Goroutines, channels, async by design | GIL limits threads, AsyncIO helps  |
+| **Ecosystem**    | Cloud-native, infra, backends    | Data science, AI/ML, automation     |
+| **Tooling**      | Built-in, opinionated, consistent| Huge but fragmented (PyPI)          |
+| **DX**           | Strict, simple, maintainable     | Flexible, expressive, rapid dev     |
+| **Best For**     | APIs, SaaS, infra, systems code  | AI/ML, ETL, scripting, prototyping  |
+
+---
+
 ## 🙌 Conclusion
 
 Go is an incredible tool for building fast, reliable software — but like any tool, it shines brightest in the hands of developers who respect its philosophy: clarity, simplicity, and composability.
