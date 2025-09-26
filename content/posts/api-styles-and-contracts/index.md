@@ -125,27 +125,68 @@ message UserResponse {
 
 ## 🌐 REST
 
-- Pros: simple, widely supported, cacheable.
+REST (Representational State Transfer) is the most widely used architectural style for building APIs. It relies on standard HTTP methods (GET, POST, PUT, DELETE) and typically exchanges data in JSON format, making it human-readable and easy to debug.
 
-- Cons: over-fetching/under-fetching, no strong typing.
+### ✅ Pros
 
-Example (Gin):
+- Simplicity → easy to implement and consume with any HTTP client.
+
+- Widely supported → nearly every language, framework, and browser works with REST out of the box.
+
+- Cacheable → HTTP caching mechanisms (ETag, Cache-Control) improve performance.
+
+- Good for public APIs → intuitive and accessible for developers.
+
+### ⚠️ Cons
+
+- Over-fetching/under-fetching → clients may receive too much or too little data (can require multiple requests).
+
+- No strong typing → JSON payloads are flexible but can lack strict schema enforcement.
+
+- Less efficient → repeated HTTP requests, verbose JSON payloads, and HTTP/1.1 overhead.
+
+- Limited real-time support → requires polling, long-polling, or add-ons like WebSocket for live updates.
+
+### 📖 Example in Go (Gin)
 
 ```go
 r.GET("/users/:id", func(c *gin.Context) {
-    c.JSON(200, gin.H{"id": c.Param("id"), "name": "Alice"})
+    c.JSON(200, gin.H{
+        "id":   c.Param("id"),
+        "name": "Alice",
+    })
 })
 ```
+
+➡️ This REST endpoint returns a user’s ID and name. It’s simple and readable, but compared to GraphQL or gRPC, it may require additional requests for related data (e.g., user’s posts).
 
 ---
 
 ## 🔍 GraphQL
 
-- Pros: client chooses fields, flexible queries.
+GraphQL is a query language and runtime for APIs, designed to give clients exactly the data they need and nothing more. Unlike REST (which often returns fixed payloads), GraphQL lets the client define the shape of the response.
 
-- Cons: complex server, N+1 query problem, caching harder.
+### ✅ Pros
 
-Example query:
+- Client-driven queries → consumers choose the fields they want, reducing over-fetching and under-fetching.
+   
+- Single endpoint → no need for multiple REST endpoints; everything is served through one /graphql endpoint.
+   
+- Strong typing → schema defines all available queries, mutations, and types, which improves tooling and auto-documentation.
+   
+- Great for frontend teams → they can evolve independently by querying what they need without waiting for backend changes.
+
+### ⚠️ Cons
+
+- Complex server logic → resolvers can be tricky to implement and optimize.
+   
+- N+1 query problem → naive resolvers may hit the database excessively (can be mitigated with DataLoader or batching).
+   
+- Caching challenges → harder compared to REST where responses can be cached by URL; requires custom caching strategies.
+   
+- Security considerations → introspection and deeply nested queries can cause performance or exposure issues if not limited.
+
+### Example query:
 
 ```graphql
 query {
@@ -157,34 +198,91 @@ query {
 }
 ```
 
+➡️ The above query retrieves a user with their id, name, and the title + creation date of their posts — all in a single round trip. In REST, this might require multiple endpoints (/users/123, /users/123/posts).
+
 ---
 
 ## 🔄 WebSocket
 
-- Pros: bidirectional, low-latency, real-time.
+WebSocket is a communication protocol that provides full-duplex, bidirectional channels over a single TCP connection. Unlike HTTP, which is request/response-based, WebSockets keep the connection open, making them ideal for real-time applications like chat, gaming, IoT, and live dashboards.
 
-- Cons: harder to scale, stateful connections.
+### ✅ Pros
 
-Example (Go):
+- Bidirectional → both client and server can send messages anytime.
+
+- Low-latency → avoids overhead of repeated HTTP requests.
+
+- Real-time capable → great for live updates, streaming, notifications, and collaborative apps.
+
+- Lightweight messaging → efficient once the connection is established.
+
+### ⚠️ Cons
+
+- Harder to scale → requires sticky sessions or specialized infrastructure to manage persistent connections.
+
+- Stateful connections → unlike stateless HTTP, connections consume server resources continuously.
+
+- Less tooling/observability → harder to debug and monitor compared to REST/GraphQL.
+
+- Security considerations → need proper authentication and throttling to prevent abuse.
+
+### 📖 Example in Go
 
 ```go
-conn, _, _ := websocket.DefaultDialer.Dial("ws://localhost:8080/ws", nil)
-conn.WriteMessage(websocket.TextMessage, []byte("hello"))
+import (
+    "log"
+    "github.com/gorilla/websocket"
+)
+
+func main() {
+    conn, _, err := websocket.DefaultDialer.Dial("ws://localhost:8080/ws", nil)
+    if err != nil {
+        log.Fatal("dial error:", err)
+    }
+    defer conn.Close()
+
+    conn.WriteMessage(websocket.TextMessage, []byte("hello"))
+}
 ```
+
+➡️ Here, a Go client establishes a WebSocket connection and sends a "hello" message. Unlike REST or gRPC, the connection stays alive and can be reused for sending/receiving multiple messages in real time.
 
 ---
 
 ## ⚡ gRPC
 
-- Pros: fast, strongly typed, streaming support, efficient over HTTP/2.
+`gRPC` is a high-performance, open-source RPC (Remote Procedure Call) framework originally developed at Google. It uses Protocol Buffers (Protobuf) for data serialization and runs over HTTP/2, making it highly efficient for service-to-service communication in distributed systems.
 
-- Cons: tooling overhead, browser requires gRPC-Web.
+### ✅ Pros
 
-Example Go client:
+- High performance → compact Protobuf messages and HTTP/2 multiplexing reduce latency and bandwidth.
+
+- Strongly typed contracts → Protobuf schemas act as a single source of truth, enabling auto-generated client/server code in multiple languages.
+
+- Streaming support → supports unary (request/response), server-streaming, client-streaming, and bidirectional streaming.
+
+- Great for microservices → ideal for internal communication between services in cloud-native environments.
+
+### ⚠️ Cons
+
+- Tooling overhead → requires schema compilation and generated code, which adds build complexity.
+
+- Browser limitations → native support is limited; web clients need gRPC-Web or REST/gRPC gateways.
+
+- Debugging → binary Protobuf payloads are harder to inspect compared to JSON in REST/GraphQL.
+
+
+### 📖 Example Go Client
 
 ```go
 resp, err := client.GetUser(ctx, &pb.UserRequest{Id: "123"})
+if err != nil {
+    log.Fatalf("could not fetch user: %v", err)
+}
+fmt.Println("User:", resp.Name)
 ```
+
+➡️ This example calls a GetUser RPC defined in a Protobuf contract. The client sends a request with Id: "123" and receives a strongly typed response
 
 ---
 
