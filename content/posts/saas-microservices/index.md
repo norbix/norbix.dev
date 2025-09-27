@@ -355,7 +355,6 @@ flowchart TB
     Kong --> CommentsService["Comments Service"]
     Kong --> BillingService["Billing Service"]
     Kong --> NotificationsService["Notifications Service"]
-
 ```
 
 - Clients must fetch JWT from Keycloak in advance.
@@ -369,6 +368,240 @@ flowchart TB
 - Adds cross-cutting features (logging, rate limiting, security).
 
 ✅ In short: Kong is the traffic cop + security guard + auditor in front of your microservices.
+
+## North–South vs East–West Traffic
+
+The north–south traffic refers to requests coming into the system from external clients (like web or mobile apps) and going out to them. This is typically handled by the API Gateway (Kong in our case).
+
+The east–west traffic refers to communication between internal services within the system. This is where microservices talk to each other to fulfill requests, share data, or trigger actions.
+
+```mermaid
+flowchart TB
+    subgraph External["🌍 External Clients"]
+        Client["👩‍💻 Web / 📱 Mobile App"]
+    end
+
+    subgraph DataCenter["🏢 Data Center / Cloud"]
+        Kong["🦍 API Gateway (Kong)"]
+
+        subgraph Services["Microservices"]
+            AuthService["🔐 Auth Service"]
+            DocsService["📄 Docs Service"]
+            BillingService["💳 Billing Service"]
+            NotificationService["📢 Notification Service"]
+        end
+    end
+
+    %% North-South traffic
+    Client -->|"North–South Traffic"| Kong
+
+    %% Routing from Kong to services
+    Kong --> AuthService
+    Kong --> DocsService
+    Kong --> BillingService
+    Kong --> NotificationService
+
+    %% East-West traffic inside services
+    DocsService -->|"East–West Traffic"| BillingService
+    BillingService --> NotificationService
+```
+
+---
+
+## ⏳ Eventual Consistency Challenge in SaaS Microservices
+
+When you split a SaaS platform into many independent services, you also split the data. That means synchronous strong consistency (like in a single SQL database) becomes hard — or impossible — to guarantee.
+
+Instead, many SaaS systems rely on eventual consistency:
+
+A user action triggers an event in one service.
+
+That event propagates asynchronously to other services.
+
+Different services may see different states for a short time.
+
+Eventually, all services converge to the same consistent state.
+
+⚠️ Why This Matters
+
+Billing vs Orders: a customer’s order might be visible immediately, but billing might update a few seconds later.
+
+Search vs Writes: you save a new document, but it doesn’t show up in search until the indexer processes the event.
+
+Notifications: a user adds a comment, but notifications are sent asynchronously.
+
+🛠️ How to Handle It
+
+Idempotency – design APIs so that replaying messages doesn’t create duplicates.
+
+Retries with backoff – transient failures are normal in async flows.
+
+Compensating actions – e.g., if payment fails, cancel the order (Saga pattern).
+
+User experience cues – show “processing…” states to set expectations.
+
+```mermaid
+sequenceDiagram
+    participant Client
+    participant OrderService
+    participant BillingService
+    participant NotificationService
+
+    Client->>OrderService: Place Order
+    OrderService-->>BillingService: Event: OrderCreated
+    OrderService-->>NotificationService: Event: OrderCreated
+    BillingService-->>NotificationService: Event: PaymentSucceeded
+    Note over Client,NotificationService: Notifications & billing may lag <br/> behind the order creation, <br/> but system converges eventually
+```
+
+✅ Takeaway: In SaaS microservices, consistency is a spectrum. Accepting temporary inconsistency — and designing for it — is key to resilience and scalability.
+
+## 🗄️ Microservices + Databases: What Happens?
+
+1. Data Ownership
+
+   - Each microservice is responsible for its own schema.
+   
+   - No other service can directly query or update its DB.
+   
+   - Example:
+   
+      - Order Service has orders table.
+   
+      - Billing Service has invoices table.
+   
+      - User Service has users table.
+   
+   This ensures loose coupling and independent evolution.
+
+1. The Consistency Problem
+
+   - A single business transaction (e.g. “Place Order and Charge Payment”) now touches multiple DBs.
+   
+   - Distributed transactions (2PC, XA) are rarely practical in cloud SaaS (complex, slow, brittle).
+   
+   - Instead, we use eventual consistency.
+
+1. How It Works
+
+   - Order Service writes new order into its DB.
+   
+   - It publishes an OrderCreated event (via Kafka, NATS, RabbitMQ, etc.).
+   
+   - Billing Service consumes the event and writes into its DB.
+   
+   - Notification Service consumes the same event to send a message.
+   
+   - All services eventually agree, though not instantly.
+
+1. Patterns to Solve It
+
+   - Event Sourcing – source of truth is the event log, DBs are projections.
+   
+   - CQRS – separate command (writes) and query (reads) models.
+   
+   - Saga Pattern – long-running transactions split into steps with compensations if something fails.
+   
+   - Outbox Pattern – ensure DB writes and event publishes happen atomically (avoids lost events).
+
+1. Example Flow (Saga for Order + Billing)
+
+   ```mermaid
+   sequenceDiagram
+    participant Client
+    participant OrderService
+    participant BillingService
+    participant NotificationService
+
+    Client->>OrderService: Place Order
+    OrderService->>OrderDB: Insert Order(status=pending)
+    OrderService-->>BillingService: Event(OrderCreated)
+
+    BillingService->>BillingDB: Create Invoice
+    BillingService-->>OrderService: Event(PaymentSucceeded)
+
+    OrderService->>OrderDB: Update Order(status=confirmed)
+    OrderService-->>NotificationService: Event(OrderConfirmed)
+    NotificationService->>NotificationDB: Send Confirmation
+   ```
+
+✅ Key takeaway:
+
+When each microservice has its own DB:
+
+- You trade immediate consistency for autonomy + scalability.
+
+- You must embrace eventual consistency and implement resilience patterns (Sagas, Outbox, CQRS).
+
+---
+
+## 🗄️ Database Role in Microservices
+
+1. Microservice Owns the DB
+
+   - Each microservice has its own private database.
+   
+   - No other service can directly read/write it.
+   
+   - Database is part of the service’s implementation detail, not a shared integration layer.
+
+1. Stored Procedures?
+
+   - In modern SaaS microservices:
+
+     - ❌ Avoid heavy stored procedures, triggers, business logic in DB.
+   
+     - ✅ Keep business logic in the service code (Go, Python, etc.).
+
+   - Why?
+
+     - Stored procedures reintroduce tight coupling to the DB vendor.
+   
+     - Harder to test, version, and evolve in CI/CD pipelines.
+   
+     - Breaks polyglot persistence (you can’t easily switch DB type if all logic lives in the DB).
+
+1. What the DB Provides
+
+The DB’s main job is to guarantee ACID (within the boundary of a single microservice):
+
+   `Atomicity` – either a transaction fully succeeds or fails.
+   
+   `Consistency` – constraints (foreign keys, uniqueness) remain valid.
+   
+   `Isolation` – concurrent transactions don’t corrupt each other.
+   
+   `Durability` – once committed, data persists even after crashes.
+
+So, the DB ensures local consistency for the service’s own state.
+Global consistency across microservices is achieved via eventual consistency and patterns like Saga / Outbox / CQRS.
+
+1. Polyglot Persistence
+
+   - Each service can choose the best DB type for its domain:
+
+      - Billing → PostgreSQL (ACID, strong transactions).
+      
+      - Analytics → ClickHouse or BigQuery (fast aggregation).
+      
+      - Notifications → Redis (fast queues, ephemeral state).
+
+   - This is possible only if business logic lives in services, not in DB stored procs.
+
+1. In Practice
+
+   - ✅ Use DB for data storage, integrity, ACID.
+   
+   - ✅ Service owns domain logic (validation, rules, workflows).
+   
+   - ❌ Don’t push domain logic into stored procedures.
+   
+   - ❌ Don’t let DB become the integration hub between services.
+
+✅ Takeaway:
+
+In microservices, the database is just a persistence layer.
+It gives you ACID for local service transactions, while business logic and cross-service coordination stay in the microservice code, not in the DB.
 
 ---
 
