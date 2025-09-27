@@ -119,7 +119,7 @@ In this article, we'll explore some of the most widely used design patterns in G
     package factory
 
     type Shape interface {
-    Draw() string
+        Draw() string
     }
     
     type Circle struct{}
