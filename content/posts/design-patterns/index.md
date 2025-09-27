@@ -220,12 +220,15 @@ In this article, we'll explore some of the most widely used design patterns in G
         "builder"
    )
    
+   // Hint: Fluent APIs are all about chaining method calls to create a readable flow.
+   // Each method modifies the builder's state and returns the builder itself.
+   // This allows you to construct complex objects step-by-step in a clear and concise manner.
    func main() {
        car := builder.CarBuilder{}.
-       SetEngine("V8").
-       SetWheels(4).
-       SetColor("Red").
-       Build()
+        SetEngine("V8").
+        SetWheels(4).
+        SetColor("Red").
+        Build()
    
            fmt.Printf("%+v\n", car)
            // Output: {Engine:V8 Wheels:4 Color:Red}
