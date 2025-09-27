@@ -1246,9 +1246,50 @@ The modulo operator is often underestimated, but it’s a fundamental tool in bo
    print(days[day_index])
    ```
 
+   🔄 Example Walkthrough
+
+   Let’s say today is Friday (currentDay = 5).
+
+   1. Offset = 2 (2 days later):
+   
+      ```matlab
+      (5 + 2) % 7 = 7 % 7 = 0
+      days[0] = "Sun"
+      ```
+
+      ✅ Two days after Friday is Sunday.
+
+   1. Offset = 10 (10 days later):
+   
+      ```matlab
+      (5 + 10) % 7 = 15 % 7 = 1
+      days[1] = "Mon"
+      ```
+
+      ✅ Ten days after Friday is Monday.
+
+   1. Offset = -3 (3 days earlier):
+   
+      ```matlab
+      (5 - 3) % 7 = 2 % 7 = 2
+      days[2] = "Tue"
+      ```
+
+      ✅ Three days before Friday is Tuesday.
+
 1. Rotating Arrays
 
-   It is often used in problems involving rotations or circular shifts.
+   Array rotation is the process of shifting elements circularly — so elements that “fall off” one end reappear on the other end.
+   
+   This is common in:
+   
+     - Coding interview problems (LeetCode, HackerRank).
+   
+     - Scheduling (round-robin tasks).
+   
+     - Games & simulations (rotating positions, cyclic states).
+   
+     - Data processing (moving averages, cyclic windows).
 
     Go implementation:
     
@@ -1259,9 +1300,9 @@ The modulo operator is often underestimated, but it’s a fundamental tool in bo
          return append(arr[n-k:], arr[:n-k]...)
     }
     ```
-    
-    Python implementation:
-    
+
+   Python implementation:
+
     ```python
     def rotate(arr, k):
           n = len(arr)
@@ -1269,21 +1310,200 @@ The modulo operator is often underestimated, but it’s a fundamental tool in bo
           return arr[-k:] + arr[:-k]
     ```
 
+   - `n := len(arr)` → length of the array.
+   
+   - `k = k % n` → ensures we don’t rotate more than necessary (e.g., rotating 12 times on length 5 = same as rotating 2 times).
+   
+   - `arr[n-k:]` → last k elements (to move to front).
+   
+   - `arr[:n-k]` → first n-k elements (move after).
+   
+   - `appen → combines into rotated array.
+
+
+   🔄 Example Walkthrough
+
+   ```go
+   arr := []int{1, 2, 3, 4, 5}
+   k := 2
+   res := rotate(arr, k)
+   fmt.Println(res)
+   ```
+
+   Steps:
+   
+   - Original: [1 2 3 4 5]
+   
+   - Split: last 2 elements → [4 5], first 3 elements → [1 2 3]
+   
+   - Append: [4 5 1 2 3]
+   
+   ✅ Result: [4 5 1 2 3]
+
+   🔄 Another Example (k > n)
+
+   ```go
+   arr := []int{10, 20, 30, 40, 50}
+   k := 7
+   res := rotate(arr, k)
+   fmt.Println(res)
+   ```
+
+   - `n = 5`
+
+   - `k = 7 % 5 = 2`
+
+   - Split: last `2` → `[40 50]`, first `3` → `[10 20 30]`
+
+   - Result: `[40 50 10 20 30]`
+
+   🧭 Left vs Right Rotations
+   
+      - Above code rotates to the right (end → front).
+   
+      - To rotate left, just swap the slices:
+
+      ```go
+      func rotateLeft(arr []int, k int) []int {
+         n := len(arr)
+         k = k % n
+         return append(arr[k:], arr[:k]...)
+      }
+      ```
+
+   ✅ Key Takeaway: Array rotation is a simple but powerful trick for cyclic problems. In Go, slicing + append makes it elegant and efficient.
+
+
+   📌 Use Cases
+
+      - Round-Robin Scheduling → rotate task queue.
+   
+      - Cipher Algorithms → shift characters cyclically.
+   
+      - Sliding Window Problems → rotate buffers instead of reallocating.
+   
+      - Gaming → rotate players’ turns.
+
 1. Hashing
 
-   It is commonly used in hash functions to ensure values fit within a fixed range.
+   Hashing is the process of taking a large (potentially infinite) set of input keys and mapping them into a fixed range of slots. This is crucial for data structures like hash tables, maps, and sets, where we want fast lookup, insert, and delete operations.
+   
+   The main idea:
+   
+     - We have more possible keys than storage slots.
+   
+     - We apply a hash function that always outputs a value within [0 … tableSize-1].
+   
+     - This allows us to place data into a fixed-size array and still find it later in constant time.
 
     Go implementation:
     
     ```go
     hash := (key % tableSize + tableSize) % tableSize // handle negative keys
     ```
-    
+
+   Output:
+
+   ```matlab
+   Key 12     → Slot 2
+   Key 99     → Slot 4
+   Key -7     → Slot 3
+   Key 123456 → Slot 1
+   ```
+
     Python implementation:
     
     ```python
     hash = (key % table_size + table_size) % table_size  # handle negative keys
     ```
+
+   1.1 🛠️ Why Hashing Matters
+   
+     - Efficiency: Lookup/insert/delete in O(1) on average.
+   
+     - Fixed memory: No need for huge arrays, even if keys are massive.
+   
+     - Determinism: Same key → always the same slot.
+
+   👉 No matter how large or negative the key is, the result always lands in [0,4] because the table size is 5.
+
+   1.2 ⚠️ The Collision Problem
+
+     Since the number of possible keys is much larger than the number of slots, different keys may map to the same slot.
+     Example:
+   
+       - 12 % 5 = 2
+   
+       - 22 % 5 = 2
+   
+     Both keys → slot 2.
+   
+     Common strategies to handle this:
+   
+     1. Chaining – each slot stores a linked list or slice of elements.
+   
+     1. Open Addressing – if a slot is taken, probe for the next free one (linear probing, quadratic probing, double hashing).
+
+      Example:
+
+      ```go
+      package main
+      
+      import "fmt"
+      
+      func main() {
+      tableSize := 5
+      table := make([][]int, tableSize) // slice of buckets (chaining)
+      
+          keys := []int{12, 22, 99, -7}
+          for _, key := range keys {
+              idx := (key % tableSize + tableSize) % tableSize
+              table[idx] = append(table[idx], key) // put key into bucket
+          }
+      
+          // 🔍 Lookup
+          keyToFind := 22
+          idx := (keyToFind % tableSize + tableSize) % tableSize
+          fmt.Println("Looking for key:", keyToFind, "in bucket:", idx)
+          fmt.Println("Bucket contents:", table[idx])
+      }
+     ```
+
+    Output:
+
+    ```matlab
+    Looking for key: 22 in bucket: 2
+    Bucket contents: [12 22]
+    ```
+
+   1.3 ✅ Key Takeaway
+
+     Hashing ensures that any key, no matter how large or small, is mapped into a fixed range of slots. This is what makes hash maps and sets in Go (and other languages) efficient and practical.
+
+   1.4 🚀 Hashing in Real Go Code (map)
+
+     In real-world Go code, you don’t usually implement hashing yourself — you just use the built-in map.
+
+      ```go
+      users := map[int]string{
+       123: "Alice",
+       456: "Bob",
+      }
+
+      fmt.Println(users[123]) // "Alice"
+     ```
+
+     Go’s map already:
+   
+       - Computes the hash of your keys.
+   
+       - Decides which bucket to put them in.
+   
+       - Handles collisions internally (buckets + open addressing).
+   
+       - Resizes automatically when needed.
+   
+     👉 Writing your own hash function is great for learning DSA, but in production Go code you almost always use map.
 
 1. Circular Buffers
 
@@ -1294,12 +1514,94 @@ The modulo operator is often underestimated, but it’s a fundamental tool in bo
     ```go
     nextIndex := (currentIndex + 1) % bufferSize
     ```
-    
+
+      - currentIndex → where you are now.
+
+      - +1 → move forward.
+
+      - % bufferSize → wraps back to 0 when you reach the end.
+
+   A circular buffer (or ring buffer) is a fixed-size data structure that treats memory as if it were connected end-to-end in a circle. When the index reaches the end of the buffer, it wraps back to the beginning.
+   
+   This makes it very useful for:
+   
+     - Streaming data (audio, video, logs).
+   
+     - Queues with fixed memory (no growing slices).
+   
+     - Producer–consumer problems (bounded buffer).
+
+   🔄 Example Walkthrough
+
+   Say bufferSize = 5, indices = 0–4.
+
+   If currentIndex = 3:
+
+   ```go
+   nextIndex = (3 + 1) % 5 = 4
+   ```
+
+   → move to index 4.
+
+   If currentIndex = 4:
+
+    ```go
+   nextIndex = (4 + 1) % 5 = 0
+   ```
+
+   → wrap around to index 0.
+
+   ✅ The % operator ensures the index always stays inside [0 … bufferSize-1].
+
+   🛠️ Simple Go Example
+
+   ```go
+   package main
+   
+   import "fmt"
+   
+   func main() {
+   bufferSize := 5
+   buffer := make([]int, bufferSize)
+   
+       for i := 0; i < 12; i++ {
+           idx := i % bufferSize
+           buffer[idx] = i
+           fmt.Printf("Write %2d → slot %d | buffer: %v\n", i, idx, buffer)
+       }
+   }
+   ```
+
+   Output:
+
+   ```matlab
+   Write  0 → slot 0 | buffer: [0 0 0 0 0]
+   Write  1 → slot 1 | buffer: [0 1 0 0 0]
+   Write  2 → slot 2 | buffer: [0 1 2 0 0]
+   Write  3 → slot 3 | buffer: [0 1 2 3 0]
+   Write  4 → slot 4 | buffer: [0 1 2 3 4]
+   Write  5 → slot 0 | buffer: [5 1 2 3 4]
+   Write  6 → slot 1 | buffer: [5 6 2 3 4]
+   ...
+   ```
+
+   👉 Notice how after filling slots 0–4, writing continues at slot 0 again, overwriting old data.
+
     Python implementation:
     
     ```python
     next_index = (current_index + 1) % buffer_size
     ```
+
+   📌 Use Cases
+   
+     - Log buffers → keep last N entries.
+   
+     - Network packets → stream without resizing memory.
+   
+     - Real-time systems → bounded memory, no GC spikes.
+
+   ✅ Key Takeaway: Circular buffers use modulus arithmetic to “wrap around” indices. They’re memory-efficient and perfect for streaming and queue-like scenarios where overwriting old data is acceptable.
 
 ### Key Insights
 
