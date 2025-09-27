@@ -184,6 +184,192 @@ In a real SaaS platform, you’ll likely mix protocols:
 
 - `CI/CD`: GitHub Actions, Drone, ArgoCD
 
+API GW Kong Example:
+
+```mermaid
+flowchart LR
+    Client[Client: Web, Mobile, Partner] -->|HTTP/gRPC| Kong[Kong API Gateway]
+    Kong -->|Routing| Service1[Microservice A]
+    Kong -->|Routing| Service2[Microservice B]
+    Kong -->|Routing| Service3[Microservice C]
+
+    Kong -.->|Auth, Rate Limit, Logging| Plugins[Plugins]
+    Kong --> Observability[Prometheus / Grafana / Logs]
+```
+
+---
+
+## ☁️ SaaS Microservices Examples
+
+### 🛒 E-commerce Platform
+
+- User Service – manages users, profiles, authentication data.
+
+- Catalog Service – product listings, categories, search.
+
+- Order Service – order placement, status tracking.
+
+- Payment Service – handles credit cards, PayPal, Stripe.
+
+- Shipping Service – shipping labels, delivery tracking.
+
+- Notification Service – emails, SMS, push notifications.
+
+### 🏦 FinTech / Banking
+
+- Customer Service – KYC, customer info.
+
+- Account Service – bank accounts, balances.
+
+- Transaction Service – transfers, deposits, withdrawals.
+
+- Fraud Detection Service – anomaly detection.
+
+- Reporting Service – statements, analytics.
+
+### 📱 SaaS / Productivity App
+
+- Auth Service – login, OAuth2, JWT issuance (could be Keycloak).
+
+- Docs Service – document storage and editing.
+
+- Comments Service – threaded discussions.
+
+- Billing Service – subscriptions, invoices.
+
+- Search Service – full-text search across documents.
+
+### 🚗 Mobility / Ride Sharing
+
+- Driver Service – driver registration, availability.
+
+- Rider Service – customer profiles.
+
+- Ride Matching Service – matches drivers ↔ riders.
+
+- Payment Service – fare calculation + payment.
+
+- Location Service – maps, GPS tracking.
+
+### 🔧 How Kong fits in
+
+Kong sits at the edge and routes requests:
+
+```mermaid
+flowchart TB
+    Client[Mobile / Web Client] --> Kong[Kong API Gateway]
+
+    Kong --> UserService[User Service]
+    Kong --> OrderService[Order Service]
+    Kong --> PaymentService[Payment Service]
+    Kong --> NotificationService[Notification Service]
+
+    Kong -.->|Auth, Rate Limiting, JWT Validation| Keycloak[(Keycloak)]
+```
+
+---
+
+## 🦍 Kong’s Role
+
+Kong sits as the API Gateway at the edge of your system.
+It acts as the single entry point for all clients (web apps, mobile apps, partner APIs).
+
+Instead of each client needing to know where every service lives, they all talk to Kong — and Kong handles:
+
+Routing – decides which microservice should get the request.
+
+Authentication & Authorization – validates JWT tokens (from Keycloak, for example).
+
+Rate Limiting – prevents abuse (e.g., 100 requests/sec max).
+
+Observability – logs, metrics, traces.
+
+Transformations – rewrites headers, payloads, or even protocols.
+
+### 🔄 Flow Example (Keycloak → Kong → Microservices)
+
+1. Client authenticates with Keycloak
+
+    - Redirects user to Keycloak login page.
+    
+    - Receives a JWT access token (and optionally a refresh token).
+    
+    - Stores token locally (browser storage, app memory).
+
+1. Client sends request with JWT
+
+    ```text
+    GET https://api.saas.com/docs/123
+    Authorization: Bearer <JWT from Keycloak>
+    ```
+1. Kong receives the request
+
+    - Validates JWT using OIDC plugin against Keycloak’s public keys.
+    
+    - Applies rate limiting plugin (e.g., 10 req/s per user).
+    
+    - Logs the request (Prometheus/Grafana integration).
+
+1. Kong routes the request
+
+    - /docs/* → goes to Docs Service
+    
+    - /billing/* → goes to Billing Service
+    
+    - /auth/* → goes to Auth Service
+    
+    - Kong uses an internal service registry (DB or declarative YAML).
+
+1. Microservice processes request
+
+    - Docs Service fetches document #123 from storage.
+    
+    - If it needs to notify the user, it may call Notification Service internally.
+
+1. Response back to client
+
+    - Kong passes the response through.
+    
+    - Optionally adds headers, strips sensitive data, or transforms payloads.
+
+### 📌 Visual Recap
+
+```mermaid
+flowchart TB
+    subgraph Auth["Keycloak Authentication"]
+        Keycloak["Keycloak OIDC Provider"]
+    end
+
+    subgraph Observability["Observability & Logs"]
+        Logs["Prometheus / Grafana / ELK / Datadog"]
+    end
+
+    Client["Web / Mobile App"] -->|"Login & Fetch JWT"| Keycloak
+    Client -->|"Bearer JWT"| Kong["Kong API Gateway"]
+
+    Kong -->|"Verify JWT"| Keycloak
+    Kong --> Logs
+
+    Kong --> AuthService["Auth Service"]
+    Kong --> DocsService["Docs Service"]
+    Kong --> CommentsService["Comments Service"]
+    Kong --> BillingService["Billing Service"]
+    Kong --> NotificationsService["Notifications Service"]
+
+```
+
+- Clients must fetch JWT from Keycloak in advance.
+
+- Kong validates JWT and enforces policies.
+
+- Microservices stay focused on business logic.
+
+- Routes traffic to the correct service.
+
+- Adds cross-cutting features (logging, rate limiting, security).
+
+✅ In short: Kong is the traffic cop + security guard + auditor in front of your microservices.
+
 ---
 
 ## 📌 Final Thoughts
