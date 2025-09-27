@@ -645,25 +645,25 @@ Performance in Go is about simplicity, memory discipline, and concurrency done r
 
 #### 🧭 Keep It Simple
 
-Go’s runtime is optimized for clarity and straightforward patterns. Complex abstractions can hurt performance more than help.
+- Go’s runtime is optimized for clarity and straightforward patterns. Complex abstractions can hurt performance more than help.
 
-Avoid deep inheritance-like structures or overuse of interfaces.
+- Avoid deep inheritance-like structures or overuse of interfaces.
 
-Inline small helper functions if they are critical hot paths.
+- Inline small helper functions if they are critical hot paths.
 
-Write concrete implementations first, introduce abstractions only if necessary.
+- Write concrete implementations first, introduce abstractions only if necessary.
 
 #### 📊 Choose Data Structures Wisely
 
-Selecting the right structure saves time and memory.
+- Selecting the right structure saves time and memory.
 
-Maps → great for fast lookups (O(1) average).
+- Maps → great for fast lookups (O(1) average).
 
-Slices → ideal for sequential or indexed data. Preallocate with make([]T, 0, n) when size is known.
+- Slices → ideal for sequential or indexed data. Preallocate with make([]T, 0, n) when size is known.
 
-Arrays → better when the size is fixed and performance is critical.
+- Arrays → better when the size is fixed and performance is critical.
 
-Avoid sync.Map unless you have high contention with many goroutines.
+- Avoid sync.Map unless you have high contention with many goroutines.
 
 Example:
 
@@ -674,13 +674,13 @@ items := make([]string, 0, 1000)
 
 #### 🧩 Reduce Allocations
 
-Every allocation puts pressure on the garbage collector.
+- Every allocation puts pressure on the garbage collector.
 
-Pre-size slices and maps.
+- Pre-size slices and maps.
 
-Reuse buffers with sync.Pool for short-lived objects.
+- Reuse buffers with sync.Pool for short-lived objects.
 
-Avoid creating temporary strings with repeated concatenations (strings.Builder is better).
+- Avoid creating temporary strings with repeated concatenations (strings.Builder is better).
 
 ```go
 var bufPool = sync.Pool{New: func() any { return new(bytes.Buffer) }}
@@ -688,13 +688,13 @@ var bufPool = sync.Pool{New: func() any { return new(bytes.Buffer) }}
 
 #### ⚡ Concurrency Done Right
 
-Goroutines are cheap but not free. Overspawning leads to memory pressure and scheduler overhead.
+- Goroutines are cheap but not free. Overspawning leads to memory pressure and scheduler overhead.
 
-Use worker pools to control concurrency.
+- Use worker pools to control concurrency.
 
-For counters, prefer sync/atomic over mutex when safe.
+- For counters, prefer sync/atomic over mutex when safe.
 
-Don’t use channels as queues unless you need synchronization.
+- Don’t use channels as queues unless you need synchronization.
 
 ```go
 var counter int64
@@ -703,13 +703,13 @@ atomic.AddInt64(&counter, 1)
 
 #### 📡 Efficient I/O
 
-I/O is often the real bottleneck.
+- I/O is often the real bottleneck.
 
-Use bufio.Reader / Writer for file and network operations.
+- Use bufio.Reader / Writer for file and network operations.
 
-Stream large files instead of loading them all at once.
+- Stream large files instead of loading them all at once.
 
-Batch database or API operations where possible.
+- Batch database or API operations where possible.
 
 ```go
 scanner := bufio.NewScanner(file)
@@ -756,15 +756,15 @@ This cycle ensures you spend time on data-driven optimizations, not micro-optimi
 
 Go’s runtime includes a concurrent garbage collector (GC) that automatically reclaims unused memory. While convenient, GC can introduce latency if your program allocates excessively or creates short-lived objects too frequently.
 
-🛠 How Go’s GC Works
+#### 🛠 How Go’s GC Works
 
-Concurrent → runs alongside your program with minimal “stop-the-world” pauses.
+- Concurrent → runs alongside your program with minimal “stop-the-world” pauses.
 
-Generational-like behavior → favors reclaiming short-lived objects quickly.
+- Generational-like behavior → favors reclaiming short-lived objects quickly.
 
-Trigger → activated when heap size has grown relative to live data.
+- Trigger → activated when heap size has grown relative to live data.
 
-You can observe GC activity by running with:
+- You can observe GC activity by running with:
 
 ```shell
 GODEBUG=gctrace=1 ./your-app
