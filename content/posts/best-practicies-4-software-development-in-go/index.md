@@ -180,57 +180,6 @@ Use a predictable layout:
 ```
 Stick to convention. Tools like [`golang-standards/project-layout`](https://github.com/golang-standards/project-layout) are a great starting point — but adapt it to your team’s needs.
 
-
-```mermaid
-flowchart TD
-
-    subgraph Public Surface
-        CMD[/cmd - binaries/]
-        PKG[/pkg - reusable libraries/]
-        API[/api - API definitions/]
-    end
-
-    subgraph Private Layer
-        INTERNAL[/internal - private app logic/]
-        CONFIG[/config - configuration & setup/]
-        TEST[/test - integration tests/]
-        SCRIPTS[/scripts - helper scripts/]
-        BUILD[/build - CI/CD & Docker/]
-        THIRD[/third_party - external code/]
-    end
-
-    CMD --> INTERNAL
-    INTERNAL --> PKG
-    INTERNAL --> API
-    INTERNAL --> CONFIG
-    PKG --> API
-
-    TEST --> INTERNAL
-    TEST --> PKG
-
-    CONFIG --> INTERNAL
-    SCRIPTS --> BUILD
-
-    style CMD fill:#00bfa5,stroke:#00695c,color:#fff
-    style INTERNAL fill:#ff7043,stroke:#bf360c,color:#fff
-    style PKG fill:#29b6f6,stroke:#0277bd,color:#fff
-    style API fill:#81c784,stroke:#2e7d32,color:#fff
-    style CONFIG fill:#ba68c8,stroke:#6a1b9a,color:#fff
-    style TEST fill:#fdd835,stroke:#f57f17,color:#000
-    style SCRIPTS fill:#9e9e9e,stroke:#424242,color:#fff
-    style BUILD fill:#9e9e9e,stroke:#424242,color:#fff
-    style THIRD fill:#bdbdbd,stroke:#616161,color:#000
-
-    %% Legend
-    subgraph Legend [Legend]
-        direction LR
-        A1[Public imports allowed]:::public
-        A2[Internal imports only]:::private
-    end
-    classDef public fill:#00bfa5,color:#fff,stroke:#00695c;
-    classDef private fill:#ff7043,color:#fff,stroke:#bf360c;
-```
-
 ### 🔒 2.1. About the `internal/` Package
 
 Go enforces a visibility rule for the internal/ directory:
@@ -390,6 +339,58 @@ A well-structured Go project isn’t just aesthetic — it communicates intent:
 - What’s declarative (api, config)
 
 Follow convention where it helps, break it where it clarifies — but always make import boundaries explicit.
+
+### 🧩 2.3. Import Boundaries Diagram
+
+```mermaid
+flowchart TD
+
+    subgraph Public Surface
+        CMD[/cmd - binaries/]
+        PKG[/pkg - reusable libraries/]
+        API[/api - API definitions/]
+    end
+
+    subgraph Private Layer
+        INTERNAL[/internal - private app logic/]
+        CONFIG[/config - configuration & setup/]
+        TEST[/test - integration tests/]
+        SCRIPTS[/scripts - helper scripts/]
+        BUILD[/build - CI/CD & Docker/]
+        THIRD[/third_party - external code/]
+    end
+
+    CMD --> INTERNAL
+    INTERNAL --> PKG
+    INTERNAL --> API
+    INTERNAL --> CONFIG
+    PKG --> API
+
+    TEST --> INTERNAL
+    TEST --> PKG
+
+    CONFIG --> INTERNAL
+    SCRIPTS --> BUILD
+
+    style CMD fill:#00bfa5,stroke:#00695c,color:#fff
+    style INTERNAL fill:#ff7043,stroke:#bf360c,color:#fff
+    style PKG fill:#29b6f6,stroke:#0277bd,color:#fff
+    style API fill:#81c784,stroke:#2e7d32,color:#fff
+    style CONFIG fill:#ba68c8,stroke:#6a1b9a,color:#fff
+    style TEST fill:#fdd835,stroke:#f57f17,color:#000
+    style SCRIPTS fill:#9e9e9e,stroke:#424242,color:#fff
+    style BUILD fill:#9e9e9e,stroke:#424242,color:#fff
+    style THIRD fill:#bdbdbd,stroke:#616161,color:#000
+
+    %% Legend
+    subgraph Legend [Legend]
+        direction LR
+        A1[Public imports allowed]:::public
+        A2[Internal imports only]:::private
+    end
+    classDef public fill:#00bfa5,color:#fff,stroke:#00695c;
+    classDef private fill:#ff7043,color:#fff,stroke:#bf360c;
+```
 
 ---
 
