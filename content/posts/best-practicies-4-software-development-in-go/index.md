@@ -168,16 +168,42 @@ fmt.Println(x == nil) // false (x holds a *int that is nil)
 Use a predictable layout:
 
 ```text
-/cmd - entry points 
-/internal - private packages 
-/pkg - public, reusable packages 
-/api - OpenAPI/proto definitions 
-/config - config loading 
-/scripts - helper scripts
+/cmd     - entry points (main packages)
+/internal - private packages (not importable from outside the module)
+/pkg     - public, reusable packages
+/api     - OpenAPI/proto definitions
+/config  - config loading and environment setup
+/scripts - helper scripts (build, test, deploy)
+```
+Stick to convention. Tools like [`golang-standards/project-layout`](https://github.com/golang-standards/project-layout) are a great starting point — but adapt it to your team’s needs.
+
+### 🔒 2.1. About the `internal/` Package
+
+Go enforces a visibility rule for the internal/ directory:
+
+- Code inside `internal/` can import any other package (including `/pkg`, `/api`, or `/config`).
+
+- Code outside `internal/` cannot import packages from `internal/`.
+
+This design ensures a clean encapsulation boundary — internal packages remain private to your module, preventing accidental dependencies by external consumers or other modules.
+
+```text
+project/
+├── cmd/
+│   └── server/main.go
+├── internal/
+│   └── service/user.go
+├── pkg/
+│   └── logger/logger.go
 ```
 
+✅ Allowed:
+internal/service/user.go → import "project/pkg/logger"
 
-Stick to convention. Tools like [`golang-standards/project-layout`](https://github.com/golang-standards/project-layout) are a great starting point — but adapt it to your team’s needs.
+❌ Forbidden:
+pkg/logger/logger.go → import "project/internal/service"
+
+This structure encourages modularity and intentional visibility — only expose what truly needs to be reused.
 
 ---
 
