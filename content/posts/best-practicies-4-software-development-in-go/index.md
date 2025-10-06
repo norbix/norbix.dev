@@ -168,12 +168,15 @@ fmt.Println(x == nil) // false (x holds a *int that is nil)
 Use a predictable layout:
 
 ```text
-/cmd     - entry points (main packages)
+/cmd      - entry points (main packages)
 /internal - private packages (not importable from outside the module)
-/pkg     - public, reusable packages
-/api     - OpenAPI/proto definitions
-/config  - config loading and environment setup
-/scripts - helper scripts (build, test, deploy)
+/pkg      - public, reusable packages
+/api      - OpenAPI/proto definitions or gRPC schemas
+/config   - config loading and environment setup
+/scripts  - helper scripts (build, test, deploy)
+/test     - integration and end-to-end tests
+/build    - Dockerfiles, CI/CD, or packaging assets
+/third_party - vendored or generated external code
 ```
 Stick to convention. Tools like [`golang-standards/project-layout`](https://github.com/golang-standards/project-layout) are a great starting point — but adapt it to your team’s needs.
 
@@ -205,9 +208,141 @@ pkg/logger/logger.go → import "project/internal/service"
 
 This structure encourages modularity and intentional visibility — only expose what truly needs to be reused.
 
+### ⚙️ 2.2. Other Common Directories
+
+#### `cmd/` — Entry Points
+
+Each subdirectory under /cmd builds a separate binary.
+
+Example:
+
+```text
+cmd/
+  server/
+    main.go   # builds binary "server"
+  cli/
+    main.go   # builds binary "cli"
+```
+
+Use `/cmd` for main packages that bootstrap your services, CLIs, or daemons.
+
+#### `pkg/` — Public Libraries
+
+Holds reusable code meant to be imported by other modules or projects.
+
+```text
+pkg/
+  logger/
+  middleware/
+  storage/
+```
+
+If your module is published publicly, `/pkg` is the "safe to import" surface.
+
+#### `api/` — Schemas and Contracts
+
+Contains OpenAPI specs, gRPC .proto files, or versioned API models:
+
+```text
+api/
+  openapi.yaml
+  v1/types.go
+  proto/service.proto
+```
+
+This makes your interfaces explicit and versioned — ideal for microservices.
+
+#### `config/` — Configuration and Setup
+
+Central place for config files, environment loaders, and schema validation:
+
+```text
+config/
+  config.yaml
+  loader.go
+```
+
+Keeps your configuration logic cleanly separated from business logic.
+
+#### `scripts/` — Automation Helpers
+
+Contains Makefiles, Taskfiles, shell scripts, and CI/CD helpers:`
+
+```text
+scripts/
+  build.sh
+  test.sh
+  lint.sh
+```
+
+Encapsulates repetitive commands and improves onboarding consistency.
+
+#### `test/` or `tests/` — Integration & E2E Tests
+
+Holds black-box or multi-package tests:
+
+```text
+test/
+  integration/
+  e2e/
+```
+
+Keeps your integration logic separate from white-box unit tests (*_test.go inside code dirs).
+
+#### `build/` — CI, Docker, and Packaging
+
+Keeps build and deployment artifacts:
+
+```text
+build/
+  Dockerfile
+  ci/
+  helm/
+```
+
+Useful for container builds, pipeline configs, and OS packaging.
+
+#### `third_party/` — External or Generated Code
+
+Stores generated clients, protobufs, or vendored dependencies not under your control.
+
+#### `vendor/` — Toolchain Cache
+
+Special Go tool-managed directory (created by go mod vendor).
+Used only when building in vendor mode (-mod=vendor).
+
+#### 🧠 Mental Model
+
+| Directory | Enforced by Go? | Purpose | Typical Visibility    |
+|-----------|-----------------|---------|-----------------------|
+| /internal	| ✅ Yes	          | Private logic	| Private               |
+| /cmd	| ❌ No	           | Executables	| Public (entry points) |
+| /pkg	| ❌ No	           | Reusable libs	| Public                |
+| /api	| ❌ No	           | Contracts, schemas	| Public                |
+| /config	| ❌ No            |	Environment setup	| Internal |
+| /scripts	| ❌ No	| Build/test helpers	| Internal |
+| /test	| ❌ No	| Integration/E2E	| Internal |
+| /build	| ❌ No	| CI/CD artifacts	| Internal |
+| /third_party	| ❌ No	| External code	| Internal |
+| /vendor	| ✅ Yes	| Dependency cache	| Tool-managed |
+
+🧩 Takeaway
+
+A well-structured Go project isn’t just aesthetic — it communicates intent:
+
+- What’s private (internal)
+
+- What’s reusable (pkg)
+
+- What’s executable (cmd)
+
+- What’s declarative (api, config)
+
+Follow convention where it helps, break it where it clarifies — but always make import boundaries explicit.
+
 ---
 
-## 🧩 2.1 Composition vs Aggregation vs Association in Go
+## 🧩 3. Composition vs Aggregation vs Association in Go
 
 When structuring relationships between objects, Go favors **composition** over inheritance. But it’s also useful to understand the difference between **association**, **aggregation**, and **composition**, especially if you’re coming from UML or other OOP-heavy backgrounds.
 
@@ -312,7 +447,7 @@ Go’s emphasis on composition over inheritance makes this distinction practical
 
 ---
 
-## 🧪 3. Tests Are Not Optional
+## 🧪 4. Tests Are Not Optional
 
 - Use table-driven tests
 - Use [`testing`](https://pkg.go.dev/testing), and only bring in libraries like `testify` if you really need them
@@ -321,7 +456,7 @@ Go’s emphasis on composition over inheritance makes this distinction practical
 
 ---
 
-## ✨ 4. Errors Are First-Class Citizens
+## ✨ 5. Errors Are First-Class Citizens
 
 - Always check errors — no exceptions.
 - Wrap errors with context using `fmt.Errorf("failed to read config: %w", err)`
@@ -329,7 +464,7 @@ Go’s emphasis on composition over inheritance makes this distinction practical
 
 ---
 
-## 📦 5. Use Interfaces at the Boundaries
+## 📦 6. Use Interfaces at the Boundaries
 
 Keep interfaces small, and only expose them where needed:
 
@@ -341,7 +476,7 @@ type Storer interface {
 
 Don’t write interfaces for everything — only where mocking or substitution matters (e.g. storage, HTTP clients, etc.).
 
-### 🔗 5.1 Interface Embedding (Composing Behaviors)
+### 🔗 6.1 Interface Embedding (Composing Behaviors)
 
 In Go, it’s common to see interfaces inside other interfaces — this is called interface embedding.
 
@@ -386,7 +521,7 @@ Any type that implements Read, Write, and Close automatically satisfies Conn.
 
 **✅ This pattern keeps Go code clean, DRY, and testable.**
 
-### 🔍 5.2 Type Assertions
+### 🔍 6.2 Type Assertions
 
 When working with interfaces, you often need to access the concrete type stored inside.
 
@@ -445,7 +580,7 @@ default:
 }
 ```
 
-### 🔑 5.3 Define Interfaces Where They Are Consumed
+### 🔑 6.3 Define Interfaces Where They Are Consumed
 
 One of the most important Go idioms:
 
@@ -529,7 +664,7 @@ return nil
 
 ---
 
-## 🧰 6. Tooling Makes You Better
+## 🧰 7. Tooling Makes You Better
 
 - Use go vet, staticcheck, and golangci-lint
 - Automate formatting: gofmt, goimports
@@ -554,7 +689,7 @@ SonarQube works great alongside golangci-lint, giving you both quick feedback lo
 
 ---
 
-## 🔐 7. Secure By Default
+## 🔐 8. Secure By Default
 
 - Always set timeouts on HTTP clients and servers
 - Avoid leaking secrets in logs
@@ -563,7 +698,7 @@ SonarQube works great alongside golangci-lint, giving you both quick feedback lo
 
 ---
 
-## 🌐 8. Embrace the Go Ecosystem
+## 🌐 9. Embrace the Go Ecosystem
 
 - Use standard library wherever possible — it's well-tested and fast
 - Prefer established, well-maintained packages
@@ -571,14 +706,14 @@ SonarQube works great alongside golangci-lint, giving you both quick feedback lo
 
 ---
 
-## 🚀 9. Performance Matters (but correctness first)
+## 🚀 10. Performance Matters (but correctness first)
 
 - Profile with `pprof`
 - Avoid allocations in tight loops
 - Use channels, but don’t abuse goroutines
 - Benchmark with go test -bench
 
-### 9.1 Cache vs Memoization
+### 10.1 Cache vs Memoization
 
 These two terms are often confused, but they solve slightly different problems:
 
@@ -636,7 +771,7 @@ func fib(n int) int {
 
 ---
 
-### 9.2 Profiling Applications in Go
+### 10.2 Profiling Applications in Go
 
 Before you optimize, measure. Profiling is the process of analyzing how your program uses CPU, memory, I/O, and goroutines at runtime.
 
@@ -847,7 +982,7 @@ You’ll see which functions are allocating most memory and putting pressure on 
 
 ---
 
-## 🧠 10. Readability > Cleverness
+## 🧠 11. Readability > Cleverness
 
 Your code will be read 10x more than it’s written.
 
@@ -857,7 +992,7 @@ Stick to idiomatic Go — use golangci-lint to enforce consistency, and always c
 
 ---
 
-## 🐹 vs 🐍 11. Go vs Python: When to Choose What
+## 🐹 vs 🐍 12. Go vs Python: When to Choose What
 
 Both Go and Python are fantastic languages — but they shine in different domains. Understanding their trade-offs helps you choose the right tool for the job.
 
