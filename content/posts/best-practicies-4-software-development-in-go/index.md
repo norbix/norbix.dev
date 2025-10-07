@@ -1105,4 +1105,16 @@ Go is an incredible tool for building fast, reliable software — but like any t
 
 ---
 
+## 🔗 Explore More with Pragmatic Code Examples
+
+If you’d like to see these principles in action, check out my open-source repositories demonstrating production-grade Go setups:
+
+- 🧱 [Build Automation Examples for Go](https://github.com/norbix/build-automation-examples-for-go) — practical `Taskfile` + `Makefile` automation patterns
+
+- 🌐 [Fullstack Demo in Go](https://github.com/norbix/demo1_fullstack_golang) — 3-tier web app with `Docker Compose` and `Nginx`
+
+- ⚙️ [CLI Demo in Go](https://github.com/norbix/demo4_cli_golang) — building powerful command-line tools using Go standard library
+
+---
+
 🚀 Follow me on [norbix.dev](https://norbix.dev) for more insights on Go, Python, AI, system design, and engineering wisdom.
