@@ -162,17 +162,25 @@ case msg2 := <-ch2:
     Fan-In: Multiple goroutines send into a single channel.
 
     ```go
+    package main
+   
+    import (
+        "fmt"
+        "time"   
+    )
+    
     func worker(id int, jobs <-chan int, results chan<- int) {
         for j := range jobs {
             fmt.Printf("Worker %d processing job %d\n", id, j)
-            time.Sleep(time.Second)
+            time.Sleep(time.Second) // simulate work
+	    	fmt.Printf("Worker %d finished job %d\n", id, j)
             results <- j * 2
         }
     }
 
     func main() {
-    jobs := make(chan int, 5)
-    results := make(chan int, 5)
+        jobs := make(chan int, 5)
+        results := make(chan int, 5)
 	
         // Creates 3 goroutines, each running worker(...).
         for w := 1; w <= 3; w++ {
@@ -186,7 +194,7 @@ case msg2 := <-ch2:
         close(jobs)
     
         // Main goroutine waits for results
-		// It receives 5 results — one for each job processed by the pool.
+        // It receives 5 results — one for each job processed by the pool.
         for a := 1; a <= 5; a++ {
             fmt.Println("Result:", <-results)
         }
@@ -222,7 +230,6 @@ A worker pool is one of the most common and practical concurrency patterns in Go
 
 Think of it like a factory line: jobs come in, a fixed number of workers handle them, results are collected.
 
-
 Basic Worker Pool Example:
 
 ```go
@@ -245,21 +252,18 @@ func worker(id int, jobs <-chan int, results chan<- int, wg *sync.WaitGroup) {
 }
 
 func main() {
-	const numJobs = 5
-	const numWorkers = 3
-
-	jobs := make(chan int, numJobs)
-	results := make(chan int, numJobs)
+	jobs := make(chan int, 5)
+	results := make(chan int, 5)
 	var wg sync.WaitGroup
 
 	// start workers
-	for w := 1; w <= numWorkers; w++ {
+	for w := 1; w <= 5; w++ {
 		wg.Add(1)
 		go worker(w, jobs, results, &wg)
 	}
 
 	// send jobs
-	for j := 1; j <= numJobs; j++ {
+	for j := 1; j <= 5; j++ {
 		jobs <- j
 	}
 	close(jobs)
