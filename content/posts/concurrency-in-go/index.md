@@ -65,18 +65,20 @@ go sayHello() starts the function in the background.
 
 ---
 
-## 📡 Channels
+## 📡 Unbuffered Channels
 
 Channels allow goroutines to communicate safely.
+
+Unbuffered channel are blocking, both send and receive are blocking operations.
 
 ```go
 ch := make(chan string)
 
 go func() {
-	ch <- "ping"
+	ch <- "ping"    // send
 }()
 
-msg := <-ch
+msg := <-ch         // receive
 fmt.Println(msg) // prints: ping
 
 ```
@@ -105,6 +107,8 @@ fmt.Println(<-ch)
 ## ❌ Closing Channels
 
 You can close a channel to indicate no more values will be sent.
+
+This example does require close(ch) because of how range works with channels. This `for range` loop keeps receiving values from the channel until it’s closed.
 
 ```go
 ch := make(chan int)
