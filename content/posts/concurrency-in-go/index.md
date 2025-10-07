@@ -155,6 +155,7 @@ case msg2 := <-ch2:
 ---
 
 ## 🛠️ Concurrency Patterns
+
 1. Fan-Out / Fan-In
 
     Fan-Out: Multiple goroutines read from the same channel.
@@ -218,133 +219,147 @@ case msg2 := <-ch2:
    
    Order isn’t guaranteed — it depends on goroutine scheduling   
 
-2. Worker Pool
+1. Worker Pool
 
-A worker pool is one of the most common and practical concurrency patterns in Go. It helps you:
+   A worker pool is one of the most common and practical concurrency patterns in Go. It helps you:
+   
+   - Control concurrency → avoid spawning too many goroutines.
+   
+     - Reuse workers → instead of creating a goroutine per job.
+   
+     - Prevent resource exhaustion → e.g. database connections, network sockets.
+   
+   Think of it like a factory line: jobs come in, a fixed number of workers handle them, results are collected.
+   
+   Basic Worker Pool Example:
 
-- Control concurrency → avoid spawning too many goroutines.
+   ```go
+   package main
+   
+   import (
+       "fmt"
+       "sync"
+       "time"
+   )
+   
+   func worker(id int, jobs <-chan int, results chan<- int, wg *sync.WaitGroup) {
+       defer wg.Done()
+       for j := range jobs {
+           fmt.Printf("Worker %d started job %d\n", id, j)
+           time.Sleep(time.Second) // simulate work
+           fmt.Printf("Worker %d finished job %d\n", id, j)
+           results <- j * 2
+       }
+   }
+   
+   func main() {
+       jobs := make(chan int, 5)
+       results := make(chan int, 5)
+       var wg sync.WaitGroup
+   
+       // start workers
+       for w := 1; w <= 5; w++ {
+           wg.Add(1)
+           go worker(w, jobs, results, &wg)
+       }
+   
+       // send jobs
+       for j := 1; j <= 5; j++ {
+           jobs <- j
+       }
+       close(jobs)
+   
+       // wait for workers to finish
+       go func() {
+           wg.Wait()
+           close(results)
+       }()
+   
+       // collect results
+       for r := range results {
+           fmt.Println("Result:", r)
+       }
+   }
+   ```
 
-- Reuse workers → instead of creating a goroutine per job.
+   ### 🧠 Key Observations
 
-- Prevent resource exhaustion → e.g. database connections, network sockets.
+   - `numWorkers` controls parallelism (not number of jobs).
 
-Think of it like a factory line: jobs come in, a fixed number of workers handle them, results are collected.
+   - Jobs are pushed into a channel → workers pull them at their own pace.
 
-Basic Worker Pool Example:
+   - `sync.WaitGroup` ensures all workers finish before closing results.
 
-```go
-package main
+   ### ⚡ Variations in Production
 
-import (
-	"fmt"
-	"sync"
-	"time"
-)
+   - Dynamic Pools → adjust number of workers depending on load.
 
-func worker(id int, jobs <-chan int, results chan<- int, wg *sync.WaitGroup) {
-	defer wg.Done()
-	for j := range jobs {
-		fmt.Printf("Worker %d started job %d\n", id, j)
-		time.Sleep(time.Second) // simulate work
-		fmt.Printf("Worker %d finished job %d\n", id, j)
-		results <- j * 2
-	}
-}
+  - Error Handling → use an errChan to collect errors from workers.
 
-func main() {
-	jobs := make(chan int, 5)
-	results := make(chan int, 5)
-	var wg sync.WaitGroup
+  - Context-Aware Pools → cancel all workers if one fails or timeout occurs.
 
-	// start workers
-	for w := 1; w <= 5; w++ {
-		wg.Add(1)
-		go worker(w, jobs, results, &wg)
-	}
+   ```go
+   ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+   defer cancel()
+   ```
 
-	// send jobs
-	for j := 1; j <= 5; j++ {
-		jobs <- j
-	}
-	close(jobs)
+   ### 📊 When to Use Worker Pools
 
-	// wait for workers to finish
-	go func() {
-		wg.Wait()
-		close(results)
-	}()
+   ✅ Best for:
 
-	// collect results
-	for r := range results {
-		fmt.Println("Result:", r)
-	}
-}
-```
+   - CPU-bound tasks (e.g., image processing).
+   
+     - I/O-bound tasks (e.g., HTTP requests, DB queries).
+   
+     - Batch jobs and pipelines.
 
-🧠 Key Observations
+   ❌ Not needed for:
 
-- `numWorkers` controls parallelism (not number of jobs).
+   - Small scripts.
 
-- Jobs are pushed into a channel → workers pull them at their own pace.
+     - Lightweight goroutine fan-out without backpressure.
 
-- `sync.WaitGroup` ensures all workers finish before closing results.
+   👉 Rule of Thumb:
 
-⚡ Variations in Production
+   Start with goroutines + channels. If you notice too many goroutines or unbounded resource use, switch to a worker pool.
 
-- Dynamic Pools → adjust number of workers depending on load.
+   ### 🔍 Key Differences Summary
+   
+   | Aspect | Without `WaitGroup` | With `WaitGroup` |
+   |--------|---------------------|------------------|
+   | **Knowing how many results to read** | Must know exact count (`for i := 1; i <= N`) | No need — `for range` until closed |
+   | **Who closes `results`** | Nobody (left open) | A goroutine after all workers finish |
+   | **When program ends** | Possibly before all workers finish | Guaranteed after all workers finish |
+   | **Synchronization** | Implicit (via job count) | Explicit (via `wg.Wait()`) |
+   | **Safety in large systems** | Not safe for unknown job counts | Safe and scalable |
 
-- Error Handling → use an errChan to collect errors from workers.
+## ⏱️ Timeout with `select`
 
-- Context-Aware Pools → cancel all workers if one fails or timeout occurs.
+In Go, you can use the `select` statement with `time.After` to implement timeouts for channel operations.  
+This prevents your goroutine from blocking forever if no data arrives within a given duration.
 
-```go
-ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-defer cancel()
-```
-
-📊 When to Use Worker Pools
-
-✅ Best for:
-
-- CPU-bound tasks (e.g., image processing).
-
-- I/O-bound tasks (e.g., HTTP requests, DB queries).
-
-- Batch jobs and pipelines.
-
-❌ Not needed for:
-
-- Small scripts.
-
-- Lightweight goroutine fan-out without backpressure.
-
-👉 Rule of Thumb:
-
-Start with goroutines + channels. If you notice too many goroutines or unbounded resource use, switch to a worker pool.
-
-3. Timeout with select
-
-    ```go
-    c := make(chan string)
-    
-    go func() {
-        time.Sleep(2 * time.Second)
-        c <- "done"
-    }()
-    
-    select {
-    case res := <-c:
-        fmt.Println(res)
-    case <-time.After(1 * time.Second):
-        fmt.Println("timeout")
-    }
-    ```
+ ```go
+ c := make(chan string)
+ 
+ go func() {
+     time.Sleep(2 * time.Second)
+     c <- "done"
+ }()
+ 
+ select {
+ case res := <-c:
+     fmt.Println(res)
+ case <-time.After(1 * time.Second):
+     fmt.Println("timeout")
+ }
+ ```
 
 ---
 
 ## ⚖️ sync.WaitGroup
 
-Use it to wait for all goroutines to finish.
+Use it to wait for all goroutines to finish before continuing execution.  
+A `WaitGroup` provides a simple way to coordinate concurrent tasks and ensure they complete before your program exits.
 
 ```go
 var wg sync.WaitGroup
