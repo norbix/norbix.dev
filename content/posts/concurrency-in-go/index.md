@@ -163,34 +163,52 @@ case msg2 := <-ch2:
 
     ```go
     func worker(id int, jobs <-chan int, results chan<- int) {
-    
         for j := range jobs {
             fmt.Printf("Worker %d processing job %d\n", id, j)
             time.Sleep(time.Second)
             results <- j * 2
         }
     }
-    ```
 
-    ```go
     func main() {
     jobs := make(chan int, 5)
     results := make(chan int, 5)
-    
+	
+        // Creates 3 goroutines, each running worker(...).
         for w := 1; w <= 3; w++ {
             go worker(w, jobs, results)
         }
     
+        // The main function (itself a goroutine) then sends 5 jobs.
         for j := 1; j <= 5; j++ {
             jobs <- j
         }
         close(jobs)
     
+        // Main goroutine waits for results
+		// It receives 5 results — one for each job processed by the pool.
         for a := 1; a <= 5; a++ {
             fmt.Println("Result:", <-results)
         }
     }
     ```
+
+   Example output (order may vary):
+
+   ```text
+   Worker 1 processing job 1
+   Worker 2 processing job 2
+   Worker 3 processing job 3
+   Worker 1 processing job 4
+   Worker 2 processing job 5
+   Result: 2
+   Result: 4
+   Result: 6
+   Result: 8
+   Result: 10
+   ```
+   
+   Order isn’t guaranteed — it depends on goroutine scheduling   
 
 2. Worker Pool
 
