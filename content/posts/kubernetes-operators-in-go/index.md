@@ -113,6 +113,21 @@ Let’s start small — a custom resource that defines a simple app replica coun
 
 ---
 
+# 🧰 Try It Yourself — Demo Repository
+
+You can explore a working version of this basic Operator (which watches and copies ConfigMaps between namespaces) here:
+
+👉 [**norbix/demo2_k8soperator_golang**](https://github.com/norbix/demo2_k8soperator_golang)
+
+It’s a minimal controller built with `kubebuilder`, showcasing:
+- A real reconciliation loop in Go,
+- RBAC permissions via `controller-gen`,
+- and namespace-aware ConfigMap copying.
+
+Feel free to clone it, run `make run`, and explore how reconciliation behaves locally before deploying it into a cluster.
+
+---
+
 # 🔄 How Reconciliation Works
 
 1. The controller watches for changes in your custom resource (App).
