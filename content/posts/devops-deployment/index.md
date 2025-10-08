@@ -357,7 +357,7 @@ keytool -list -keystore $JAVA_HOME/lib/security/cacerts | grep myrootca
 
 For containerized Java apps, mount or bake the updated keystore into your image.
 
-## CAs in Kubernetes
+### CAs in Kubernetes
 
 You can mount custom CA bundles into pods via ConfigMaps or Secrets.
 
@@ -398,7 +398,7 @@ spec:
 
 This ensures all HTTPS clients inside the container trust your internal CA.
 
-### ✅ Quick Tips
+#### ✅ Quick Tips
 
 - Always verify your containers include updated ca-certificates packages.
 
@@ -406,7 +406,7 @@ This ensures all HTTPS clients inside the container trust your internal CA.
 
 - For internal APIs, prefer short-lived certs from an internal CA (Vault, Smallstep, or cert-manager).
 
-### 🧭 Visualizing the Trust Chain Across Platforms
+#### 🧭 Visualizing the Trust Chain Across Platforms
 
 ```mermaid
 flowchart TB
@@ -451,7 +451,7 @@ Flow:
 1. Kubernetes workloads mount or inherit these trust stores to enable secure HTTPS connections.
 
 
-### 🌐 End-to-End Trust Flow Inside a Kubernetes Cluster
+#### 🌐 End-to-End Trust Flow Inside a Kubernetes Cluster
 
 To visualize how certificates propagate and maintain trust between components within a live Kubernetes environment:
 
