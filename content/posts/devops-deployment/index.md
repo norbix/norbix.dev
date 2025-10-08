@@ -15,7 +15,7 @@ weight = 13
 
 ![banner](banner.jpg)
 
-# 🚀 DevOps Deployment: Dockerize and Deploy a 3-Tier App with Helm on Kubernetes
+## 🚀 DevOps Deployment: Dockerize and Deploy a 3-Tier App with Helm on Kubernetes
 
 As modern applications evolve, DevOps workflows bridge the gap between development and operations. In this post, we’ll walk through how to Dockerize a 3-tier web application—consisting of a frontend, backend, and PostgreSQL database—and deploy it to a Kubernetes cluster using a custom Helm chart.
 
@@ -29,7 +29,7 @@ You’ll learn:
 
 ---
 
-# 🧱 3-Tier Architecture Overview
+## 🧱 3-Tier Architecture Overview
 
 We'll build and deploy the following:
 
@@ -48,9 +48,9 @@ goapi --> pg[PostgreSQL DB]
 
 ---
 
-# 📦 Step 1: Dockerize Each Tier
+## 📦 Step 1: Dockerize Each Tier
 
-## 🔹 Frontend Dockerfile (e.g., Hugo + Nginx)
+### 🔹 Frontend Dockerfile (e.g., Hugo + Nginx)
 
 ```Dockerfile
 # Stage 1 – Build Hugo site
@@ -64,7 +64,7 @@ FROM nginx:alpine
 COPY --from=builder /app/public /usr/share/nginx/html
 ```
 
-## 🔹 Backend Dockerfile (Go API)
+### 🔹 Backend Dockerfile (Go API)
 
 ```Dockerfile
 # Stage 1 – Build
@@ -80,13 +80,13 @@ EXPOSE 8080
 ENTRYPOINT ["/server"]
 ```
 
-## 🔹 PostgreSQL (Official Image)
+### 🔹 PostgreSQL (Official Image)
 
 No Dockerfile needed, just reference postgres:15-alpine in your docker-compose.yml or Kubernetes deployment.
 
 ---
 
-# 🧪 Step 2: Local Testing with Docker Compose
+## 🧪 Step 2: Local Testing with Docker Compose
 
 Use Compose to test locally before pushing to Kubernetes:
 
@@ -122,13 +122,13 @@ volumes:
 
 ---
 
-# ☸️ Step 3: Prepare Kubernetes Manifests
+## ☸️ Step 3: Prepare Kubernetes Manifests
 
 Break deployments into individual resources: `Deployment`, `Service`, `ConfigMap`, and `Secret`. Then, template them using `Helm`.
 
 ---
 
-# 📦 Step 4: Create a Custom Helm Chart
+## 📦 Step 4: Create a Custom Helm Chart
 
 ```text
 helm create myapp
@@ -198,7 +198,7 @@ postgres:
 
 ---
 
-# 🚢 Step 5: Deploy to Kubernetes
+## 🚢 Step 5: Deploy to Kubernetes
 
 ```text
 helm install myapp ./myapp --namespace my-namespace --create-namespace
@@ -212,7 +212,7 @@ helm upgrade myapp ./myapp
 
 ---
 
-# 🧹 Cleanup
+## 🧹 Cleanup
 
 ```text
 helm uninstall myapp --namespace my-namespace
@@ -221,11 +221,11 @@ kubectl delete namespace my-namespace
 
 ---
 
-# 🔐 Managing CA Certificates in DevOps Environments
+## 🔐 Managing CA Certificates in DevOps Environments
 
 When deploying secure applications, especially in containerized or multi-service environments, your workloads need to trust Certificate Authorities (CAs). This ensures that HTTPS, TLS, and mTLS connections work correctly across Docker, Kubernetes, and JVM-based applications.
 
-## 🧩 Why It Matters
+### 🧩 Why It Matters
 
 If your backend calls external APIs, databases, or internal services over HTTPS, your containers must trust the issuing CA of those certificates — otherwise you’ll see errors like:
 
@@ -235,7 +235,7 @@ x509: certificate signed by unknown authority
 
 This usually means your CA isn’t installed in the trust store.
 
-## 🪜 Understanding the CA Chain
+### 🪜 Understanding the CA Chain
 
 A Certificate Authority chain (also known as a “trust chain”) establishes trust between the server’s TLS certificate and a root authority your system already trusts. 
 
@@ -245,7 +245,7 @@ It typically looks like this:
 Root CA → Intermediate CA(s) → Leaf/Server Certificate
 ```
 
-### 🧠 Components of the Chain
+#### 🧠 Components of the Chain
 
 1. Root CA – The top-level authority (e.g., DigiCert, Let’s Encrypt, or your internal PKI root).
 
@@ -274,7 +274,7 @@ unable to verify the first certificate
 certificate signed by unknown authority
 ```
 
-### 🧩 Building a Full Chain File
+#### 🧩 Building a Full Chain File
 
 In some deployments (especially Nginx or Ingress controllers), you must provide a full-chain certificate combining all components:
 
@@ -303,7 +303,7 @@ D -->|Validates Chain| A
 
 If any link between A–D is missing or broken, trust fails — even if the server certificate itself is valid.
 
-## 🐧 CA Certificates in Linux
+### 🐧 CA Certificates in Linux
 
 Trusted CAs are managed system-wide and stored in platform-specific locations:
 
@@ -327,7 +327,7 @@ COPY my-root-ca.crt /usr/local/share/ca-certificates/
 RUN update-ca-certificates
 ```
 
-## ☕ CA Certificates in the JVM (Java & Spring Boot Apps)
+### ☕ CA Certificates in the JVM (Java & Spring Boot Apps)
 
 JVM apps don’t use the OS trust store by default. They rely on the Java keystore:
 
@@ -398,7 +398,7 @@ spec:
 
 This ensures all HTTPS clients inside the container trust your internal CA.
 
-## ✅ Quick Tips
+### ✅ Quick Tips
 
 - Always verify your containers include updated ca-certificates packages.
 
@@ -406,7 +406,7 @@ This ensures all HTTPS clients inside the container trust your internal CA.
 
 - For internal APIs, prefer short-lived certs from an internal CA (Vault, Smallstep, or cert-manager).
 
-## 🧭 Visualizing the Trust Chain Across Platforms
+### 🧭 Visualizing the Trust Chain Across Platforms
 
 ```mermaid
 flowchart TB
@@ -451,7 +451,7 @@ Flow:
 1. Kubernetes workloads mount or inherit these trust stores to enable secure HTTPS connections.
 
 
-## 🌐 End-to-End Trust Flow Inside a Kubernetes Cluster
+### 🌐 End-to-End Trust Flow Inside a Kubernetes Cluster
 
 To visualize how certificates propagate and maintain trust between components within a live Kubernetes environment:
 
@@ -505,7 +505,7 @@ This ensures end-to-end security across:
 
 ---
 
-# `DORA` Metrics for DevOps Success
+## `DORA` Metrics for DevOps Success
 
 DORA (DevOps Research and Assessment) metrics help measure software delivery performance. Focus on:
 
@@ -566,7 +566,7 @@ flowchart LR
     
     - Goal: Detect issues quickly and restore service fast.
 
-## 📊 Why They Matter
+### 📊 Why They Matter
 
 - They provide objective data on DevOps maturity.
 
@@ -575,7 +575,7 @@ flowchart LR
 - Help teams focus on outcomes, not vanity metrics (like “number of commits”).
 
 
-## ⚙️ How to Track DORA Metrics
+### ⚙️ How to Track DORA Metrics
 
 - Version Control (GitHub/GitLab): commits & PR timestamps.
 
@@ -585,7 +585,7 @@ flowchart LR
 
 - Incident management (PagerDuty, OpsGenie): failure tracking.
 
-## 🏆 Benchmarks (from Google’s 2022 DevOps Report)
+### 🏆 Benchmarks (from Google’s 2022 DevOps Report)
 
 | Metric                | Elite Performers        | Low Performers          |
 |------------------------|-------------------------|-------------------------|
@@ -598,7 +598,7 @@ flowchart LR
 
 ---
 
-# 🎯 Final Thoughts
+## 🎯 Final Thoughts
 
 By combining Docker, Kubernetes, and Helm, you get:
 
