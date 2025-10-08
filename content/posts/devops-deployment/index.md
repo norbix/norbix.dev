@@ -265,7 +265,7 @@ The client verifies:
 
 - Each certificate was signed by the next one up,
 
-- The top-most certificate (Root CA) exists in its trust store.
+- The top-most certificate (`Root CA`) exists in its trust store.
 
 If any link in the chain is missing or invalid, you’ll see handshake errors like:
 
@@ -273,6 +273,54 @@ If any link in the chain is missing or invalid, you’ll see handshake errors li
 unable to verify the first certificate
 certificate signed by unknown authority
 ```
+
+#### 🧩 Why Intermediate CAs Exist
+
+Intermediate CAs are critical for security and scalability in any modern PKI:
+
+| Level | Who Signs It | Purpose |
+|-------|--------------|---------|
+| Root CA	| Self-signed	| Acts as the ultimate trust anchor. Kept offline and rarely used. |
+| Intermediate CA	| Signed by Root CA	| Issues end-user or server certificates safely. |
+| Leaf / Server Cert	| Signed by Intermediate CA	| Used by servers and applications. |
+
+Why it matters:
+
+- 🧱 The Root CA stays offline (cold storage or HSM).
+
+- ⚙️ Intermediates handle day-to-day certificate issuance.
+
+- 🛡️ If an intermediate is compromised, it can be revoked independently of the root.
+
+- 🧩 Enterprises can delegate intermediates per environment (e.g., staging, prod) or per region.
+
+
+##### 🔐 Example Real-World Chain
+
+Using OpenSSL to inspect the trust path:
+
+```shell
+openssl s_client -connect norbix.dev:443 -showcerts
+```
+
+Typical output:
+
+```text
+0 s:/CN=api.norbix.dev
+  i:/CN=Norbix Intermediate CA
+1 s:/CN=Norbix Intermediate CA
+  i:/CN=Norbix Root CA
+2 s:/CN=Norbix Root CA
+  i:/CN=Norbix Root CA
+```
+
+Here:
+
+- Certificate 0 – your server cert (leaf).
+
+- Certificate 1 – your Intermediate CA (signed by the Root).
+
+- Certificate 2 – your Root CA (self-signed).
 
 #### 🧩 Building a Full Chain File
 
