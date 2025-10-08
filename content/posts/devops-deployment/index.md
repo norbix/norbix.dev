@@ -2,9 +2,10 @@
 date = '2025-04-19T15:53:01+02:00'
 draft = false
 title = 'DevOps Deployment'
-tags = ["devops", "docker", "kubernetes", "helm"]
+tags = ["devops", "docker", "kubernetes", "helm", "security", "ca-certificates"]
 categories = ["devops", "docker", "kubernetes"]
-summary = "A comprehensive guide to deploying a 3-tier application using Docker, Kubernetes, and Helm."
+summary = "A complete DevOps walkthrough — from Docker and Helm deployment to managing CA certificates and end-to-end TLS trust in Kubernetes."
+readingTime = true
 comments = true
 ShowToc = true
 TocOpen = true
@@ -14,7 +15,7 @@ weight = 13
 
 ![banner](banner.jpg)
 
-## 🚀 DevOps Deployment: Dockerize and Deploy a 3-Tier App with Helm on Kubernetes
+# 🚀 DevOps Deployment: Dockerize and Deploy a 3-Tier App with Helm on Kubernetes
 
 As modern applications evolve, DevOps workflows bridge the gap between development and operations. In this post, we’ll walk through how to Dockerize a 3-tier web application—consisting of a frontend, backend, and PostgreSQL database—and deploy it to a Kubernetes cluster using a custom Helm chart.
 
@@ -24,10 +25,11 @@ You’ll learn:
 - Dockerfile tips for Go-based services
 - Kubernetes deployment best practices
 - How to create a reusable Helm chart for real-world deployments
+- How to manage trusted CA certificates across Linux, Docker, and JVM-based systems
 
 ---
 
-## 🧱 3-Tier Architecture Overview
+# 🧱 3-Tier Architecture Overview
 
 We'll build and deploy the following:
 
@@ -46,9 +48,9 @@ goapi --> pg[PostgreSQL DB]
 
 ---
 
-## 📦 Step 1: Dockerize Each Tier
+# 📦 Step 1: Dockerize Each Tier
 
-### 🔹 Frontend Dockerfile (e.g., Hugo + Nginx)
+## 🔹 Frontend Dockerfile (e.g., Hugo + Nginx)
 
 ```Dockerfile
 # Stage 1 – Build Hugo site
@@ -62,7 +64,7 @@ FROM nginx:alpine
 COPY --from=builder /app/public /usr/share/nginx/html
 ```
 
-### 🔹 Backend Dockerfile (Go API)
+## 🔹 Backend Dockerfile (Go API)
 
 ```Dockerfile
 # Stage 1 – Build
@@ -78,13 +80,13 @@ EXPOSE 8080
 ENTRYPOINT ["/server"]
 ```
 
-### 🔹 PostgreSQL (Official Image)
+## 🔹 PostgreSQL (Official Image)
 
 No Dockerfile needed, just reference postgres:15-alpine in your docker-compose.yml or Kubernetes deployment.
 
 ---
 
-## 🧪 Step 2: Local Testing with Docker Compose
+# 🧪 Step 2: Local Testing with Docker Compose
 
 Use Compose to test locally before pushing to Kubernetes:
 
@@ -120,13 +122,13 @@ volumes:
 
 ---
 
-## ☸️ Step 3: Prepare Kubernetes Manifests
+# ☸️ Step 3: Prepare Kubernetes Manifests
 
 Break deployments into individual resources: `Deployment`, `Service`, `ConfigMap`, and `Secret`. Then, template them using `Helm`.
 
 ---
 
-## 📦 Step 4: Create a Custom Helm Chart
+# 📦 Step 4: Create a Custom Helm Chart
 
 ```text
 helm create myapp
@@ -196,7 +198,7 @@ postgres:
 
 ---
 
-## 🚢 Step 5: Deploy to Kubernetes
+# 🚢 Step 5: Deploy to Kubernetes
 
 ```text
 helm install myapp ./myapp --namespace my-namespace --create-namespace
@@ -210,7 +212,7 @@ helm upgrade myapp ./myapp
 
 ---
 
-## 🧹 Cleanup
+# 🧹 Cleanup
 
 ```text
 helm uninstall myapp --namespace my-namespace
@@ -219,7 +221,291 @@ kubectl delete namespace my-namespace
 
 ---
 
-## `DORA` Metrics for DevOps Success
+# 🔐 Managing CA Certificates in DevOps Environments
+
+When deploying secure applications, especially in containerized or multi-service environments, your workloads need to trust Certificate Authorities (CAs). This ensures that HTTPS, TLS, and mTLS connections work correctly across Docker, Kubernetes, and JVM-based applications.
+
+## 🧩 Why It Matters
+
+If your backend calls external APIs, databases, or internal services over HTTPS, your containers must trust the issuing CA of those certificates — otherwise you’ll see errors like:
+
+```matlab
+x509: certificate signed by unknown authority
+```
+
+This usually means your CA isn’t installed in the trust store.
+
+## 🪜 Understanding the CA Chain
+
+A Certificate Authority chain (also known as a “trust chain”) establishes trust between the server’s TLS certificate and a root authority your system already trusts. 
+
+It typically looks like this:
+
+```text
+Root CA → Intermediate CA(s) → Leaf/Server Certificate
+```
+
+### 🧠 Components of the Chain
+
+1. Root CA – The top-level authority (e.g., DigiCert, Let’s Encrypt, or your internal PKI root).
+
+   - Preinstalled in the OS or Java keystore.
+
+1. Intermediate CA – A delegated authority signed by the root; used for scalability and security.
+
+   - Often multiple intermediates exist between root and server.
+
+1. Server Certificate (Leaf) – The certificate installed on your app, load balancer, or ingress.
+
+   - Signed by an intermediate CA.
+
+When a TLS handshake occurs, the server presents its certificate chain to the client.
+
+The client verifies:
+
+- Each certificate was signed by the next one up,
+
+- The top-most certificate (Root CA) exists in its trust store.
+
+If any link in the chain is missing or invalid, you’ll see handshake errors like:
+
+```text
+unable to verify the first certificate
+certificate signed by unknown authority
+```
+
+### 🧩 Building a Full Chain File
+
+In some deployments (especially Nginx or Ingress controllers), you must provide a full-chain certificate combining all components:
+
+```shell
+cat server.crt intermediate.crt rootCA.crt > fullchain.pem
+```
+
+Use this file in configurations such as:
+
+```nginx configuration
+ssl_certificate /etc/nginx/certs/fullchain.pem;
+ssl_certificate_key /etc/nginx/certs/server.key;
+```
+
+The same principle applies to Ingress resources in Kubernetes (using `tls.crt` inside Secrets).
+
+### 🔗 Bonus: Visualizing the Trust Chain
+
+```mermaid
+graph TD
+A[Root CA] --> B[Intermediate CA]
+B --> C[Server Certificate]
+C --> D[Application / Client]
+D -->|Validates Chain| A
+```
+
+If any link between A–D is missing or broken, trust fails — even if the server certificate itself is valid.
+
+## 🐧 CA Certificates in Linux
+
+Trusted CAs are managed system-wide and stored in platform-specific locations:
+
+| Distribution | CA Store Location                | Update Command                     |
+|--------------|----------------------------------|------------------------------------|
+| Debian / Ubuntu	| /usr/local/share/ca-certificates/ (custom) | /etc/ssl/certs/ (system)	sudo update-ca-certificates |
+| RedHat / CentOS / Fedora	| /etc/pki/ca-trust/source/anchors/	| sudo update-ca-trust extract |
+| Alpine Linux	| /usr/share/ca-certificates/ | update-ca-certificates |
+
+To add a custom CA:
+
+```shell
+sudo cp my-root-ca.crt /usr/local/share/ca-certificates/
+sudo update-ca-certificates
+```
+
+Inside a Dockerfile (Debian/Ubuntu base):
+
+```Dockerfile
+COPY my-root-ca.crt /usr/local/share/ca-certificates/
+RUN update-ca-certificates
+```
+
+## ☕ CA Certificates in the JVM (Java & Spring Boot Apps)
+
+JVM apps don’t use the OS trust store by default. They rely on the Java keystore:
+
+```shell
+$JAVA_HOME/lib/security/cacerts
+```
+
+- Default password: changeit
+
+- Managed using the keytool utility.
+
+Add your CA to the keystore:
+
+```shell
+sudo keytool -importcert \
+  -trustcacerts \
+  -file my-root-ca.crt \
+  -alias myrootca \
+  -keystore $JAVA_HOME/lib/security/cacerts
+```
+
+Verify:
+
+```shell
+keytool -list -keystore $JAVA_HOME/lib/security/cacerts | grep myrootca
+```
+
+For containerized Java apps, mount or bake the updated keystore into your image.
+
+## CAs in Kubernetes
+
+You can mount custom CA bundles into pods via ConfigMaps or Secrets.
+
+Example:
+
+```yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: custom-ca
+data:
+  my-root-ca.crt: |
+    -----BEGIN CERTIFICATE-----
+    MIID...
+    -----END CERTIFICATE-----
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: myapp
+spec:
+  template:
+    spec:
+      volumes:
+        - name: ca-cert
+          configMap:
+            name: custom-ca
+      containers:
+        - name: backend
+          image: myregistry/backend
+          volumeMounts:
+            - mountPath: /usr/local/share/ca-certificates/my-root-ca.crt
+              subPath: my-root-ca.crt
+          env:
+            - name: SSL_CERT_DIR
+              value: /usr/local/share/ca-certificates
+```
+
+This ensures all HTTPS clients inside the container trust your internal CA.
+
+## ✅ Quick Tips
+
+- Always verify your containers include updated ca-certificates packages.
+
+- Use CI/CD build steps to refresh CAs for long-lived images.
+
+- For internal APIs, prefer short-lived certs from an internal CA (Vault, Smallstep, or cert-manager).
+
+## 🧭 Visualizing the Trust Chain Across Platforms
+
+```mermaid
+flowchart TB
+    subgraph PKI["🏛️ Public Key Infrastructure"]
+        A["Root CA"]
+        B["Intermediate CA"]
+        C["Server Certificate (Leaf)"]
+    end
+
+    subgraph Linux["🐧 Linux System"]
+        D["/etc/ssl/certs/"]
+        E["update-ca-certificates"]
+    end
+
+    subgraph Docker["🐋 Docker Container"]
+        F["ca-certificates package"]
+        G["/usr/local/share/ca-certificates/*.crt"]
+    end
+
+    subgraph JVM["☕ JVM Environment"]
+        H["$JAVA_HOME/lib/security/cacerts"]
+        I["keytool import"]
+    end
+
+    subgraph K8s["☸️ Kubernetes"]
+        J["ConfigMap / Secret with fullchain.pem"]
+        K["Mounted to Pod at /usr/local/share/ca-certificates/"]
+    end
+
+    A --> B --> C
+    C --> D --> F --> G
+    G --> H --> I
+    G --> J --> K
+```
+
+Flow:
+
+1. Root and Intermediate CAs are distributed from your PKI.
+
+1. They’re installed into Linux, Docker images, or JVM keystores.
+
+1. Kubernetes workloads mount or inherit these trust stores to enable secure HTTPS connections.
+
+
+## 🌐 End-to-End Trust Flow Inside a Kubernetes Cluster
+
+To visualize how certificates propagate and maintain trust between components within a live Kubernetes environment:
+
+```mermaid
+flowchart TB
+   subgraph Cluster["☸️ Kubernetes Cluster"]
+      A["Ingress Controller (Nginx / Traefik)"]
+      B["Backend Service (Go API)"]
+      C["Pod with Mounted CA Bundle"]
+      D["PostgreSQL Service / External API"]
+   end
+
+   subgraph PKI["🏛️ Internal / External PKI"]
+      E["Root CA"]
+      F["Intermediate CA"]
+      G["Issued Server Certs"]
+   end
+
+   E --> F --> G
+   G --> A
+   G --> B
+   G --> D
+
+   A -->|TLS Handshake| B
+   B -->|Mutual TLS / HTTPS| D
+   C -->|Uses mounted trust store| F
+
+   A -.->|Validates chain against Root CA| E
+   B -.->|Trusts mounted CA certs| E
+```
+
+Flow Explanation:
+
+1. 🔐 Root and Intermediate CAs issue server and client certificates (via cert-manager, Vault, or your internal PKI).
+
+1. 🧱 The Ingress Controller presents a full certificate chain (tls.crt with intermediates).
+
+1. ⚙️ The Backend Service validates this chain using system or mounted CAs.
+
+1. ☁️ The Pod includes a ConfigMap or Secret-mounted trust store for external HTTPS calls.
+
+1. 🧩 All communication — ingress to service to external API — relies on the same root of trust.
+
+This ensures end-to-end security across:
+
+- Internal service-to-service communication
+
+- External API calls
+
+- Database or message broker TLS connections
+
+---
+
+# `DORA` Metrics for DevOps Success
 
 DORA (DevOps Research and Assessment) metrics help measure software delivery performance. Focus on:
 
@@ -280,7 +566,7 @@ flowchart LR
     
     - Goal: Detect issues quickly and restore service fast.
 
-### 📊 Why They Matter
+## 📊 Why They Matter
 
 - They provide objective data on DevOps maturity.
 
@@ -289,7 +575,7 @@ flowchart LR
 - Help teams focus on outcomes, not vanity metrics (like “number of commits”).
 
 
-### ⚙️ How to Track DORA Metrics
+## ⚙️ How to Track DORA Metrics
 
 - Version Control (GitHub/GitLab): commits & PR timestamps.
 
@@ -299,7 +585,7 @@ flowchart LR
 
 - Incident management (PagerDuty, OpsGenie): failure tracking.
 
-### 🏆 Benchmarks (from Google’s 2022 DevOps Report)
+## 🏆 Benchmarks (from Google’s 2022 DevOps Report)
 
 | Metric                | Elite Performers        | Low Performers          |
 |------------------------|-------------------------|-------------------------|
@@ -312,7 +598,7 @@ flowchart LR
 
 ---
 
-## 🎯 Final Thoughts
+# 🎯 Final Thoughts
 
 By combining Docker, Kubernetes, and Helm, you get:
 
