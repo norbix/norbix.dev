@@ -632,6 +632,110 @@ This ensures end-to-end security across:
 
 - Database or message broker TLS connections
 
+### 🔐 What Is Mutual TLS (mTLS)
+
+So far, we’ve talked about **one-way TLS**, where the client verifies the server’s identity.  
+**Mutual TLS (mTLS)** extends this idea — it makes **both sides authenticate each other** using X.509 certificates.
+
+In a standard TLS handshake:
+- The **server** presents its certificate chain (so the client knows it’s talking to the right endpoint).
+- The **client** simply trusts that certificate based on its CA bundle.
+
+In **mTLS**, an additional step occurs:
+- The **client also presents its own certificate** to the server.
+- The **server verifies the client certificate** against its trusted CA store.
+
+That means:
+- The **client authenticates the server** ✅
+- The **server authenticates the client** ✅
+
+This creates *mutual trust* — useful in microservices, APIs, and internal systems where both ends need to verify identity.
+
+#### 🧩 mTLS in Practice
+
+| Component | Uses Certificate From | Verified Against |
+|------------|-----------------------|------------------|
+| Client | Client certificate (issued by same PKI) | Server’s trust store (Root + Intermediate CA) |
+| Server | Server certificate (public endpoint) | Client’s trust store (Root + Intermediate CA) |
+
+Once both sides complete validation, the TLS session is established and encrypted.
+
+#### 🧱 mTLS in Kubernetes
+
+mTLS is commonly used between **microservices**, **sidecars**, or **service meshes** like Istio or Linkerd.
+
+Example setup with cert-manager or Vault:
+- Each service gets its own **certificate and key** (often short-lived).
+- Services trust a shared **Root or Intermediate CA**.
+- The service mesh injects sidecars that handle mTLS transparently.
+
+#### ☸️ Example: Go API with mTLS Validation
+
+If your Go-based backend connects securely to another internal service:
+
+```go
+cert, _ := tls.LoadX509KeyPair("client.crt", "client.key")
+caCert, _ := os.ReadFile("rootCA.crt")
+
+caPool := x509.NewCertPool()
+caPool.AppendCertsFromPEM(caCert)
+
+tlsConfig := &tls.Config{
+    Certificates: []tls.Certificate{cert}, // client certificate
+    RootCAs:      caPool,                  // trust server CA
+    ClientCAs:    caPool,                  // verify client CA (on server)
+    ClientAuth:   tls.RequireAndVerifyClientCert,
+}
+```
+
+This configuration ensures:
+
+- The client proves its identity with its certificate.
+
+- The server verifies the client’s cert against a trusted CA.
+
+- Both endpoints encrypt traffic and authenticate each other.
+
+#### 🔐 Benefits of `mTLS`
+
+- 🧭 Strong identity assurance between services.
+
+- 🧱 Zero-trust networking — authentication is built into every connection.
+
+- 🔒 Defense in depth — even if network boundaries are breached, only valid certs can communicate.
+
+- ⚙️ Automatable with cert-manager, Vault, or SPIRE for rotation and issuance.
+
+- 🧩 Visualizing Mutual TLS
+
+```mermaid
+flowchart TD
+    subgraph ServiceA["Service A (Client)"]
+        A1["Client Certificate + Key"]
+    end
+
+    subgraph ServiceB["Service B (Server)"]
+        B1["Server Certificate + Key"]
+    end
+
+    subgraph PKI["🏛️ Shared PKI"]
+        R["Root / Intermediate CA"]
+    end
+
+    A1 -->|presents cert| B1
+    B1 -->|presents cert| A1
+    A1 -->|verifies via CA| R
+    B1 -->|verifies via CA| R
+```
+
+Both sides use certificates issued from the same trust root, and the handshake only succeeds when each validates the other’s chain.
+
+🧠 In short:
+
+- `TLS` guarantees confidentiality and server authenticity,
+
+- `mTLS` guarantees confidentiality, integrity, and mutual identity verification — making it essential for secure microservice communication inside Kubernetes clusters or service meshes.
+
 ---
 
 ## `DORA` Metrics for DevOps Success
