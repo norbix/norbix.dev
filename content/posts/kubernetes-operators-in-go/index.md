@@ -5,10 +5,12 @@ title = "Kubernetes Operators in Go"
 tags = ["kubernetes", "go", "operator-sdk", "controller-runtime", "cloud-native"]
 categories = ["platform-engineering", "golang", "kubernetes"]
 summary = "Learn how to build and understand Kubernetes Operators in Go — from controllers and reconciliation loops to the Operator SDK."
+readingTime = true
 comments = true
 ShowToc = true
 TocOpen = true
 image = "kubernetes-operator-banner.jpg"
+image = "banner.jpg"
 weight = 27
 +++
 
