@@ -9,7 +9,6 @@ readingTime = true
 comments = true
 ShowToc = true
 TocOpen = true
-image = "kubernetes-operator-banner.jpg"
 image = "banner.jpg"
 weight = 27
 +++
