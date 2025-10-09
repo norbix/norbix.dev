@@ -120,6 +120,8 @@ ORDER BY a.name, b.year;
 
 Keep all rows from the left table, even if there’s no match on the right.
 
+➡️ The “left table” is the one written before the JOIN keyword.
+
 ```sql
 --- Only authors with their books (if any)
 SELECT a.name, b.title
