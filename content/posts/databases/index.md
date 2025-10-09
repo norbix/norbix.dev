@@ -160,6 +160,71 @@ FROM authors a
 CROSS JOIN (VALUES (2024), (2025)) AS y(year);
 ```
 
+🧠 What a CROSS JOIN does
+
+A CROSS JOIN (also called a Cartesian product) combines every row from the left table with every row from the right table.
+
+So instead of matching on a condition (like author_id = author_id),
+it produces all possible combinations of rows.
+
+📊 Step 1 — Example Data
+
+Let’s assume your authors table:
+
+| name |
+|------|
+| Alicja|
+|Bartosz|
+|Chloe|
+
+and the inline value list (a temporary table created by `VALUES`):
+
+| year |
+|------|
+| 2024 |
+| 2025 |
+
+⚙️ Step 2 — What CROSS JOIN does
+
+Now, the database pairs each author with each year:
+
+| name | year |
+|------|------|
+| Alicja | 2024 |
+| Alicja | 2025 |
+| Bartosz | 2024 |
+| Bartosz | 2025 |
+| Chloe | 2024 |
+| Chloe | 2025 |
+
+✅ That’s 3 authors × 2 years = 6 total rows.
+
+This is useful when you want to generate combinations, like all authors for a set of years.
+
+🧮 Step 3 — Why use (VALUES (...), (...)) AS y(year)
+
+VALUES creates an inline temporary table directly inside your query — no need for a real table.
+
+Equivalent to:
+
+```sql
+SELECT a.name, y.year
+FROM authors a
+CROSS JOIN (SELECT 2024 AS year UNION ALL SELECT 2025) y;
+```
+
+But the `VALUES` syntax is shorter and cleaner.
+
+🧩 Step 4 — When to use CROSS JOIN
+
+- To generate combinations (e.g., authors × years, users × roles, stores × months).
+
+- To simulate small lookup tables inline.
+
+- To expand data for reporting or pivoting.
+
+⚠️ Be careful with large tables — CROSS JOIN multiplies row counts and can explode in size quickly.
+
 ##### Semi/anti joins (idiomatic filters)
 
 EXISTS (semi-join): return authors who have at least one book.
