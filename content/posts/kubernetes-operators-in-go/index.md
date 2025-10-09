@@ -16,14 +16,14 @@ weight = 27
 
 ![banner](banner.jpg)
 
-# 🐹 Developing `Kubernetes (K8s) Operators` in `Go`
+## 🐹 Developing `Kubernetes (K8s) Operators` in `Go`
 
 “Automation is powerful. But automation that understands Kubernetes state? That’s what Operators deliver.”
 
 Kubernetes Operators let you extend the platform’s capabilities beyond deployments and services — into managing complex applications, lifecycle events, and custom resources.
 And Go is the native language of Kubernetes — which makes it the perfect choice for building them.
 
-# ⚙️ What Is a `Kubernetes (K8s) Operator`?
+## ⚙️ What Is a `Kubernetes (K8s) Operator`?
 
 A Kubernetes Operator is a special kind of controller that manages the lifecycle of Custom Resources (CRDs) — your own Kubernetes-native objects.
 
@@ -41,7 +41,7 @@ flowchart LR
 
 ---
 
-# 🧱 The Core Concepts
+## 🧱 The Core Concepts
 
 |Concept | Description |
 | ------ | ----------- |
@@ -52,7 +52,7 @@ flowchart LR
 
 ---
 
-# 🧰 Tooling: Operator SDK and Controller Runtime
+## 🧰 Tooling: Operator SDK and Controller Runtime
 
 Most operators are built using either:
 
@@ -63,7 +63,7 @@ Both use the same controller-runtime library under the hood.
 
 ---
 
-# 🧑‍💻 Minimal Operator in Go
+## 🧑‍💻 Minimal Operator in Go
 
 Let’s start small — a custom resource that defines a simple app replica count, like a toy version of a Deployment.
 
@@ -115,7 +115,7 @@ Let’s start small — a custom resource that defines a simple app replica coun
 
 ---
 
-# 🧰 Try It Yourself — Demo Repository
+## 🧰 Try It Yourself — Demo Repository
 
 You can explore a working version of this basic Operator (which watches and copies ConfigMaps between namespaces) here:
 
@@ -130,7 +130,7 @@ Feel free to clone it, run `make run`, and explore how reconciliation behaves lo
 
 ---
 
-# 🔄 How Reconciliation Works
+## 🔄 How Reconciliation Works
 
 1. The controller watches for changes in your custom resource (App).
 
@@ -146,7 +146,7 @@ This “watch → compare → act” loop is the heartbeat of every Kubernetes O
 
 ---
 
-# 🧩 Example Use Cases
+## 🧩 Example Use Cases
 
 - Database lifecycle (PostgreSQL, Cassandra)
 
@@ -160,7 +160,7 @@ This “watch → compare → act” loop is the heartbeat of every Kubernetes O
 
 ---
 
-# 🧠 Why Build Operators in Go?
+## 🧠 Why Build Operators in Go?
 
 | Reason | Benefit |
 | -------- | --------- |
@@ -172,7 +172,7 @@ This “watch → compare → act” loop is the heartbeat of every Kubernetes O
 
 ---
 
-# ⚙️ Common Pitfalls
+## ⚙️ Common Pitfalls
 
 - Forgetting to requeue (return ctrl.Result{RequeueAfter: ...})
 
@@ -184,7 +184,7 @@ This “watch → compare → act” loop is the heartbeat of every Kubernetes O
 
 ---
 
-# 🚀 What if you want to build a real-world Operator?
+## 🚀 What if you want to build a real-world Operator?
 
 - Try `kubebuilder init --domain=example.com --repo=github.com/norbix/app-operator`
 
@@ -196,7 +196,7 @@ This “watch → compare → act” loop is the heartbeat of every Kubernetes O
 
 ---
 
-# 🧩 Summary
+## 🧩 Summary
 
 Kubernetes Operators let you embed operational knowledge directly into the cluster.
 They turn scripts into controllers, and manual operations into self-healing automation.
@@ -205,7 +205,7 @@ They turn scripts into controllers, and manual operations into self-healing auto
 
 ---
 
-# 🔗 Further Reading
+## 🔗 Further Reading
 
 - [`Kubebuilder` Book](https://book.kubebuilder.io/)
 
