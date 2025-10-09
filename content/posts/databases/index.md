@@ -275,6 +275,7 @@ JOIN authors USING (author_id);
 
 - Filtering presence/absence? → EXISTS / LEFT … IS NULL (semi/anti).
 
+
 #### Aggregation
 
 Aggregate functions summarize data: `COUNT()`, `SUM()`, `AVG()`, `MIN()`, `MAX()`.
