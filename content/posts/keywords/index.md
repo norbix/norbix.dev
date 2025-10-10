@@ -183,6 +183,40 @@ The whiteboard outlines an entire **mental toolkit for system design**:
 
 ---
 
+## ⚙️ An invariant is a concept, not a keyword
+
+An invariant in programming is a condition that must always remain true while the program runs — not just a constant value.
+
+```go
+type Account struct {
+    Balance int
+}
+
+// invariant: Balance must never be negative
+func (a *Account) Withdraw(amount int) error {
+    if a.Balance < amount {
+        return fmt.Errorf("insufficient funds")
+    }
+    a.Balance -= amount
+    return nil
+}
+```
+
+Here, the invariant is that Balance >= 0 must always hold true — it’s a logical rule, not a literal const.
+
+🧩 In short:
+
+| Concept | Example	| Meaning |
+| ------- | -------- | ------- |
+| Constant | const Pi = 3.14 | A fixed value that never changes. |
+| Invariant	| Balance >= 0	| A rule or property that must always hold true, even as data changes. |
+
+So:
+- ➡️ Every const is invariant in value,
+- ❌ but not every invariant is a const — some are runtime conditions you enforce through logic.
+
+---
+
 > _"Architecture is not about boxes and arrows. It's about decisions and trade-offs."_  
 > – Norbert Jakubczak
 
