@@ -14,7 +14,7 @@ weight = 12
 
 ![banner](banner.jpg)
 
-**"If it hurts, do it more often."**
+**"If it hurts, do it more often."** -- Kent Beck
 
 That provocative quote lies at the heart of `Extreme Programming (XP)` — an Agile software development methodology focused on frequent releases, tight feedback loops, and engineering excellence.
 
