@@ -83,7 +83,7 @@ This forces clear thinking, ensures test coverage, and makes refactoring safe.
 
 Every change begins with a failing test → then passes → then gets refactored.
 
-**“`TDD` doesn’t slow you down — it keeps you from going the wrong way fast.”$**
+**“`TDD` doesn’t slow you down — it keeps you from going the wrong way fast.”**
 
 ### 👯‍♂️ Pair Programming
 
