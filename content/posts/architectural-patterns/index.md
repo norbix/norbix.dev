@@ -817,16 +817,22 @@ That means:
 ### 🏛 Typical Layers
 
 ```mermaid
-flowchart TD
-    A[Presentation Layer<br>HTTP, CLI, gRPC] --> B[Application Layer<br>Use Cases]
-    B --> C[Domain Layer<br>Entities, Business Rules]
-    C --> D[Infrastructure Layer<br>DB, APIs, Frameworks]
+graph TD
+    UI["Presentation<br>(HTTP/gRPC/UI)"]
+    UC["Application<br>(Use Cases)"]
+    DOMAIN["Domain<br>(Entities, Rules)"]
+    INFRA["Infrastructure<br>(DB, APIs, Frameworks)"]
 
-    style A fill:#29b6f6,stroke:#0277bd,color:#fff
-    style B fill:#66bb6a,stroke:#2e7d32,color:#fff
-    style C fill:#ffca28,stroke:#f57f17,color:#000
-    style D fill:#8d6e63,stroke:#4e342e,color:#fff
+    UI --> UC
+    UC --> DOMAIN
+    DOMAIN --> INFRA
+
+    style DOMAIN fill:#ffca28,stroke:#f57f17,color:#000
+    style UC fill:#66bb6a,stroke:#2e7d32,color:#fff
+    style UI fill:#29b6f6,stroke:#0277bd,color:#fff
+    style INFRA fill:#8d6e63,stroke:#4e342e,color:#fff
 ```
+
 
 1. Domain Layer (Entities)
 
@@ -934,7 +940,6 @@ handler := interfaces.NewOrderHandler(uc)
 In practice, Hexagonal = implementation style,
 
 Clean Architecture = guiding principle.
-
 
 ✅ When to Use
 
