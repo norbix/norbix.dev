@@ -801,6 +801,167 @@ flowchart LR
 
 ---
 
+## 🧱 Clean Architecture
+
+**Clean Architecture**, introduced by *Robert C. Martin (Uncle Bob)*, is an evolution of Hexagonal and Onion architectures.  
+It’s designed to keep your **core business logic independent** from frameworks, databases, and user interfaces.
+
+### 🎯 Goal
+
+> Source code dependencies always point **inward**, toward the business logic.
+
+That means:
+- The **domain** and **use cases** know nothing about HTTP, databases, or frameworks.
+- Outer layers (HTTP, DB, UI) depend on **inner layers**, never the other way around.
+
+### 🏛 Typical Layers
+
+```mermaid
+flowchart TD
+    A[Presentation Layer<br>HTTP, CLI, gRPC] --> B[Application Layer<br>Use Cases]
+    B --> C[Domain Layer<br>Entities, Business Rules]
+    C --> D[Infrastructure Layer<br>DB, APIs, Frameworks]
+
+    style A fill:#29b6f6,stroke:#0277bd,color:#fff
+    style B fill:#66bb6a,stroke:#2e7d32,color:#fff
+    style C fill:#ffca28,stroke:#f57f17,color:#000
+    style D fill:#8d6e63,stroke:#4e342e,color:#fff
+```
+
+1. Domain Layer (Entities)
+
+Pure business rules — no dependencies, no frameworks, no I/O.
+
+```go
+type Order struct {
+    ID     string
+    Amount float64
+}
+
+func (o *Order) Validate() error {
+    if o.Amount <= 0 {
+        return errors.New("invalid amount")
+    }
+    return nil
+}
+```
+
+
+1. Application Layer (Use Cases)
+
+Defines what the system does — coordinates entities and repositories.
+
+```go
+type OrderRepository interface {
+    Save(order *Order) error
+}
+
+type CreateOrder struct {
+    Repo OrderRepository
+}
+
+func (uc *CreateOrder) Execute(o *Order) error {
+    if err := o.Validate(); err != nil {
+        return err
+    }
+    return uc.Repo.Save(o)
+}
+```
+
+1. . Interface Layer (Controllers / Delivery)
+
+Adapts input (HTTP, CLI, gRPC) to use cases.
+
+```go
+func (h *OrderHandler) Create(c *gin.Context) {
+    var order Order
+    _ = json.NewDecoder(c.Request.Body).Decode(&order)
+
+    if err := h.uc.Execute(&order); err != nil {
+        c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+        return
+    }
+    c.Status(http.StatusCreated)
+}
+```
+
+1. Infrastructure Layer (Adapters)
+
+Implements the interfaces the core defines — DBs, external APIs, etc.
+
+```go
+type PostgresOrderRepo struct {
+    db *sql.DB
+}
+
+func (r *PostgresOrderRepo) Save(o *Order) error {
+    _, err := r.db.Exec("INSERT INTO orders (id, amount) VALUES ($1,$2)", o.ID, o.Amount)
+    return err
+}
+```
+
+### 🧩 Example Go Layout
+
+```text
+/internal
+  /domain       # entities, pure logic
+  /application  # use cases, ports
+  /interface    # controllers, transport
+  /infrastructure # db, external adapters
+/cmd
+  main.go        # wiring, DI
+```
+
+`Main.go` wiring:
+
+```go
+repo := infrastructure.NewPostgresOrderRepo(db)
+uc := application.NewCreateOrder(repo)
+handler := interfaces.NewOrderHandler(uc)
+```
+
+### ⚖️ Clean vs Hexagonal
+
+| Concept       | Hexagonal                                       | Clean Architecture                       |
+| ------------- | ----------------------------------------------- | ---------------------------------------- |
+| Focus         | Ports & Adapters                                | Dependency direction                     |
+| Model         | Two-sided (in/out adapters)                     | Concentric rings (domain center)         |
+| Origin        | Alistair Cockburn                               | Robert C. Martin                         |
+| Key Rule      | Domain defines ports                            | Inner layers never depend on outer ones  |
+| Example in Go | Define `UserRepo` in domain, implement in infra | Same, but structured explicitly by layer |
+
+
+In practice, Hexagonal = implementation style,
+
+Clean Architecture = guiding principle.
+
+
+✅ When to Use
+
+- You want long-lived codebases that outlive frameworks.
+
+- You plan to swap out transport (HTTP → gRPC) or storage (Postgres → DynamoDB).
+
+- You want testable, independent domain logic.
+
+⚠️ Pitfalls
+
+- Can be overkill for small apps.
+
+- Too many layers = friction if not disciplined.
+
+- Needs thoughtful dependency injection.
+
+💬 Takeaway
+
+**“Frameworks are tools, not architectures.”** – Robert C. Martin
+
+Clean Architecture keeps your business rules pure and your frameworks replaceable.
+
+It’s not anti-framework — it just ensures you own your core, not the other way around.
+
+---
+
 ## 🔚 Wrap-up pointers
 
 - Hexagonal: best baseline for testability and longevity; add adapters as you go.
