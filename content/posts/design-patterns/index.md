@@ -96,7 +96,7 @@ In this article, we'll explore some of the most widely used design patterns in G
    }
    ```
 
-### 1. 🏭 Factory
+### 2. 🏭 Factory
 
     Creates objects without specifying the exact class.
 
@@ -159,7 +159,7 @@ In this article, we'll explore some of the most widely used design patterns in G
    }
    ```
 
-### 1. 🧱 Builder
+### 3. 🧱 Builder
 
     Separates the construction of a complex object from its representation.
 
@@ -298,7 +298,7 @@ In this article, we'll explore some of the most widely used design patterns in G
    }
    ```
 
-### 1. 🎀 Decorator
+### 2. 🎀 Decorator
 
     Adds behavior to objects dynamically by **embedding** and extending existing functionality.
 
@@ -354,7 +354,7 @@ In this article, we'll explore some of the most widely used design patterns in G
    }
    ```
 
-### 1. 🛡 Proxy (aka Virtual Proxy)
+### 3. 🛡 Proxy (aka Virtual Proxy)
 
    Provides a surrogate or placeholder shows the “virtual proxy” pattern (lazy-loading the real object only when needed).
 
@@ -421,7 +421,7 @@ In this article, we'll explore some of the most widely used design patterns in G
    }
    ```
 
-### 1. 🌳 Composite
+### 4. 🌳 Composite
 
     Composes objects into tree structures.
     Composes objects into tree structures and lets you treat individual and composite objects uniformly.
@@ -593,7 +593,7 @@ In this article, we'll explore some of the most widely used design patterns in G
    
    This makes your code modular, extensible, and easy to adapt to new behaviors without touching your existing flow.
 
-### 1. 👀 Observer
+### 2. 👀 Observer
 
    Wants to listen to events and be notified when something happens.
    
@@ -682,7 +682,7 @@ In this article, we'll explore some of the most widely used design patterns in G
    
    This approach is intrusive — the observable must explicitly support subscriptions and notify logic.
 
-### 1. 🔁 State
+### 3. 🔁 State
 
    Allows an object to alter its behavior when its internal state changes — effectively changing its class at runtime.
 
