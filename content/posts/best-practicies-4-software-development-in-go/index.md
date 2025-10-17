@@ -939,6 +939,41 @@ if flags.Enabled("betaUI") {
 }
 ```
 
+🧩 Example: Loading Feature Flags from Config
+
+```yaml
+# config.yaml
+feature_flags:
+  betaUI: true
+  newCheckoutFlow: false
+```
+
+```go
+type Config struct {
+    FeatureFlags map[string]bool `yaml:"feature_flags"`
+}
+
+func LoadConfig(path string) (*Config, error) {
+    data, err := os.ReadFile(path)
+    if err != nil {
+        return nil, err
+    }
+    var cfg Config
+    if err := yaml.Unmarshal(data, &cfg); err != nil {
+        return nil, err
+    }
+    return &cfg, nil
+}
+
+// usage
+cfg, _ := LoadConfig("config.yaml")
+if cfg.FeatureFlags["betaUI"] {
+    renderBetaUI()
+}
+```
+
+✅ This shows readers a real-world approach — environment-driven toggles loaded at runtime
+
 For production systems, you can use configuration-driven toggles (YAML, JSON, or environment variables), or integrate external services like:
 
 - [LaunchDarkly](https://launchdarkly.com)
