@@ -48,6 +48,8 @@ In this article, we’ll explore how to build `SaaS` microservices in Go, focusi
 
 - Inter-service communication (APIs!)
 
+![saas](saas.gif)
+
 ---
 
 ## 🌐 `REST API`: The Classic Workhorse
