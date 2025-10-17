@@ -48,7 +48,7 @@ In this article, we'll explore some of the most widely used design patterns in G
 
    🧑‍💻 Example:
 
-    ```go
+```go
     package singleton
     
     import (
@@ -66,17 +66,17 @@ In this article, we'll explore some of the most widely used design patterns in G
         Value string
     }
 	
-   func GetInstance(value string) *singleton {
-    once.Do(func() {
-        instance = &singleton{Value: value}
-    })
-    return instance
-   }
-    ```
+    func GetInstance(value string) *singleton {
+     once.Do(func() {
+         instance = &singleton{Value: value}
+     })
+     return instance
+    }
+```
 
-   🧪 Usage
+   🧪 Usage:
 
-   ```go
+```go
    package main
    
    import (
@@ -94,7 +94,7 @@ In this article, we'll explore some of the most widely used design patterns in G
 	  // Confirm both variables point to the same instance by using pointer equality. If they point to different objects, the comparison will return false.
 	  fmt.Println(a == b) // Output: true
    }
-   ```
+```
 
 ### 2. 🏭 Factory
 
@@ -115,7 +115,7 @@ In this article, we'll explore some of the most widely used design patterns in G
 
    🧑‍💻 Example:
 
-    ```go
+```go
     package factory
 
     type Shape interface {
@@ -138,7 +138,7 @@ In this article, we'll explore some of the most widely used design patterns in G
             return nil
         }
     }
-    ```
+```
 
    🧪 Usage
    
@@ -177,7 +177,7 @@ In this article, we'll explore some of the most widely used design patterns in G
 
    🧑‍💻 Example:
 
-    ```go
+```go
     package builder
     
     type Car struct {
@@ -208,11 +208,11 @@ In this article, we'll explore some of the most widely used design patterns in G
     func (b *CarBuilder) Build() Car {
         return b.car
     }
-    ```
+```
 
    🧪 Usage
 
-   ```go
+```go
    package main
    
    import (
@@ -233,7 +233,7 @@ In this article, we'll explore some of the most widely used design patterns in G
            fmt.Printf("%+v\n", car)
            // Output: {Engine:V8 Wheels:4 Color:Red}
    }
-   ```
+```
 
 ---
 
@@ -313,7 +313,7 @@ In this article, we'll explore some of the most widely used design patterns in G
 
    🧑‍💻 Example: wrapping a basic `Coffee` with a `MilkDecorator`:
 
-    ```go
+```go
     package decorator
     
     type Coffee interface {
@@ -398,11 +398,11 @@ In this article, we'll explore some of the most widely used design patterns in G
     
         return p.realImage.Display()
     }
-   ```
+```
 
    🧪 Usage
 
-   ```go
+```go
    package main
    
    import (
@@ -419,7 +419,7 @@ In this article, we'll explore some of the most widely used design patterns in G
        // The real image is reused without reloading
        fmt.Println(img.Display()) // Output: Displaying cat.png
    }
-   ```
+```
 
 ### 4. 🌳 Composite
 
@@ -442,7 +442,7 @@ In this article, we'll explore some of the most widely used design patterns in G
 
    🧑‍💻 Example:
 
-    ```go
+```go
    package composite
 
    import "strings"
@@ -478,11 +478,11 @@ In this article, we'll explore some of the most widely used design patterns in G
    
         return strings.Join(results, " ")
    }
-    ```
+```
 
     📦 Example usage:
 
-    ```go
+```go
     package main
 
     import (
@@ -500,7 +500,7 @@ In this article, we'll explore some of the most widely used design patterns in G
    
         fmt.Println(folder.Operation()) // Output: FileA.txt FileB.txt
     }
-    ```
+```
 
     ✅ When to use Composite:
    
