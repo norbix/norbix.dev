@@ -92,6 +92,39 @@ In complex environments — multiple teams, microservices, polyglot stacks — p
 
 ---
 
+## 🧭 From DevOps to Platform Engineering
+
+As organizations mature, their engineering practices evolve across several stages — from ad-hoc processes to fully autonomous, AI-driven ecosystems.
+
+![cloud_native_chart](cloud_native_chart.png)
+
+This chart illustrates the evolutionary path of software delivery maturity, showing how teams move through stages of:
+
+- Culture — from individualistic to collaborative to experimental
+
+- Architecture — from monoliths to microservices to functions
+
+- Infrastructure — from manual servers to orchestrated containers to edge computing
+
+- Process & Delivery — from random releases to continuous delivery to continuous deployment
+
+Platform engineering typically thrives at the Cloud Native stage — where DevOps, SRE, and developer experience converge.
+
+At this point, teams have:
+
+- Automated provisioning (Kubernetes, Terraform, GitOps)
+
+- Continuous delivery pipelines
+
+- Full observability and self-healing systems
+
+- Data-driven decision-making across infrastructure and product layers
+
+The next frontier (`NEXT`) is where platforms become intelligent: predictive maintenance, AI-driven ops, and self-organizing teams.
+Platform engineers will lead this transition by combining automation with machine learning and proactive governance.
+
+---
+
 ## 🌍 The 6 R’s of Cloud Migration
 
 Platform engineering often intersects with **cloud migration strategies**. When modernizing workloads, organizations typically choose from the **6 R’s** framework:
