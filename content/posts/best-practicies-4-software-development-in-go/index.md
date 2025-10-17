@@ -885,6 +885,71 @@ SonarQube works great alongside golangci-lint, giving you both quick feedback lo
 - Validate all inputs — especially on the API boundary
 - Use context.Context consistently and propagate it properly
 
+### ⚙️ 8.1 Feature Toggles — Safe and Gradual Releases
+
+In modern Go services — especially those deployed continuously — you often need to release features safely without deploying new binaries.
+That’s where feature toggles (also known as feature flags) come in.
+
+A feature toggle is simply a conditional switch in your code that enables or disables functionality at runtime:
+
+```go
+if featureFlags["newCheckoutFlow"] {
+    runNewCheckoutFlow()
+} else {
+    runOldCheckoutFlow()
+}
+```
+
+By decoupling deployment from release, toggles let you control exposure dynamically — through config files, environment variables, or even a remote flag service.
+
+🧩 Common Use Cases
+
+| Goal | Example |
+|------|---------|
+| Gradual rollout | Enable a feature for 10% of users |
+| Canary testing | Validate stability before full release |
+| Kill switch | Turn off a buggy or expensive feature instantly |
+| A/B testing | Compare user behavior across versions |
+| Permissioning | Premium or internal-only features |
+
+🧠 Types of Feature Toggles
+
+| Type | Description |
+|------|-------------|
+| Release toggles | Hide incomplete work in production |
+| Ops toggles | Control runtime features for stability or performance |
+| Experiment toggles | Run experiments or A/B tests |
+| Permission toggles | Enable per-customer or per-role features |
+
+🧰 How to Implement in Go
+
+For small projects:
+
+```go
+type FeatureFlags map[string]bool
+
+func (f FeatureFlags) Enabled(name string) bool {
+    return f[name]
+}
+
+// Example
+flags := FeatureFlags{"betaUI": true}
+if flags.Enabled("betaUI") {
+    renderBetaUI()
+}
+```
+
+For production systems, you can use configuration-driven toggles (YAML, JSON, or environment variables), or integrate external services like:
+
+- [LaunchDarkly](https://launchdarkly.com)
+- [Unleash](https://www.getunleash.io/)
+- [Flagsmith](https://flagsmith.com/)
+- [AWS AppConfig Feature Flags](https://docs.aws.amazon.com/appconfig/latest/userguide/feature-flags.html)
+
+🧩 Takeaway:
+
+Feature toggles empower Go developers to deploy continuously yet release safely, minimizing risk and improving operational control — a perfect fit for DevOps and Platform Engineering workflows.
+
 ---
 
 ## 🌐 9. Embrace the Go Ecosystem
