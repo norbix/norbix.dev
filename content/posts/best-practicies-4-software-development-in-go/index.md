@@ -928,13 +928,13 @@ For small projects:
 ```go
 type FeatureFlags map[string]bool
 
-func (f FeatureFlags) Enabled(name string) bool {
+func (f FeatureFlags) IsEnabled(name string) bool {
     return f[name]
 }
 
 // Example
 flags := FeatureFlags{"betaUI": true}
-if flags.Enabled("betaUI") {
+if flags.IsEnabled("betaUI") {
     renderBetaUI()
 }
 ```
