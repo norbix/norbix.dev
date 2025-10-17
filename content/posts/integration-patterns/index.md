@@ -326,6 +326,8 @@ In event-driven architectures, CQRS is often combined with **Kafka**:
 - the **Read side** consumes and projects them into optimized **read models**.
 - Microservices remain independent, but their state converges via **eventual consistency**.
 
+![CQRS Pattern — separation of reads and writes in event-driven systems](cqrs_pattern.png)
+
 ```mermaid
 flowchart LR
     ClientW[Client - REST Write] -->|POST /users| WriteAPI[Write Service]
@@ -413,6 +415,9 @@ Over time, the system achieves eventual consistency: all services converge on th
 - **Writes = REST**
 - **Reads = GraphQL + WebSockets**
 - **State is shared asynchronously** via Kafka with **eventual consistency**
+
+
+
 
 ---
 
