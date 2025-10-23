@@ -124,3 +124,9 @@ URL = "s3://your-bucket-name?region=your-region"
 changefreq = "monthly"
 filename = "sitemap.xml"
 priority = 0.5
+
+# Table of Contents settings
+[markup.tableOfContents]
+startLevel = 2
+endLevel = 5
+ordered = true
