@@ -878,7 +878,7 @@ func execute(f func(string)) {
 
 func main() {
     sayHello := greet
-    sayHello("Damian") // Assigned function
+    sayHello("MJ") // Assigned function
     execute(greet)     // Passed as argument
 }
 ```
@@ -894,7 +894,7 @@ func makeGreeter(prefix string) func(string) {
 
 func main() {
     welcome := makeGreeter("Welcome,")
-    welcome("Damian")
+    welcome("MJ")
 }
 ```
 
