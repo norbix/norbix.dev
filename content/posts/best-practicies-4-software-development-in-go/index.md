@@ -851,7 +851,7 @@ return nil
 
 - Use type switches for clean multi-branch logic.
 
-#### ⚙️ 6.3.1 First-Class Functions in Go
+### ⚙️ 6.3.1 First-Class Functions in Go
 
 Before diving into middleware, it’s important to understand why this pattern works so elegantly in Go.
 
