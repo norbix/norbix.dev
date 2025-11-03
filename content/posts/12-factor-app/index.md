@@ -2,7 +2,7 @@
 date = 2025-11-03
 draft = false
 title = "The Twelve-Factor App — Timeless Principles for Modern Software"
-tags = ["Cloud", "DevOps", "Go", "Docker", "Kubernetes", "Software Architecture"]
+tags = ["cloud", "devops", "go", "docker", "kubernetes", "software architecture", "best-practices"]
 categories = ["Best-Practices"]
 summary = "Revisiting the Twelve-Factor App principles in the context of modern Go, Docker, and Kubernetes setups."
 readingTime = true
