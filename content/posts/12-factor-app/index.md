@@ -284,6 +284,24 @@ Never run migrations manually from a developer laptop.
 
 ---
 
+## 🧭 Lifecycle Overview
+
+Below is a simplified flow of how the **Twelve-Factor App lifecycle** maps onto modern CI/CD pipelines:
+
+```mermaid
+flowchart LR
+    A[Build Stage] --> B[Release Stage]
+    B --> C[Run Stage]
+    C --> D[Monitor & Logs]
+    D --> A
+    style A fill:#f9f,stroke:#333,stroke-width:1px
+    style B fill:#9ff,stroke:#333,stroke-width:1px
+    style C fill:#aff,stroke:#333,stroke-width:1px
+    style D fill:#ffc,stroke:#333,stroke-width:1px
+```
+
+---
+
 ## 🧩 Summary
 
 The Twelve Factors aren’t outdated — they’re timeless.
