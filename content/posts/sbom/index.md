@@ -99,6 +99,17 @@ openssl          1.1.1k     1.1.1t    apk      CVE-2022-0778    High
 
 Treat SBOM generation as part of your secure build pipeline, not an afterthought.
 
+```mermaid
+flowchart LR
+    A[Source Code] --> B[Build Image]
+    B --> C[Generate SBOM]
+    C --> D[Sign & Store SBOM]
+    D --> E[Scan for Vulnerabilities]
+    E --> F[Deploy to Production]
+    F --> G[Monitor & Patch]
+    style C fill:#f9f,stroke:#333,stroke-width:2px
+```
+
 Example GitHub Action snippet:
 
 ```yaml
