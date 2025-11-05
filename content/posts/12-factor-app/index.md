@@ -110,13 +110,13 @@ This abstraction supports portability and disaster recovery because you can swit
 ## 📦 5. Build, Release, Run
 > Strictly separate build and run stages.
 
-1. Each deployment should follow three immutable stages:
+Each deployment should follow three immutable stages:
 
 1. Build: Compile code, install dependencies, and produce a deployable artifact (e.g., Docker image or binary).
 
 1. Release: Combine the build artifact with environment configuration to form a release.
 
-Run: Execute the app in one or more environments.
+1. Run: Execute the app in one or more environments.
 
 In CI/CD terms:
 ```yaml
