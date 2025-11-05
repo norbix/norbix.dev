@@ -15,15 +15,17 @@ weight = 29
 
 ![banner](banner.jpg)
 
-# 🧩 SBOM Generation for Security and Compliance
+# 🧩 `SBOM` Generation for Security and Compliance
 
 Software supply chains are under more scrutiny than ever.  
 High-profile incidents like **SolarWinds** and **Log4Shell** have made one thing clear — organizations can’t secure what they don’t fully understand.  
 That’s where **SBOMs (Software Bill of Materials)** come in.
 
+🎥 **Watch related video:** [SBOM in Practice — Anchore Syft & Grype Overview](https://www.youtube.com/watch?v=Vqn9P6gEM5I)
+
 ---
 
-## 🔍 What Is an SBOM?
+## 🔍 What Is an `SBOM`?
 
 An **SBOM (Software Bill of Materials)** is a structured inventory of every component in your software — including third-party libraries, dependencies, and their versions.
 
