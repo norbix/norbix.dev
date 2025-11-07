@@ -78,7 +78,7 @@ The **norbix.dev** blog is built with the same engineering discipline I apply to
 - **Static site generator:** [Hugo](https://gohugo.io) + [PaperMod](https://github.com/adityatelange/hugo-PaperMod) theme
 - **Content:** Markdown files version-controlled in `Git`
 - **Automation:** Built and deployed automatically via **GitHub Actions**
-- **Infrastructure:** Hosted on a lightweight, container-friendly stack (Nginx reverse proxy in the future)
+- **Infrastructure:** Served via GitHub Pages, with continuous deployment managed by GitHub Actions.
 - **Versioning:** Each article is treated like a code change — reviewed, versioned, and deployed continuously
 
 💡 *This blog isn’t just written about engineering — it’s engineered itself.*
