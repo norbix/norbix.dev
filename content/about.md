@@ -69,7 +69,7 @@ Here's what my clients and collaborators say on Google:
 <figure style="max-width: 500px; margin: 1rem 0;">
   <img src="/images/physical_dev_env_setup.jpg" alt="Norbert Jakubczak - Norbix" style="width: 100%; border-radius: 10px;" />
   <figcaption style="text-align: center; font-style: italic; color: #aaa;">
-    Building norbix.dev — Behind the Scenes.
+    *Engineering norbix.dev — Behind the Scenes.*
   </figcaption>
 </figure>
 
