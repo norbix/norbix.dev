@@ -66,9 +66,7 @@ Here's what my clients and collaborators say on Google:
 
 ## 🧱 How This Blog Is Built
 
-![physical_dev_env_setup](/static/images/physical_dev_env_setup.jpg)
-
-<figure style="max-width: 250px; margin: 1rem 0;">
+<figure style="max-width: 500px; margin: 1rem 0;">
   <img src="/images/physical_dev_env_setup.jpg" alt="Norbert Jakubczak - Norbix" style="width: 100%; border-radius: 10px;" />
   <figcaption style="text-align: center; font-style: italic; color: #aaa;">
     Building norbix.dev — Behind the Scenes.
