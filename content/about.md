@@ -64,6 +64,22 @@ Here's what my clients and collaborators say on Google:
 
 ---
 
+## 🧱 How This Blog Is Built
+
+![physical_dev_env_setup](/static/images/physical_dev_env_setup.jpg)
+
+The **norbix.dev** blog is built with the same engineering discipline I apply to software projects — modular, automated, and reproducible.
+
+- **Static site generator:** [Hugo](https://gohugo.io) + [PaperMod](https://github.com/adityatelange/hugo-PaperMod) theme
+- **Content:** Markdown files version-controlled in `Git`
+- **Automation:** Built and deployed automatically via **GitHub Actions**
+- **Infrastructure:** Hosted on a lightweight, container-friendly stack (Nginx reverse proxy in the future)
+- **Versioning:** Each article is treated like a code change — reviewed, versioned, and deployed continuously
+
+💡 *This blog isn’t just written about engineering — it’s engineered itself.*
+
+---
+
 ## 🌍 Connect with me
 
 - GitHub: [@norbix](https://github.com/norbix)
