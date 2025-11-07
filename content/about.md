@@ -68,6 +68,13 @@ Here's what my clients and collaborators say on Google:
 
 ![physical_dev_env_setup](/static/images/physical_dev_env_setup.jpg)
 
+<figure style="max-width: 250px; margin: 1rem 0;">
+  <img src="/images/physical_dev_env_setup.jpg" alt="Norbert Jakubczak - Norbix" style="width: 100%; border-radius: 10px;" />
+  <figcaption style="text-align: center; font-style: italic; color: #aaa;">
+    Building norbix.dev — Behind the Scenes.
+  </figcaption>
+</figure>
+
 The **norbix.dev** blog is built with the same engineering discipline I apply to software projects — modular, automated, and reproducible.
 
 - **Static site generator:** [Hugo](https://gohugo.io) + [PaperMod](https://github.com/adityatelange/hugo-PaperMod) theme
