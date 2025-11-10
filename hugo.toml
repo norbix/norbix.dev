@@ -61,7 +61,7 @@ title = "Norbert (Mr. Norbix) Jakubczak"
 #subtitle = "Software Engineer · Internal Developer Platforms · SaaS Microservices"
 subtitle = """Software Engineer · Internal Developer Platforms · SaaS Microservices
 <br><br>
-<img src="/images/we-learn-we-grow.png" alt="We learn. We grow. We deliver - together." style="max-width:300px; border-radius:12px; margin-top:1rem;">
+<img src="/images/we-learn-we-grow.png" alt="We learn. We grow. We deliver - together." style="max-width:600px; border-radius:24px; margin-top:1rem;">
 """
 imageUrl = "images/my_avatar.PNG"
 imageTitle = "Norbert (Mr. Norbix) Jakubczak"
