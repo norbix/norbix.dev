@@ -1,27 +1,34 @@
-/* Make the profile title span full width */
-/*.profile-title {*/
-/*    text-align: center;*/
-/*    width: 100%;*/
-/*    max-width: none !important;*/
-/*    font-size: 2.5rem; !* adjust as needed *!*/
-/*    display: block;*/
-/*}*/
-
-.profile-title {
-    font-weight: 700;
-    letter-spacing: 0.5px;
-    text-transform: none;
-    color: #fff;
-    text-align: center;
+/* ---- Center the entire profile block ---- */
+.profile {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
     width: 100%;
-    max-width: none !important;
-    margin-bottom: 0.4rem;
+    text-align: center;
 }
 
+/* ---- Make sure title spans the full container ---- */
+.profile-title {
+    width: 100%;
+    max-width: 100%;
+    text-align: center !important;
+    margin: 0 auto;
+    font-size: 2.4rem;
+    font-weight: 700;
+    line-height: 1.2;
+}
 
-/* Center and slightly enlarge subtitle for balance */
+/* ---- Center and slightly tone the subtitle ---- */
 .profile-subtitle {
-    text-align: center;
+    text-align: center !important;
+    margin: 0.5rem auto 1rem;
     font-size: 1.1rem;
     opacity: 0.85;
+}
+
+/* ---- Ensure the profile image and subsequent elements also align ---- */
+.profile img {
+    display: block;
+    margin: 1.2rem auto;
 }
