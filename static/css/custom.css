@@ -1,0 +1,27 @@
+/* Make the profile title span full width */
+/*.profile-title {*/
+/*    text-align: center;*/
+/*    width: 100%;*/
+/*    max-width: none !important;*/
+/*    font-size: 2.5rem; !* adjust as needed *!*/
+/*    display: block;*/
+/*}*/
+
+.profile-title {
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-transform: none;
+    color: #fff;
+    text-align: center;
+    width: 100%;
+    max-width: none !important;
+    margin-bottom: 0.4rem;
+}
+
+
+/* Center and slightly enlarge subtitle for balance */
+.profile-subtitle {
+    text-align: center;
+    font-size: 1.1rem;
+    opacity: 0.85;
+}
