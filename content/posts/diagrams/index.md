@@ -24,6 +24,22 @@ Direction:
 - TB: Top to Bottom
 - BT: Bottom to Top
 
+### Code
+
+```text
+flowchart LR
+    G[(Goals)] <===> P[(Projects)]
+    P ---o PD(Deadline)
+    PD ---- OV([Overdue]) ---> FOV{4 Days}
+    PD ---x MT([Met])
+    P ---o PT(Tasks)
+    PT ---- C([Complete])
+    PT ---x IC([Incomplete])
+    C ---> R[[Review]]
+    R -..-> G
+```
+
+### Rendered Diagram
 
 ```mermaid
 flowchart LR
@@ -45,6 +61,17 @@ flowchart LR
 
 🎯 Example with styling, click links, and labels:
 
+### Code
+
+```text
+flowchart LR;
+    classDef blue fill:#2374f7,stroke:#000,color:#fff
+    G[(Goals)]:::blue <===> |Connects To| P[(Projects)]:::blue
+    click P "https://github.com/norbix"
+```
+
+### Rendered Diagram
+
 ```mermaid
 flowchart LR;
     classDef blue fill:#2374f7,stroke:#000,color:#fff
@@ -57,6 +84,34 @@ flowchart LR;
 ## 🧩 Class Diagrams (UML-style)
 
 Great for `OOP` design documentation.
+
+### Code
+
+```text
+classDiagram
+    class Order {
+        +OrderStatus status
+    }
+    class OrderStatus {
+        <<enumeration>>
+        FAILED
+        PENDING
+        PAID
+    }
+    class PaymentProcessor {
+        <<interface>>
+        -String apiKey
+        +processPayment(Order order) OrderStatus
+    }
+    class Customer {
+        +String name
+    }
+    Order o-- Customer : aggregation
+    Car *-- Engine : composition
+    PaymentProcessor <|-- StripePaymentProcessor
+```
+
+### Rendered Diagram
 
 ```mermaid
 classDiagram
@@ -82,9 +137,43 @@ classDiagram
     PaymentProcessor <|-- StripePaymentProcessor
 ```
 
-🧩 UML Relationships
+## 🧩 UML Relationships
 
 Mermaid also supports association, aggregation, and composition, which are common in UML.
+
+### Code
+
+```text
+classDiagram
+    class Teacher {
+      +Name string
+      +Teach(Student)
+    }
+    class Student {
+      +Name string
+    }
+    Teacher --> Student : association
+
+    class Department {
+      +Name string
+      +Professors []Professor
+    }
+    class Professor {
+      +Name string
+    }
+    Department o-- Professor : aggregation
+
+    class House {
+      +Address string
+      +Rooms []Room
+    }
+    class Room {
+      +Number int
+    }
+    House *-- Room : composition
+```
+
+### Rendered Diagram
 
 ```mermaid
 classDiagram
@@ -128,6 +217,20 @@ This makes it easy to visually document relationships in Go codebases.
 
 ## 🧱 Graph Diagrams (UML-style)
 
+### Code
+
+```text
+graph TD
+    a(content) --> b([hello])
+    b --> c[(world)]
+    b --> d(branch)
+    d --> e((circle))
+    d ==> f>flag]
+    f --- g{diamond}
+```
+
+### Rendered Diagram
+
 ```mermaid
 graph TD
     a(content) --> b([hello])
@@ -139,6 +242,21 @@ graph TD
 ```
 
 Use subgraph to group elements:
+
+### Code
+
+```text
+graph TD
+    subgraph Graph One
+        A --> B
+    end
+    subgraph Graph Two
+        C --> D
+    end
+    A --> D
+```
+
+### Rendered Diagram
 
 ```mermaid
 graph TD
@@ -155,6 +273,18 @@ graph TD
 
 ## 🥧 Pie Charts
 
+### Code
+
+```text
+pie
+    title Content Breakdown
+    "youtube" : 50
+    "twitch" : 20
+    "twitter" : 30
+```
+
+### Rendered Diagram
+
 ```mermaid
 pie
     title Content Breakdown
@@ -168,6 +298,20 @@ pie
 ## 🧭 Journey Diagrams
 
 Track progress or workflows using narrative sections:
+
+### Code
+
+```text
+journey
+    title My Working Day
+    section Work
+        Wrote code: 3: me
+        Reviewed PRs: 4: me
+    section Twitch
+        Streamed: 3: me
+```
+
+### Rendered Diagram
 
 ```mermaid
 journey
@@ -184,6 +328,34 @@ journey
 ## 🧩 Class Diagrams
 
 Great for OOP design documentation.
+
+### Code
+
+```text
+classDiagram
+    class Order {
+        +OrderStatus status
+    }
+    class OrderStatus {
+        <<enumeration>>
+        FAILED
+        PENDING
+        PAID
+    }
+    class PaymentProcessor {
+        <<interface>>
+        -String apiKey
+        +processPayment(Order order) OrderStatus
+    }
+    class Customer {
+        +String name
+    }
+    Order o-- Customer
+    Car *-- Engine
+    PaymentProcessor <|-- StripePaymentProcessor
+```
+
+### Rendered Diagram
 
 ```mermaid
 classDiagram
@@ -212,6 +384,26 @@ classDiagram
 ---
 
 ## 📜 Sequence Diagrams
+
+### Code
+
+```text
+sequenceDiagram
+    participant fe as Front-End
+    participant be as Back-End
+    participant auth as Auth
+
+    fe -->> be: Login
+    be -->> auth: Validate
+    auth -->> be: Token
+    be -->> fe: Success
+
+    alt Invalid credentials
+        be -->> fe: Error
+    end
+```
+
+### Rendered Diagram
 
 ```mermaid
 sequenceDiagram
