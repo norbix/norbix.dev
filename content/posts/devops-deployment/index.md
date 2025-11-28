@@ -29,6 +29,15 @@ You’ll learn:
 
 ---
 
+## 🖼️ CI/CD Pipeline Overview (Hand-Drawn)
+
+Below is a high-level view of the CI/CD workflow, including
+Source → Test → Build → QA → Release → Monitoring:
+
+![devops-ci-cd-flow](devops-ci-cd-flow.png)
+
+---
+
 ## 🧱 3-Tier Architecture Overview
 
 We'll build and deploy the following:
