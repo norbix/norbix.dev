@@ -377,3 +377,7 @@ A modern globally resilient architecture often uses this pattern:
 Using both creates a powerful, multi-layered reliability strategy for modern SaaS and distributed systems.
 
 If you operate multi-cloud or multi-region platforms — especially those requiring near-continuous availability — then WIP + VIP together is essential tooling for delivering a high-SLA network architecture.
+
+---
+
+🚀 Follow me on [norbix.dev](https://norbix.dev) for more insights on Go, Python, AI, system design, and engineering wisdom.
