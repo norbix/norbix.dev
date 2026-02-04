@@ -1,5 +1,5 @@
 +++
-date = '2025-02-21T37:30:00+02:00'
+date = '2026-02-21T37:30:00+02:00'
 draft = false
 title = 'Testing Strategy in Modern DevOps'
 tags = ["testing", "devops", "go", "ci-cd", "quality", "automation"]
