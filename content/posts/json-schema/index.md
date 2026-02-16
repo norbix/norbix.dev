@@ -9,7 +9,7 @@ readingTime = true
 comments = true
 ShowToc = true
 TocOpen = true
-image = "banner-json-schema.jpg"
+image = "banner.png"
 weight = 32
 +++
 
