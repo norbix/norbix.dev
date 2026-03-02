@@ -749,41 +749,38 @@ Failing schema compatibility should block release.
 
 ## 💧 Schema Hydration in Microservices
 
-Validation answers the question:
+Validation answers:
 
-- “Is this payload structurally correct?”
+- “Is this payload structurally correct according to the schema?”
 
-Hydration answers a different question:
+But before validation can even happen, the system must know:
 
-- “Is this payload semantically complete and ready for domain execution?”
+- “What is the complete schema?”
 
-Schema hydration is the process of:
+In contract-composed systems, the schema is often:
 
-- enriching validated input with derived data,
+- split into multiple files,
 
-- applying default values,
+- composed via `$ref`,
 
-- resolving references,
+- versioned across services,
 
-- transforming external formats into internal canonical models.
+- extended by shared components.
 
-Validation ensures correctness.
-Hydration ensures usability.
+Therefore:
+
+- Schema hydration happens before validation.
 
 ---
 
 ### 🧱 Validation vs Hydration
 
-| Concern                           | Validation | Hydration |
-|-----------------------------------|------------|-----------|
-| Checks structure	                 | ✅	| ❌ |
-| Applies defaults	                 | ❌	| ✅ |
-| Enriches with computed fields	| ❌	| ✅ | 
-| Resolves external IDs	| ❌	| ✅ | 
-| Ensures business readiness	| ❌	| ✅ |
-
-**Validation protects boundaries.
-Hydration prepares data for domain logic.**
+| Concern                     | Schema Hydration | Validation |
+| --------------------------- | ---------------- | ---------- |
+| Resolves `$ref`             | ✅                | ❌          |
+| Builds the effective schema | ✅                | ❌          |
+| Checks payload structure    | ❌                | ✅          |
+| Prepares data for domain    | ❌                | ❌          |
 
 ---
 
@@ -794,43 +791,39 @@ In mature microservice systems:
 ```text
 Contract Layer
 ↓
+Schema Hydration (resolve $ref, compose schema)
+↓
 Validation Layer
 ↓
-Hydration Layer
+Domain Evaluation Layer
 ↓
-Domain Layer
-↓
-Persistence Layer
+Persistence / External Calls
 ```
-
-Each layer has a single responsibility.
-
-This separation is what enables:
-
-- safe evolution,
-
-- independent deployment,
-
-- strict contracts,
-
-- clean domain models.
 
 ---
 
 ### 🧪 Hydration in CI/CD
 
-Hydration logic should be:
+Schema hydration (schema composition / dereferencing) should be:
 
 - unit-tested independently,
 
-- contract-tested with multiple schema versions,
+- tested against complex $ref graphs,
 
-- validated for backward compatibility.
+- verified across multiple schema versions,
 
-Schema validation prevents malformed input.
-Hydration prevents malformed domain state.
+- validated for backward compatibility,
 
-Both are required for production safety.
+- checked for deterministic schema output (same input → same effective schema).
+
+Because hydration builds the effective schema, any failure here corrupts the contract layer.
+
+Validation then operates on that fully constructed schema.
+
+Schema `hydration` prevents malformed contracts.
+Schema `validation` prevents malformed input.
+
+Both are required for production safety in contract-first microservices.
 
 ---
 
@@ -844,31 +837,14 @@ Diagram
 flowchart LR
 A[Client Request] --> B[REST Controller]
 B --> C[JSON Unmarshal → DTO]
-C --> D[JSON Schema Validation]
-D -->|Valid| E[Schema Hydration Layer]
-E --> F[Business Logic]
-D -->|Invalid| G[400 Bad Request]
+C --> D[Schema Hydration<br/>(resolve $ref, compose effective schema)]
+D --> E[JSON Schema Validation]
+E -->|Valid| F[Business Logic]
+E -->|Invalid| G[400 Bad Request]
 F --> H[Persistence / External Calls]
 H --> I[Response DTO]
 I --> J[HTTP Response]
 ```
-
-Hydration is a separate layer, not part of business logic and not part of validation.
-
-This separation:
-
-- keeps validation pure,
-
-- keeps business logic clean,
-
-- keeps transformations centralized.
-
-### 🎯 Architectural Principle
-
-Validation protects the system from invalid data.
-Hydration prepares valid data for meaningful execution.
-
-Both are part of a mature contract-first microservice design.
 
 ---
 
