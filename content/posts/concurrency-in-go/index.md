@@ -333,167 +333,167 @@ case msg2 := <-ch2:
    | **Synchronization** | Implicit (via job count) | Explicit (via `wg.Wait()`) |
    | **Safety in large systems** | Not safe for unknown job counts | Safe and scalable |
 
-1. Advanced WorkerPool Implementation
+3. Advanced WorkerPool Implementation.
 
-    The previous examples show the concept clearly.
-    Now let’s look at a more structured, reusable implementation — something you could actually use inside a backend service.
+   The previous examples show the concept clearly.
+   Now let’s look at a more structured, reusable implementation — something you could actually use inside a backend service.
     
-    This version:
+   This version:
     
-    - Is thread-safe
+   - Is thread-safe
     
-    - Prevents starting twice
+   - Prevents starting twice
     
-    - Returns only non-nil errors
+   - Returns only non-nil errors
 
-    - Enforces pool size at creation
+   - Enforces pool size at creation
     
-    - Ensures tasks cannot be added before starting
+   - Ensures tasks cannot be added before starting
     
-    - Encapsulates internal channels
+   - Encapsulates internal channels
 
-    ```go
-    package task
-    
-    import (
-        "errors"
-        "sync"
-    )
-    
-    // WorkerPool errors, do not change!
-    var (
-        ErrBadParams  = errors.New("bad params")
-        ErrBadTask    = errors.New("bad task")
-        ErrNotStarted = errors.New("not started")
-    )
-    
-    // Task to be computed by the WorkerPool.
-    type Task func() error
-    
-    // WorkerPool represents a pool of goroutines.
-    type WorkerPool struct {
-        size    int
-        tasks   chan Task
-        results chan error
-    
-        started bool
-        mu      sync.Mutex
-    }
-    
-    // NewWorkerPool creates a new pool with a given size.
-    func NewWorkerPool(size int) (*WorkerPool, error) {
-        if size <= 0 {
-            return nil, ErrBadParams
-        }
-    
-        wp := &WorkerPool{
-            size:    size,
-            tasks:   make(chan Task),
-            results: make(chan error, size),
-        }
-    
-        return wp, nil
-    }
-    
-    // Results returns channel of non-nil errors.
-    func (wp *WorkerPool) Results() <-chan error {
-        return wp.results
-    }
-    
-    // Run will start workers (goroutines) for tasks computation.
-    func (wp *WorkerPool) Run() {
-        wp.mu.Lock()
-        defer wp.mu.Unlock()
-    
-        if wp.started {
-            return
-        }
-    
-        wp.started = true
-    
-        for i := 0; i < wp.size; i++ {
-            go func() {
-                for task := range wp.tasks {
-                    if task == nil {
-                        continue
-                    }
-    
-                    if err := task(); err != nil {
-                        wp.results <- err
-                    }
-                }
-            }()
-        }
-    }
-    
-    // AddTask will add a task to the worker pool queue.
-    func (wp *WorkerPool) AddTask(task Task) error {
-        if task == nil {
-            return ErrBadTask
-        }
-    
-        wp.mu.Lock()
-        defer wp.mu.Unlock()
-    
-        if !wp.started {
-            return ErrNotStarted
-        }
-    
-        wp.tasks <- task
-        return nil
-    }
-    ```
+   ```go
+      package task
+        
+      import (
+          "errors"
+          "sync"
+      )
+        
+      // WorkerPool errors, do not change!
+      var (
+          ErrBadParams  = errors.New("bad params")
+          ErrBadTask    = errors.New("bad task")
+          ErrNotStarted = errors.New("not started")
+      )
+        
+      // Task to be computed by the WorkerPool.
+      type Task func() error
+        
+      // WorkerPool represents a pool of goroutines.
+      type WorkerPool struct {
+          size    int
+          tasks   chan Task
+          results chan error
+        
+          started bool
+          mu      sync.Mutex
+      }
+        
+      // NewWorkerPool creates a new pool with a given size.
+      func NewWorkerPool(size int) (*WorkerPool, error) {
+          if size <= 0 {
+              return nil, ErrBadParams
+          }
+        
+          wp := &WorkerPool{
+              size:    size,
+              tasks:   make(chan Task),
+              results: make(chan error, size),
+          }
+        
+          return wp, nil
+      }
+        
+      // Results returns channel of non-nil errors.
+      func (wp *WorkerPool) Results() <-chan error {
+          return wp.results
+      }
+        
+      // Run will start workers (goroutines) for tasks computation.
+      func (wp *WorkerPool) Run() {
+          wp.mu.Lock()
+          defer wp.mu.Unlock()
+        
+          if wp.started {
+              return
+          }
+        
+          wp.started = true
+        
+          for i := 0; i < wp.size; i++ {
+              go func() {
+                  for task := range wp.tasks {
+                      if task == nil {
+                          continue
+                      }
+        
+                      if err := task(); err != nil {
+                          wp.results <- err
+                      }
+                  }
+              }()
+          }
+      }
+        
+      // AddTask will add a task to the worker pool queue.
+      func (wp *WorkerPool) AddTask(task Task) error {
+          if task == nil {
+              return ErrBadTask
+          }
+        
+          wp.mu.Lock()
+          defer wp.mu.Unlock()
+        
+          if !wp.started {
+              return ErrNotStarted
+          }
+        
+          wp.tasks <- task
+          return nil
+      }
+   ```
 
-    # 🔬 Why This Version Is “Advanced”
+  # 🔬 Why This Version Is “Advanced”
     
-    Compared to the basic example:
+  Compared to the basic example:
     
-    |Feature	| Basic Example	| Advanced Version |
-    | --- | --- | --- |
-    | Encapsulation	| Inline in `main` | Reusable struct |
-    | Thread-safety	| Minimal	| Mutex protected |
-    | Lifecycle control	| Implicit	| Explicit `Run()` |
-    | Error channel	| Optional	| Built-in |
-    | Validation	| None	| Strict checks |
-    | Production ready	| Demo	| Yes |
+  |Feature	| Basic Example	| Advanced Version |
+  | --- | --- | --- |
+  | Encapsulation	| Inline in `main` | Reusable struct |
+  | Thread-safety	| Minimal	| Mutex protected |
+  | Lifecycle control	| Implicit	| Explicit `Run()` |
+  | Error channel	| Optional	| Built-in |
+  | Validation	| None	| Strict checks |
+  | Production ready	| Demo	| Yes |
 
-    # 🧠 Architectural Insight
+  # 🧠 Architectural Insight
 
-    This design introduces an important production principle:
+  This design introduces an important production principle:
 
-        **Control concurrency explicitly. Never let goroutines grow unbounded.**
+      **Control concurrency explicitly. Never let goroutines grow unbounded.**
 
-    In real backend systems (like API servers, message consumers, or background processors):
+  In real backend systems (like API servers, message consumers, or background processors):
 
-        - You must limit DB connections
+      - You must limit DB connections
 
-        - You must limit HTTP calls
+      - You must limit HTTP calls
 
-        -- You must avoid spawning 100k goroutines
+      -- You must avoid spawning 100k goroutines
 
-    This pool guarantees:
+  This pool guarantees:
     
-    ```text
-    max concurrency = pool size
-    ```
+  ```text
+  max concurrency = pool size
+  ```
 
-    That’s deterministic concurrency — a huge advantage in distributed systems.
+  That’s deterministic concurrency — a huge advantage in distributed systems.
 
-    # 🧩 Where This Pattern Shines
+  # 🧩 Where This Pattern Shines
 
-    This implementation is ideal for:
+  This implementation is ideal for:
 
-        - Database batch processing
+      - Database batch processing
 
-        - Controlled API fan-out
+      - Controlled API fan-out
 
-        - Message queue consumers
+      - Message queue consumers
 
-        - File processing pipelines
+      - File processing pipelines
 
-        - CPU-bound workers
+      - CPU-bound workers
 
-        - Rate-limited external integrations
+      - Rate-limited external integrations
 
 ## ⏱️ Timeout with `select`
 
