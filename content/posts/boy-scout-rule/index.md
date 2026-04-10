@@ -26,6 +26,9 @@ And yet — it’s one of the most powerful principles in software engineering.
 
 ## 🧭 What Is the Boy Scout Rule?
 
+![boy-scout-rule](boy-scout-rule.png)
+
+
 The Boy Scout Rule comes from a simple idea:
 
 > Always leave a place cleaner than you found it.
