@@ -89,7 +89,7 @@ Here's what my clients and collaborators say on Google:
 I collaborate as:
 - **Individual Contributor**
 - **Technology Partner**
-- **Vendor (B2B)**
+- **Vendor**
 
 📍 Remote-first  
 📅 Available for new engagements
