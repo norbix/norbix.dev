@@ -2,8 +2,9 @@
 &lt;figure style="max-width: 500px; margin: 1rem 0;">
 &lt;img src="https://norbix.dev/images/my_photo.jpg" alt="Norbert Jakubczak - Norbix" style="width: 100%; border-radius: 10px;" />
 &lt;figcaption style="text-align: center; font-style: italic; color: #aaa;">
-Welcome to my tech blog — where code, systems thinking, and engineering mindset meet. 🚀
+Building scalable systems where engineering meets real-world delivery. 🚀
 &lt;/figcaption>
 &lt;/figure>
-&lt;p>I&amp;rsquo;m a polyglot &lt;strong>Software Engineer&lt;/strong> with a strong focus on &lt;strong>Golang&lt;/strong> and &lt;strong>Python&lt;/strong>, working across the full stack — from backend and cloud infrastructure to frontend integration and developer tooling.&lt;/p>
-&lt;p>I specialize in building &lt;strong>Internal Developer Platforms (IDPs)&lt;/strong> and architecting scalable &lt;strong>Software-as-a-Service (SaaS)&lt;/strong> systems using microservices and modern cloud-native technologies.&lt;/p></description></item></channel></rss>
+&lt;p>&lt;strong>Software Engineer | Technology Partner | Distributed Systems (Go, Python, TypeScript) | AWS &amp;amp; K8s&lt;/strong>&lt;/p>
+&lt;p>I help companies design and build &lt;strong>scalable distributed systems&lt;/strong>, &lt;strong>Internal Developer Platforms (IDP)&lt;/strong>, and &lt;strong>cloud-native SaaS solutions&lt;/strong>.&lt;/p>
+&lt;p>I work hands-on across the stack — from &lt;strong>backend services in Go &amp;amp; Python&lt;/strong>, through &lt;strong>cloud infrastructure (AWS, Kubernetes)&lt;/strong>, to &lt;strong>developer tooling and system design&lt;/strong>.&lt;/p></description></item></channel></rss>
