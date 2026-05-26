@@ -12,7 +12,7 @@ image = "api-modeling-banner.jpg"
 weight = 35
 +++
 
-![banner](img.png)
+![banner](banner.png)
 
 # 🌍 Why API Modeling Matters
 
