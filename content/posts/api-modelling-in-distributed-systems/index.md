@@ -48,8 +48,7 @@ A well-designed API model improves:
 - Performance
 - Observability
 
-👉 The important part:
-Modern distributed systems rarely use only one API style.
+👉 **The important part: Modern distributed systems rarely use only one API style.**
 
 The best architectures combine multiple communication models together.
 
@@ -333,7 +332,7 @@ This architecture combines:
 - `gRPC` for internal services
 - `WebSocket` for realtime communication
 
-👉 This is where modern API modeling becomes architectural rather than theoretical.
+👉 **This is where modern API modeling becomes architectural rather than theoretical.**
 
 ---
 
