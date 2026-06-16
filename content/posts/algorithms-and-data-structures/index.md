@@ -1617,6 +1617,328 @@ Think of % as the wrap-around operator — it keeps numbers within limits.
 
 ---
 
+## 🔄 Backtracking
+
+Backtracking is a depth-first search technique used to explore all possible solutions while abandoning paths that cannot lead to a valid result.
+
+Common interview problems:
+
+- Subsets
+- Combinations
+- Permutations
+- N-Queens
+- Sudoku Solver
+- Word Search
+
+### 📦 Subsets
+
+Generate all subsets of [1,2,3].
+
+```go
+func subsets(nums []int) [][]int {
+var result [][]int
+var current []int
+
+	var dfs func(int)
+	dfs = func(index int) {
+		combination := append([]int{}, current...)
+		result = append(result, combination)
+
+		for i := index; i < len(nums); i++ {
+			current = append(current, nums[i])
+			dfs(i + 1)
+			current = current[:len(current)-1]
+		}
+	}
+
+	dfs(0)
+	return result
+}
+```
+
+Output:
+
+```text
+[]
+[1]
+[2]
+[3]
+[1 2]
+[1 3]
+[2 3]
+[1 2 3]
+```
+
+Time Complexity: O(2^n)
+
+### 🔗 Combinations
+
+Choose k elements from n.
+
+```go
+
+func combinations(n, k int) [][]int {
+var result [][]int
+var current []int
+
+	var dfs func(int)
+
+	dfs = func(start int) {
+		if len(current) == k {
+			result = append(result, append([]int{}, current...))
+			return
+		}
+
+		for i := start; i <= n; i++ {
+			current = append(current, i)
+			dfs(i + 1)
+			current = current[:len(current)-1]
+		}
+	}
+
+	dfs(1)
+	return result
+}
+```
+
+Example:
+
+```text
+n=4 k=2
+
+[1 2]
+[1 3]
+[1 4]
+[2 3]
+[2 4]
+[3 4]
+```
+
+### 🔀 Permutations
+
+Generate all possible orderings.
+
+```go
+func permutations(nums []int) [][]int {
+var result [][]int
+
+	var dfs func([]int, []int)
+
+	dfs = func(remaining []int, path []int) {
+		if len(remaining) == 0 {
+			result = append(result, append([]int{}, path...))
+			return
+		}
+
+		for i := 0; i < len(remaining); i++ {
+			next := append([]int{}, remaining[:i]...)
+			next = append(next, remaining[i+1:]...)
+
+			dfs(next, append(path, remaining[i]))
+		}
+	}
+
+	dfs(nums, []int{})
+	return result
+}
+```
+
+Output:
+
+```text
+[1 2 3]
+[1 3 2]
+[2 1 3]
+[2 3 1]
+[3 1 2]
+[3 2 1]
+```
+
+Time Complexity: O(n!)
+
+---
+
+## 🪟 Sliding Window
+
+Sliding Window is used when working with contiguous subarrays or substrings.
+
+Common interview problems:
+
+- Longest substring without repeating characters
+- Maximum sum subarray
+- Minimum window substring
+- Average of K elements
+
+### Maximum Sum Subarray of Size K
+
+```go
+func maxSum(nums []int, k int) int {
+windowSum := 0
+
+	for i := 0; i < k; i++ {
+		windowSum += nums[i]
+	}
+
+	maxSum := windowSum
+
+	for right := k; right < len(nums); right++ {
+		windowSum += nums[right]
+		windowSum -= nums[right-k]
+
+		if windowSum > maxSum {
+			maxSum = windowSum
+		}
+	}
+
+	return maxSum
+}
+```
+
+Example:
+
+```text
+nums = [2,1,5,1,3,2]
+k = 3
+
+Result = 9
+```
+
+Subarray:
+
+```text
+[5,1,3]
+```
+
+Time Complexity:
+
+```text
+O(n)
+```
+
+instead of
+
+```text
+O(n*k)
+```
+
+---
+
+## 🧠 Dynamic Programming
+
+Dynamic Programming (DP) solves problems by storing previously computed results.
+
+The key idea:
+
+**Don't solve the same problem twice.**
+
+Common interview problems:
+
+- Fibonacci
+- Climbing Stairs
+- Coin Change
+- House Robber
+- Longest Increasing Subsequence
+- Knapsack
+
+### Fibonacci with Memoization
+
+```go
+func fibonacci(n int, memo map[int]int) int {
+    if n <= 1 {
+        return n
+    }
+
+	if val, exists := memo[n]; exists {
+		return val
+	}
+
+	memo[n] = fibonacci(n-1, memo) +
+		fibonacci(n-2, memo)
+
+	return memo[n]
+}
+```
+
+Time Complexity:
+
+```text
+O(n)
+```
+
+instead of
+
+```text
+O(2^n)
+```
+
+### Climbing Stairs
+
+Classic DP interview problem.
+
+```go
+func climbStairs(n int) int {
+    if n <= 2 {
+        return n
+    }
+
+	dp := make([]int, n+1)
+
+	dp[1] = 1
+	dp[2] = 2
+
+	for i := 3; i <= n; i++ {
+		dp[i] = dp[i-1] + dp[i-2]
+	}
+
+	return dp[n]
+}
+```
+
+Example:
+
+```text
+n = 5
+
+Ways:
+1+1+1+1+1
+1+1+1+2
+1+1+2+1
+1+2+1+1
+2+1+1+1
+1+2+2
+2+1+2
+2+2+1
+
+Result = 8
+```
+
+Time Complexity:
+
+```text
+O(n)
+```
+
+Space Complexity:
+
+```text
+O(n)
+```
+
+---
+
+## 📋 Interview Patterns Cheat Sheet
+
+| Pattern	| Typical Problems	| Complexity |
+|------------------|-------------------------|------------|
+|Backtracking	| Subsets, Combinations, Permutations, N-Queens	| O(2ⁿ) to O(n!) |
+| Sliding Window	| Subarrays, Substrings	| Usually O(n) |
+| Dynamic Programming	| Fibonacci, Knapsack, Coin Change	| Usually O(n) or O(n²) |
+| DFS	| Trees, Graphs	| O(V+E) |
+| BFS	| Shortest Path	| O(V+E) |
+| Binary Search	| Sorted Arrays	| O(log n) |
+
+---
+
 ## 🧠 Tips for Learning DSA with Go
 
 - Practice problems: Use platforms like [LeetCode](https://leetcode.com/), [HackerRank](https://www.hackerrank.com/), or [Exercism](https://exercism.org/).
