@@ -25,7 +25,7 @@ weight = 36
 
 ![banner](banner.png)
 
-# 🌍 Why Every Software Engineer Should Understand Proxies
+## 🌍 Why Every Software Engineer Should Understand Proxies
 
 Ask ten engineers what a **proxy** is and you'll likely receive ten different answers.
 
@@ -53,7 +53,7 @@ They simply describe different implementations of the same architectural idea.
 
 ---
 
-# 🧠 One Concept, Many Implementations
+### 🧠 One Concept, Many Implementations
 
 A proxy is an intermediary.
 
@@ -75,7 +75,7 @@ Everything else in this article is a specialization of this simple concept.
 
 ---
 
-# 🌍 Where You Already Use Proxies
+### 🌍 Where You Already Use Proxies
 
 Even if you've never configured one yourself, you already rely on proxies every day.
 
@@ -99,7 +99,7 @@ Modern cloud-native systems often process a single request through several diffe
 
 ---
 
-# 🏗 Modern Request Journey
+### 🏗 Modern Request Journey
 
 A typical request may look like this:
 
@@ -127,13 +127,13 @@ Understanding these responsibilities is one of the most valuable skills in moder
 
 ---
 
-# 🚦 Routing vs Proxy
+## 🚦 Routing vs Proxy
 
 One of the biggest misconceptions is confusing **routing** with **proxying**.
 
 Although both determine where traffic goes, they operate very differently.
 
-## Routing
+### Routing
 
 Routers work at the network layer.
 
@@ -166,7 +166,7 @@ Routing is primarily concerned with IP connectivity.
 
 ---
 
-## Proxying
+### Proxying
 
 A proxy receives a request as its own endpoint.
 
@@ -199,7 +199,7 @@ This additional context enables much more sophisticated behaviour.
 
 ---
 
-# 🔑 Routing vs Proxy
+### 🔑 Routing vs Proxy
 
 | Routing | Proxy |
 |----------|-------|
@@ -222,7 +222,7 @@ This distinction becomes increasingly important as we move into cloud-native arc
 
 ---
 
-# 🌐 Forward Proxy
+## 🌐 Forward Proxy
 
 The first type of proxy most engineers encounter is the **forward proxy**.
 
@@ -241,7 +241,7 @@ To the destination website, every request appears to originate from the proxy ra
 
 This simple architectural change enables a surprising number of capabilities.
 
-## Common Uses
+### Common Uses
 
 Forward proxies are commonly used for:
 
@@ -260,7 +260,7 @@ The proxy becomes the organization's controlled gateway to external services.
 
 ---
 
-# 🌍 What the Internet Sees
+### 🌍 What the Internet Sees
 
 Without a forward proxy:
 
@@ -292,7 +292,7 @@ This distinction explains why forward proxies are commonly used for privacy, sec
 
 ---
 
-# 🔄 The Evolution of the Proxy
+## 🔄 The Evolution of the Proxy
 
 As software systems evolved, so did proxies.
 
@@ -327,7 +327,7 @@ Let's explore each step.
 
 ---
 
-# 🔁 Reverse Proxy
+## 🔁 Reverse Proxy
 
 While a **forward proxy** represents the client, a **reverse proxy** represents the server.
 
@@ -350,7 +350,7 @@ Only then is it forwarded to the appropriate backend service.
 
 ---
 
-# 🏗 Why Reverse Proxies Exist
+### 🏗 Why Reverse Proxies Exist
 
 Imagine exposing every backend service directly to the Internet.
 
@@ -393,7 +393,7 @@ The proxy centralizes cross-cutting concerns, allowing backend applications to f
 
 ---
 
-# ⚙️ Common Reverse Proxy Responsibilities
+### ⚙️ Common Reverse Proxy Responsibilities
 
 Modern reverse proxies commonly handle:
 
@@ -412,7 +412,7 @@ Instead of duplicating this functionality across every application, it can be im
 
 ---
 
-# 🌍 Popular Reverse Proxy Solutions
+### 🌍 Popular Reverse Proxy Solutions
 
 Some of the most widely used reverse proxies include:
 
@@ -430,7 +430,7 @@ Receive requests, inspect them, and forward them to the appropriate destination.
 
 ---
 
-# 🚦 Reverse Proxy Routing
+### 🚦 Reverse Proxy Routing
 
 One of the biggest advantages of a reverse proxy is intelligent request routing.
 
@@ -478,7 +478,7 @@ Clients remain unaware of the underlying infrastructure.
 
 ---
 
-# ⚖️ Reverse Proxy vs Load Balancer
+### ⚖️ Reverse Proxy vs Load Balancer
 
 Many engineers use these terms interchangeably.
 
@@ -515,7 +515,7 @@ Most modern reverse proxies also include load balancing capabilities, which is w
 
 ---
 
-# ⚙️ Load Balancing Strategies
+### ⚙️ Load Balancing Strategies
 
 Different workloads benefit from different balancing algorithms.
 
@@ -539,7 +539,7 @@ Cloud providers implement these algorithms behind managed load balancers such as
 
 ---
 
-# 🚀 When a Reverse Proxy Isn't Enough
+### 🚀 When a Reverse Proxy Isn't Enough
 
 As organizations adopted microservices, reverse proxies started accumulating more and more responsibilities.
 
@@ -562,7 +562,7 @@ This is where the **API Gateway** enters the picture.
 
 ---
 
-# 🌐 API Gateway
+## 🌐 API Gateway
 
 An API Gateway is a specialized reverse proxy designed specifically for APIs.
 
@@ -585,7 +585,7 @@ Instead of simply forwarding requests, an API Gateway actively participates in r
 
 ---
 
-# 🔑 Typical API Gateway Responsibilities
+### 🔑 Typical API Gateway Responsibilities
 
 Modern API Gateways commonly provide:
 
@@ -610,7 +610,7 @@ Because these capabilities are centralized, backend services remain focused on i
 
 ---
 
-# ☁️ Popular API Gateways
+### ☁️ Popular API Gateways
 
 Today's cloud ecosystem offers many API Gateway implementations.
 
@@ -631,7 +631,7 @@ Although they differ in implementation, they all follow the same architectural p
 
 ---
 
-# 🧠 Reverse Proxy vs API Gateway
+### 🧠 Reverse Proxy vs API Gateway
 
 A useful mental model is:
 
@@ -647,7 +647,7 @@ You can think of an API Gateway as a reverse proxy that has evolved to understan
 
 ---
 
-# 🔐 SSH Tunnels and SOCKS Proxies
+## 🔐 SSH Tunnels and SOCKS Proxies
 
 So far we've looked at proxies that sit inside server infrastructure.
 
@@ -663,7 +663,7 @@ It can become a secure transport layer between two networks.
 
 ---
 
-# 🌍 Why SSH Tunneling Exists
+### 🌍 Why SSH Tunneling Exists
 
 Imagine a database running inside a private network.
 
@@ -682,7 +682,7 @@ The traffic simply travels through an encrypted tunnel.
 
 ---
 
-# 🏠 Local Port Forwarding (`ssh -L`)
+### 🏠 Local Port Forwarding (`ssh -L`)
 
 Local port forwarding is the most commonly used SSH forwarding mode.
 
@@ -726,7 +726,7 @@ No firewall rules need to expose the database directly to the Internet.
 
 ---
 
-# 🚀 Common Uses of Local Forwarding
+### 🚀 Common Uses of Local Forwarding
 
 Local forwarding is frequently used for:
 
@@ -742,7 +742,7 @@ Because traffic is encrypted by SSH, no additional VPN is required for many deve
 
 ---
 
-# 🌍 Remote Port Forwarding (`ssh -R`)
+### 🌍 Remote Port Forwarding (`ssh -R`)
 
 Remote forwarding works in the opposite direction.
 
@@ -772,7 +772,7 @@ even though the application actually runs on your laptop.
 
 ---
 
-# 🔧 Common Uses of Remote Forwarding
+### 🔧 Common Uses of Remote Forwarding
 
 Remote forwarding is useful when:
 
@@ -787,7 +787,7 @@ Instead of deploying software, developers simply expose their local application 
 
 ---
 
-# 🌐 Dynamic Port Forwarding (`ssh -D`)
+### 🌐 Dynamic Port Forwarding (`ssh -D`)
 
 Dynamic forwarding is where SSH becomes especially interesting.
 
@@ -823,7 +823,7 @@ The client decides where each connection should go.
 
 ---
 
-# 🧠 What Makes SOCKS Different?
+### 🧠 What Makes SOCKS Different?
 
 HTTP proxies understand HTTP.
 
@@ -848,7 +848,7 @@ It only forwards network connections.
 
 ---
 
-# 🌍 HTTP Proxy vs SOCKS Proxy
+### 🌍 HTTP Proxy vs SOCKS Proxy
 
 Although both are proxies, they serve different purposes.
 
@@ -864,7 +864,7 @@ This distinction explains why browsers commonly support both HTTP and SOCKS prox
 
 ---
 
-# 🔒 Why SSH Tunnels Are So Popular
+### 🔒 Why SSH Tunnels Are So Popular
 
 SSH forwarding offers several advantages:
 
@@ -879,7 +879,7 @@ For many development teams, SSH tunneling becomes the simplest secure networking
 
 ---
 
-# ⚠️ Limitations
+### ⚠️ Limitations
 
 Despite its flexibility, SSH tunneling isn't intended to replace production networking infrastructure.
 
@@ -895,7 +895,7 @@ SSH tunnels are excellent operational tools, but they are usually temporary by n
 
 ---
 
-# 🧩 A Common Misconception
+### 🧩 A Common Misconception
 
 Many engineers think of SSH port forwarding as a completely different technology from reverse proxies or API Gateways.
 
@@ -916,7 +916,7 @@ The underlying architectural principle remains exactly the same:
 
 ---
 
-# ☸️ Kubernetes, Service Meshes and Sidecar Proxies
+## ☸️ Kubernetes, Service Meshes and Sidecar Proxies
 
 As applications grew from a handful of servers into hundreds of microservices, a new challenge emerged.
 
@@ -960,7 +960,7 @@ The industry needed another evolution of the proxy.
 
 ---
 
-# 🌐 Kubernetes Ingress
+### 🌐 Kubernetes Ingress
 
 Before requests can reach applications running inside Kubernetes, they must first enter the cluster.
 
@@ -1011,7 +1011,7 @@ To clients outside the cluster, the Ingress becomes the public face of the platf
 
 ---
 
-# 🚀 Ingress Controllers
+### 🚀 Ingress Controllers
 
 Kubernetes itself doesn't process HTTP traffic.
 
@@ -1034,7 +1034,7 @@ Receive incoming requests and route them to the correct workload.
 
 ---
 
-# 🌍 The Gateway API
+### 🌍 The Gateway API
 
 As Kubernetes adoption grew, engineers discovered that the original Ingress API had limitations.
 
@@ -1060,7 +1060,7 @@ Many modern Kubernetes environments are gradually moving from traditional Ingres
 
 ---
 
-# 🧠 Ingress vs Gateway API
+### 🧠 Ingress vs Gateway API
 
 A useful way to think about them is:
 
@@ -1078,7 +1078,7 @@ Instead, it provides a standardized way to configure them within Kubernetes.
 
 ---
 
-# 🕸 Service Mesh
+### 🕸 Service Mesh
 
 Until now we've focused on requests entering the cluster.
 
@@ -1113,7 +1113,7 @@ This architecture is known as a **Service Mesh**.
 
 ---
 
-# 🚀 Sidecar Proxies
+### 🚀 Sidecar Proxies
 
 Rather than allowing services to communicate directly, a proxy is deployed alongside every application instance.
 
@@ -1135,7 +1135,7 @@ The application itself remains completely unaware.
 
 ---
 
-# 🌍 Why Sidecars?
+### 🌍 Why Sidecars?
 
 Sidecar proxies provide capabilities such as:
 
@@ -1154,7 +1154,7 @@ Instead of every development team implementing these features independently, the
 
 ---
 
-# ⚙️ Envoy
+### ⚙️ Envoy
 
 The most widely adopted sidecar proxy today is **Envoy**.
 
@@ -1175,7 +1175,7 @@ It is a programmable Layer 7 proxy capable of handling both edge traffic and int
 
 ---
 
-# ☁️ Istio
+### ☁️ Istio
 
 Istio builds an entire service mesh around Envoy.
 
@@ -1196,7 +1196,7 @@ The mesh handles them transparently.
 
 ---
 
-# 🔄 A Request Inside a Service Mesh
+### 🔄 A Request Inside a Service Mesh
 
 A request inside a service mesh often follows a path like this:
 
@@ -1224,7 +1224,7 @@ This enables centralized networking policies without modifying application code.
 
 ---
 
-# 🧩 The Big Picture
+### 🧩 The Big Picture
 
 At this point, we've encountered several different proxy technologies:
 
@@ -1247,7 +1247,7 @@ The difference lies only in **where** the proxy sits and **what** decisions it m
 
 ---
 
-# 💻 The Proxy Design Pattern
+## 💻 The Proxy Design Pattern
 
 By now you've seen proxies used throughout networking:
 
@@ -1272,7 +1272,7 @@ Only the implementation has.
 
 ---
 
-# 🧠 The Core Idea
+### 🧠 The Core Idea
 
 Without a proxy:
 
@@ -1307,7 +1307,7 @@ It's exactly what we've been doing throughout this article.
 
 ---
 
-# 🔧 A Simple Go Example
+### 🔧 A Simple Go Example
 
 Suppose we have a service responsible for retrieving user information.
 
@@ -1344,7 +1344,7 @@ Another is to introduce a proxy.
 
 ---
 
-# 📝 Logging Proxy
+### 📝 Logging Proxy
 
 ```go
 type LoggingProxy struct {
@@ -1378,7 +1378,7 @@ The original service remains completely unchanged.
 
 ---
 
-# 🔒 Protection Proxy
+### 🔒 Protection Proxy
 
 A proxy can also enforce authorization.
 
@@ -1403,7 +1403,7 @@ The only difference is the layer at which they operate.
 
 ---
 
-# ⚡ Caching Proxy
+### ⚡ Caching Proxy
 
 Another common example is caching.
 
@@ -1435,7 +1435,7 @@ The proxy hides these implementation details.
 
 ---
 
-# 🌍 Remote Proxy
+### 🌍 Remote Proxy
 
 One of the original motivations for the Proxy pattern was remote communication.
 
@@ -1463,7 +1463,7 @@ The network becomes invisible to the caller.
 
 ---
 
-# 💤 Virtual Proxy
+### 💤 Virtual Proxy
 
 Sometimes an object is expensive to create.
 
@@ -1492,7 +1492,7 @@ This technique is known as **lazy initialization**.
 
 ---
 
-# 🧠 Smart Proxy
+### 🧠 Smart Proxy
 
 A Smart Proxy performs additional work before or after forwarding requests.
 
@@ -1521,7 +1521,7 @@ The architectural idea does not.
 
 ---
 
-# 🌍 Infrastructure vs Code
+## 🌍 Infrastructure vs Code
 
 The similarities become surprisingly obvious.
 
@@ -1539,7 +1539,7 @@ Only the level of abstraction changes.
 
 ---
 
-# 🧩 One Architectural Pattern Everywhere
+## 🧩 One Architectural Pattern Everywhere
 
 Let's revisit the journey we've taken.
 
@@ -1581,7 +1581,7 @@ And that's exactly the point.
 
 ---
 
-# 🚀 Final Thoughts
+## 🚀 Final Thoughts
 
 One of the biggest misconceptions in software engineering is treating proxies as individual technologies.
 
@@ -1613,7 +1613,7 @@ Once you start recognizing proxies as a design concept rather than a specific te
 
 ---
 
-# 📚 Key Takeaways
+## 📚 Key Takeaways
 
 - A proxy is an intermediary between two communicating parties.
 - Routing and proxying solve different problems.
