@@ -25,7 +25,7 @@ This is where **style guides** become valuable.
 
 One of the best collections of real-world engineering conventions is the **[Google Style Guides](https://google.github.io/styleguide/)** project.
 
-![banner](banner.jpg)
+![banner](banner.png)
 
 ---
 
