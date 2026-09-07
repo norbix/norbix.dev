@@ -12,6 +12,8 @@ image = "banner.png"
 weight = 38
 +++
 
+![banner](banner.png)
+
 > Functional programming becomes much more interesting when it moves beyond textbook examples and into production-grade TypeScript backends.
 
 The important questions are no longer just how to use map(), filter(), or immutable data. Functional principles can influence the architecture of an entire application.
