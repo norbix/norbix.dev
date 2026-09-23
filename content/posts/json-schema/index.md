@@ -835,15 +835,15 @@ Diagram
 
 ```mermaid
 flowchart LR
-A[Client Request] --> B[REST Controller]
-B --> C[JSON Unmarshal → DTO]
-C --> D[Schema Hydration<br/>(resolve $ref, compose effective schema)]
-D --> E[JSON Schema Validation]
-E -->|Valid| F[Business Logic]
-E -->|Invalid| G[400 Bad Request]
-F --> H[Persistence / External Calls]
-H --> I[Response DTO]
-I --> J[HTTP Response]
+    A["Client Request"] --> B["REST Controller"]
+    B --> C["JSON Unmarshal → DTO"]
+    C --> D["Schema Hydration<br/>(resolve $ref, compose effective schema)"]
+    D --> E["JSON Schema Validation"]
+    E -->|Valid| F["Business Logic"]
+    E -->|Invalid| G["400 Bad Request"]
+    F --> H["Persistence / External Calls"]
+    H --> I["Response DTO"]
+    I --> J["HTTP Response"]
 ```
 
 ---
