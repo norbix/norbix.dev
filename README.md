@@ -133,6 +133,19 @@ Then open your browser at: http://localhost:1313
 
 ---
 
+## 🎨 Homepage Redesign with Codex
+
+The redesign requirements and reference screenshots are in
+[`docs/specs/homepage-redesign.md`](docs/specs/homepage-redesign.md).
+
+Open this repository in Codex and give it this instruction:
+
+> Implement `docs/specs/homepage-redesign.md`. Read the two reference screenshots listed in the spec, make the site changes, run `hugo --panicOnWarning`, and check the desktop and mobile previews. Do not deploy.
+
+Review the local preview and code changes before committing.
+
+---
+
 ## 🛠 Updating Content
 
 All blog posts and pages live in the content/ directory.

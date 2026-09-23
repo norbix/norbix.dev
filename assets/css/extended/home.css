@@ -11,7 +11,6 @@ body.home.dark {
   --home-muted: #bebdbb;
   --home-line: #3c3932;
   --primary: #f0efeb;
-  --theme: #1d1e20;
 }
 .home .header { border-bottom: 1px solid var(--home-line); }
 .home .nav { max-width: 1380px; }

@@ -1,0 +1,1 @@
+Update the blog’s dark-theme background to match docs/specs/images/navy-background/img.png. Sample the image’s colors and subtle variation, then implement the background in the site’s CSS. Check the homepage and a post page at desktop and mobile widths. Preserve the light theme, gold accents, and text contrast. Run hugo --panicOnWarning. Do not deploy.

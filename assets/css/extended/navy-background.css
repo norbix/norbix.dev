@@ -1,0 +1,16 @@
+/* Sampled from docs/specs/images/navy-background/img.png:
+   upper-left #162a51, center #0f2345, lower-right #091b3b.
+   Low-opacity lines approximate the reference's fine horizontal texture.
+   Viewport-sized gradients keep the variation consistent on long articles. */
+body.dark,
+body.home.dark {
+  --theme: #0f2345;
+  background-color: var(--theme);
+  background-image:
+    repeating-linear-gradient(0deg,
+      rgb(255 255 255 / 1%) 0 1px, transparent 1px 3px),
+    repeating-linear-gradient(92deg,
+      rgb(0 0 0 / 1%) 0 1px, transparent 1px 7px),
+    linear-gradient(125deg, #162a51 0%, #0f2345 48%, #091b3b 100%);
+  background-attachment: fixed;
+}
