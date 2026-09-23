@@ -1,0 +1,50 @@
+/* Mermaid's default palette needs a light drawing surface in either site theme. */
+.post-content .mermaid {
+  background: #fff;
+  color: #222;
+  border-radius: 6px;
+  padding: 12px;
+  overflow: auto;
+}
+.diagram-zoomable { cursor: zoom-in; }
+.diagram-zoom-trigger {
+  display: block;
+  color: var(--brand-gold);
+  border: 1px solid currentColor;
+  border-radius: 4px;
+  padding: 8px 14px;
+  margin: 8px 0 24px;
+  min-height: 44px;
+  font: inherit;
+}
+.diagram-zoom-trigger:hover { text-decoration: underline; }
+.diagram-dialog {
+  width: min(1200px, calc(100vw - 32px));
+  max-width: none;
+  height: min(900px, calc(100dvh - 32px));
+  max-height: none;
+  margin: auto;
+  padding: 0;
+  border: 1px solid var(--brand-gold);
+  border-radius: 8px;
+  background: var(--theme);
+  color: var(--primary);
+  overflow: hidden;
+}
+.diagram-dialog[open] { display: flex; flex-direction: column; }
+.diagram-dialog::backdrop { background: rgb(0 0 0 / 75%); }
+.diagram-toolbar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; padding: 12px 16px 0; }
+.diagram-toolbar h2 { font-size: 20px; margin: 0; }
+.diagram-controls { display: flex; align-items: center; gap: 8px; }
+.diagram-controls button { min-width: 44px; min-height: 44px; padding: 6px 10px; border: 1px solid var(--brand-gold); color: var(--brand-gold); border-radius: 4px; font: inherit; }
+.diagram-controls button:disabled { opacity: .45; cursor: default; }
+.diagram-scale { min-width: 50px; text-align: center; font-size: 14px; }
+#diagram-dialog-help { padding: 8px 16px 12px; margin: 0; font-size: 14px; }
+.diagram-viewport { flex: 1; min-height: 0; overflow: auto; background: #fff; color: #222; overscroll-behavior: contain; padding: 24px; }
+.diagram-viewport > svg { display: block; flex: none; }
+.diagram-viewport:focus-visible { outline: 3px solid currentColor; outline-offset: -4px; }
+@media (max-width: 600px) {
+  .diagram-dialog { width: calc(100vw - 16px); height: calc(100dvh - 16px); }
+  .diagram-toolbar { padding: 8px 12px 0; }
+  .diagram-viewport { padding: 16px; }
+}
