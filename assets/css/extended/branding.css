@@ -1,0 +1,56 @@
+/* Shared branding, using the original homepage's theme-specific gold values. */
+:root {
+  --brand-gold: #805900;
+  --brand-line: #d8cfbd;
+  --brand-serif: Georgia, "Times New Roman", serif;
+}
+body.dark {
+  --brand-gold: #eac16b;
+  --brand-line: #3c3932;
+}
+
+.header { border-bottom: 1px solid var(--brand-line); }
+.header .nav { max-width: 1380px; }
+.header .logo a {
+  color: var(--brand-gold);
+  font-family: var(--brand-serif);
+  font-size: 32px;
+  font-weight: 400;
+  letter-spacing: .02em;
+}
+.header #menu { font-family: var(--brand-serif); }
+.header #menu .active {
+  border-color: var(--brand-gold);
+  padding-bottom: 12px;
+}
+.header a:hover,
+.header button:hover,
+.post-content a:hover,
+.post-tags a:hover,
+.paginav a:hover,
+.toc a:hover {
+  color: var(--brand-gold);
+}
+.header a:hover {
+  text-decoration: underline;
+  text-underline-offset: 5px;
+}
+a:focus-visible,
+button:focus-visible,
+summary:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+  outline: 2px solid var(--brand-gold);
+  outline-offset: 4px;
+  border-radius: 2px;
+}
+/* Keep keyboard outlines inside PaperMod's horizontally scrollable menu. */
+.header #menu a:focus-visible { outline-offset: -2px; }
+
+@media (max-width: 700px) {
+  .header .nav { justify-content: center; }
+  .header .logo { justify-content: center; }
+  .header #menu { line-height: 48px; }
+  .header #menu li + li { margin-inline-start: 20px; }
+}

@@ -1,32 +1,16 @@
 /* PaperMod bundles css/extended/*.css after its core styles. */
 body.home {
-  --home-gold: #805900;
   --home-muted: #56534d;
-  --home-line: #d8cfbd;
-  --home-serif: Georgia, "Times New Roman", serif;
   background: var(--theme);
 }
 body.home.dark {
-  --home-gold: #eac16b;
   --home-muted: #bebdbb;
-  --home-line: #3c3932;
   --primary: #f0efeb;
 }
-.home .header { border-bottom: 1px solid var(--home-line); }
-.home .nav { max-width: 1380px; }
-.home .logo a {
-  color: var(--home-gold);
-  font-family: var(--home-serif);
-  font-size: 32px;
-  font-weight: 400;
-  letter-spacing: .02em;
-}
-.home #menu { font-family: var(--home-serif); }
-.home #menu .active { border-color: var(--home-gold); padding-bottom: 12px; }
 .home .main { max-width: 1380px; padding: 0 24px 32px; }
 .home-hero { text-align: center; padding: 42px 0 44px; }
 .home-avatar { display: block; margin: 0 auto 12px; border-radius: 50%; }
-.home-name { font: 400 clamp(36px, 4.9vw, 70px)/1.16 var(--home-serif); }
+.home-name { font: 400 clamp(36px, 4.9vw, 70px)/1.16 var(--brand-serif); }
 .home-role {
   margin-top: 10px;
   color: var(--home-muted);
@@ -36,42 +20,37 @@ body.home.dark {
 }
 .home-hero h1 {
   margin: 30px 0 8px;
-  font: 400 clamp(32px, 3.7vw, 54px)/1.2 var(--home-serif);
+  font: 400 clamp(32px, 3.7vw, 54px)/1.2 var(--brand-serif);
   text-wrap: balance;
 }
-.home-hero h1 strong { color: var(--home-gold); font-weight: 400; }
-.home-description { color: var(--home-muted); font: 400 clamp(19px, 1.8vw, 25px)/1.5 var(--home-serif); }
+.home-hero h1 strong { color: var(--brand-gold); font-weight: 400; }
+.home-description { color: var(--home-muted); font: 400 clamp(19px, 1.8vw, 25px)/1.5 var(--brand-serif); }
 .home-links { display: flex; justify-content: center; flex-wrap: wrap; margin: 58px 0 38px; position: relative; }
-.home-links::before { content: ""; position: absolute; width: 46px; height: 2px; background: var(--home-gold); top: -30px; left: calc(50% - 23px); }
-.home-links a { color: var(--home-gold); font: 400 23px/1.4 var(--home-serif); padding: 0 42px; }
-.home-links a + a { border-left: 1px solid var(--home-line); }
+.home-links::before { content: ""; position: absolute; width: 46px; height: 2px; background: var(--brand-gold); top: -30px; left: calc(50% - 23px); }
+.home-links a { color: var(--brand-gold); font: 400 23px/1.4 var(--brand-serif); padding: 0 42px; }
+.home-links a + a { border-left: 1px solid var(--brand-line); }
 .home-links span { margin-left: 10px; }
 .home-topics { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px 22px; list-style: none; padding: 0; }
 .home-topics li { color: var(--home-muted); font-size: 12px; letter-spacing: .23em; text-transform: uppercase; }
-.home-topics li + li::before { content: "·"; color: var(--home-gold); margin-right: 22px; }
+.home-topics li + li::before { content: "·"; color: var(--brand-gold); margin-right: 22px; }
 .home-section-heading { display: flex; align-items: center; gap: 26px; margin-bottom: 16px; }
-.home-section-heading::after { content: ""; height: 1px; background: var(--home-line); flex: 1; order: 1; }
-.home-section-heading h2 { font: 400 32px/1.25 var(--home-serif); }
-.home-section-heading > a { order: 2; color: var(--home-gold); font: 400 17px/1.5 var(--home-serif); }
+.home-section-heading::after { content: ""; height: 1px; background: var(--brand-line); flex: 1; order: 1; }
+.home-section-heading h2 { font: 400 32px/1.25 var(--brand-serif); }
+.home-section-heading > a { order: 2; color: var(--brand-gold); font: 400 17px/1.5 var(--brand-serif); }
 .home-section-heading span { margin-left: 8px; }
 .home-posts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 30px; }
-.home-card { border: 1px solid var(--home-line); border-radius: 6px; padding: 24px 26px 22px; display: flex; flex-direction: column; }
+.home-card { border: 1px solid var(--brand-line); border-radius: 6px; padding: 24px 26px 22px; display: flex; flex-direction: column; }
 .home-card-meta { display: flex; flex-wrap: wrap; gap: 12px; color: var(--home-muted); font-size: 11px; letter-spacing: .15em; text-transform: uppercase; }
-.home-card-meta span::before { content: "·"; color: var(--home-gold); margin-right: 12px; }
-.home-card h3 { margin: 10px 0 8px; font: 400 28px/1.15 var(--home-serif); overflow-wrap: anywhere; }
-.home-card-summary { color: var(--home-muted); font: 400 18px/1.45 var(--home-serif); margin-bottom: 14px; }
+.home-card-meta span::before { content: "·"; color: var(--brand-gold); margin-right: 12px; }
+.home-card h3 { margin: 10px 0 8px; font: 400 28px/1.15 var(--brand-serif); overflow-wrap: anywhere; }
+.home-card-summary { color: var(--home-muted); font: 400 18px/1.45 var(--brand-serif); margin-bottom: 14px; }
 .home-card-bottom { display: flex; align-items: end; gap: 12px; justify-content: space-between; margin-top: auto; }
 .home-tags { display: flex; gap: 8px; flex-wrap: wrap; list-style: none; padding: 0; }
 .home-tags a { display: block; padding: 3px 10px; border: 1px solid var(--home-muted); border-radius: 4px; color: var(--home-muted); font-size: 10px; line-height: 1.6; letter-spacing: .07em; text-transform: uppercase; overflow-wrap: anywhere; }
-.home-card-arrow { color: var(--home-gold); font-size: 26px; line-height: 1; }
+.home-card-arrow { color: var(--brand-gold); font-size: 26px; line-height: 1; }
 .home a:hover { text-decoration: underline; text-underline-offset: 5px; }
-.home a:focus-visible, .home button:focus-visible { outline: 2px solid var(--home-gold); outline-offset: 5px; border-radius: 2px; }
 @media (max-width: 700px) {
   .home .main { padding-inline: 20px; }
-  .home .nav { justify-content: center; }
-  .home .logo { justify-content: center; }
-  .home #menu { line-height: 48px; }
-  .home #menu li + li { margin-inline-start: 20px; }
   .home-hero { padding: 30px 0 38px; }
   .home-avatar { width: 100px; height: 100px; margin-bottom: 18px; }
   .home-role { font-size: 11px; letter-spacing: .18em; max-width: 330px; margin: 14px auto 0; }
