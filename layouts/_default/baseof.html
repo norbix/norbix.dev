@@ -1,48 +1,29 @@
+{{- if lt hugo.Version "0.112.4" }}
+{{- errorf "=> hugo v0.112.4 or greater is required for hugo-PaperMod to build " }}
+{{- end -}}
+
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ site.Language }}" dir="{{ .Language.LanguageDirection | default "auto" }}">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <!-- Theme persistence script (run early, before CSS) -->
-    <script>
-        (function() {
-            const savedTheme = localStorage.getItem('theme');
-            const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-
-            if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
-                document.documentElement.classList.add('dark');
-            } else {
-                document.documentElement.classList.remove('dark');
-            }
-
-            window.setTheme = function(theme) {
-                localStorage.setItem('theme', theme);
-                document.documentElement.classList.toggle('dark', theme === 'dark');
-            }
-        })();
-    </script>
-
-    <title>
-        {{ if .Title }}
-        {{ .Title }} | norbix.dev
-        {{ else }}
-        norbix.dev – The log of my journey through code & software systems architecture
-        {{ end }}
-    </title>
-
-    {{ partial "head.html" . }}
+    {{- partial "head.html" . }}
 </head>
-<body>
-{{ partial "header.html" . }}
 
-<main>
-    {{ block "main" . }}{{ end }}
-</main>
-
-{{ partial "footer.html" . }}
-
-<!-- LinkedIn Profile Badge Script -->
-<script src="https://platform.linkedin.com/badges/js/profile.js" async defer type="text/javascript"></script>
+<body class="
+{{- if (or (ne .Kind `page` ) (eq .Layout `archives`) (eq .Layout `search`)) -}}
+{{- print "list" -}}
+{{- end -}}
+{{- if eq site.Params.defaultTheme `dark` -}}
+{{- print " dark" }}
+{{- end -}}
+{{ if .IsHome }} home{{ end }}" id="top">
+    {{- partialCached "header.html" . .Page -}}
+    <main class="main">
+        {{- block "main" . }}{{ end }}
+    </main>
+    {{ partialCached "footer.html" . .Layout .Kind (.Param "hideFooter") (.Param "ShowCodeCopyButtons") -}}
+<!-- Existing LinkedIn profile badge integration -->
+<script src="https://platform.linkedin.com/badges/js/profile.js" async defer></script>
 </body>
+
 </html>

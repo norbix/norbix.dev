@@ -1,6 +1,6 @@
 baseURL = 'https://norbix.dev/'
 languageCode = "en-us"
-title = "norbix.dev - The log of my journey through code & software systems architecture"
+title = "norbix.dev"
 theme = "PaperMod"
 defaultContentLanguage = "en"
 buildDrafts = false
@@ -21,10 +21,6 @@ social = [
     { name = "email", url = "mailto:norbert.jakubczak@gmail.com" }
 ]
 
-[params.homeInfoParams]
-Title = "Hi, I'm Norbix 👋"
-Content = "Welcome to my personal blog where I share my journey through code, software systems."
-
 author = "Norbix"
 description = "norbix.dev - Norbix's dev blog"
 DateFormat = "2006-01-02"
@@ -37,9 +33,6 @@ ShowWordCount = true
 ShowToc = true
 TocOpen = false
 comments = true
-
-# Custom assets
-assets = "assets"
 
 [params.giscus]
 repo = "norbix/norbix.dev"
@@ -54,42 +47,30 @@ input_position = "bottom"
 theme = "dark"
 lang = "en"
 
-# Optional: SEO / social image
-[params.profileMode]
-enabled = true
-title = "Norbert (Mr. Norbix) Jakubczak"
-#subtitle = """Software Engineer · Internal Developer Platforms · SaaS Microservices
-#<br><br>
-#<img src="/images/we-learn-we-grow.png"
-#     alt="We learn. We grow. We deliver - together."
-#     style="display:block;
-#            margin:1.5rem auto;
-#            max-width:600px;
-#            width:100%;
-#            border-radius:24px;
-#            box-shadow:0 0 25px rgba(0, 150, 255, 0.25);">
-#"""
-subtitle = """<div style='text-align:center;'>
-Software Engineer | Technology Partner
-<br><br>
-Distributed Systems · Go · Python · TypeScript · AWS · Kubernetes
-<br><br>
-<img src="/images/we-learn-we-grow.png"
-     alt="We learn. We grow. We deliver - together."
-     style="display:block;
-            margin:1.5rem auto;
-            max-width:600px;
-            width:100%;
-            border-radius:24px;
-            box-shadow:0 0 25px rgba(0,150,255,0.25);">
-</div>"""
-imageUrl = "images/my_avatar.PNG"
-imageTitle = "Norbert (Mr. Norbix) Jakubczak"
-imageWidth = 120
-imageHeight = 120
+# Homepage copy; markup lives in layouts/index.html.
+[params.homepage]
+name = "Norbert Jakubczak"
+role = "Software Engineer · Technology Partner"
+headline = "Think **independently.** Build **deliberately.**"
+description = "Engineering notes on software systems, architecture, and the decisions behind them."
+avatar = "images/my_avatar.PNG"
+avatarAlt = "Gold Spartan helmet — Norbert Jakubczak's avatar"
+topics = ["Distributed Systems", "Go", "Python", "TypeScript", "AWS", "Kubernetes"]
+latestTitle = "Latest posts"
+allPostsLabel = "View all posts"
+postsURL = "/posts/"
 
-[params.assets]
-css = ["css/custom.css"]
+[[params.homepage.links]]
+name = "Read the notes"
+url = "/posts/"
+
+[[params.homepage.links]]
+name = "About me"
+url = "/about/"
+
+[[params.homepage.links]]
+name = "Work with me"
+url = "/about/#-work-with-me"
 
 # Menus (top nav)
 [[menu.main]]

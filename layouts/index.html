@@ -1,0 +1,46 @@
+{{ define "main" }}
+{{ $home := site.Params.homepage }}
+<section class="home-hero" aria-labelledby="hero-headline">
+  <img class="home-avatar" src="{{ $home.avatar | relURL }}" alt="{{ $home.avatarAlt }}" width="120" height="120">
+  <p class="home-name">{{ $home.name }}</p>
+  <p class="home-role">{{ $home.role }}</p>
+  <h1 id="hero-headline">{{ $home.headline | markdownify }}</h1>
+  <p class="home-description">{{ $home.description }}</p>
+  <nav class="home-links" aria-label="Introduction">
+    {{ range $home.links }}
+    <a href="{{ .url | relURL }}">{{ .name }} <span aria-hidden="true">→</span></a>
+    {{ end }}
+  </nav>
+  <ul class="home-topics" aria-label="Topics">
+    {{ range $home.topics }}<li>{{ . }}</li>{{ end }}
+  </ul>
+</section>
+<section class="home-latest" aria-labelledby="latest-heading">
+  <div class="home-section-heading">
+    <h2 id="latest-heading">{{ $home.latestTitle }}</h2>
+    <a href="{{ $home.postsURL | relURL }}">{{ $home.allPostsLabel }} <span aria-hidden="true">→</span></a>
+  </div>
+  <div class="home-posts">
+    {{/* Explicit date ordering ignores editorial weights. Never promote drafts or scheduled posts. */}}
+    {{ $posts := where site.RegularPages "Section" "posts" }}
+    {{ $posts = where $posts "Draft" false }}
+    {{ $posts = where $posts "PublishDate" "le" now }}
+    {{ range first 2 $posts.ByDate.Reverse }}
+    <article class="home-card">
+      <div class="home-card-meta">
+        <time datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format "Jan 2, 2006" }}</time>
+        {{ if site.Params.ShowReadingTime }}<span>{{ .ReadingTime }} min read</span>{{ end }}
+      </div>
+      <h3><a href="{{ .RelPermalink }}">{{ .Title }}</a></h3>
+      {{ with .Summary }}<p class="home-card-summary">{{ . | plainify | htmlUnescape }}</p>{{ end }}
+      <div class="home-card-bottom">
+        <ul class="home-tags" aria-label="Post tags">
+          {{ range first 3 (.GetTerms "tags") }}<li><a href="{{ .RelPermalink }}">{{ .LinkTitle }}</a></li>{{ end }}
+        </ul>
+        <span class="home-card-arrow" aria-hidden="true">→</span>
+      </div>
+    </article>
+    {{ end }}
+  </div>
+</section>
+{{ end }}
