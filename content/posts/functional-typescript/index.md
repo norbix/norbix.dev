@@ -527,6 +527,249 @@ An HTTP handler should coordinate the boundary.
 
 Keeping those responsibilities separate prevents surprisingly large amounts of complexity.
 
+## 🛠️ Utility Types: Derive Models Without Duplicating Them
+
+Small transformations are useful at the type level too.
+
+A backend often needs several views of the same data: a stored record, a creation command, an update command, and a public response.
+
+Writing each shape by hand makes changes harder to keep consistent.
+
+TypeScript's built-in utility types let us express how those shapes relate. They are available without imports.
+
+Start with a simple internal model:
+
+```ts
+type Device = {
+  id: string;
+  serialNumber: string;
+  country: string;
+  firmwareVersion?: string;
+  internalToken: string;
+  metadata: {
+    model: string;
+    labels: string[];
+  };
+};
+```
+
+### `Record<K, T>`: Model a Lookup Table
+
+Sometimes the relationship is between a set of keys and one value type.
+
+```ts
+type Market = "PL" | "DE" | "JP";
+type Region = "europe" | "asia";
+
+const regionByMarket: Record<Market, Region> = {
+  PL: "europe",
+  DE: "europe",
+  JP: "asia"
+};
+
+const resolveRegion = (market: Market): Region =>
+  regionByMarket[market];
+```
+
+`K` describes the keys. `T` describes the value stored under each key.
+
+Here, every market in the finite union needs an entry. Adding another market makes the compiler point out the missing mapping.
+
+This works well for routing rules, status labels, and configuration tables.
+
+An open dictionary needs more care:
+
+```ts
+const devicesById: Partial<Record<string, Device>> = {};
+
+const device = devicesById["missing-id"];
+// Device | undefined
+```
+
+A type annotation cannot guarantee that an arbitrary identifier exists at runtime. Use an optional lookup shape, or enable `noUncheckedIndexedAccess` to make unchecked indexed reads account for missing values.
+
+### `Omit<T, K>`: Leave Selected Properties Out
+
+A client creating a device should not need to provide fields owned by the server.
+
+```ts
+type CreateDeviceCommand = Omit<Device, "id" | "internalToken">;
+
+const command: CreateDeviceCommand = {
+  serialNumber: "ABC123",
+  country: "PL",
+  metadata: {
+    model: "sensor",
+    labels: []
+  }
+};
+```
+
+The remaining properties keep their existing types and modifiers. `firmwareVersion` is still optional.
+
+This is useful when a derived model should follow most of the original model.
+
+There is a tradeoff: adding a property to `Device` also adds it to this command unless we exclude it. For a public contract that must evolve independently, an explicit contract can be a better choice.
+
+### `Pick<T, K>`: Select a Focused View
+
+A response often needs only a few properties.
+
+```ts
+type DeviceSummary = Pick<Device, "id" | "serialNumber" | "country">;
+
+const toDeviceSummary = (device: Device): DeviceSummary => ({
+  id: device.id,
+  serialNumber: device.serialNumber,
+  country: device.country
+});
+```
+
+The selected keys must exist in `Device`.
+
+This gives the mapper a focused output type and makes the intended response easy to inspect.
+
+Neither `Pick` nor `Omit` changes an object at runtime:
+
+```ts
+const unsafeSummary = (device: Device): DeviceSummary => device;
+```
+
+This can compile because TypeScript uses structural compatibility. The returned object still contains `internalToken` and every other original field. Serializing it can expose those fields.
+
+The explicit mapper above constructs the actual response. A return type alone does not filter data.
+
+### `Readonly<T>`: Prevent Reassignment Through a Typed Reference
+
+Functional transformations are easier to follow when input data stays unchanged.
+
+The built-in spelling is `Readonly<T>`.
+
+```ts
+const moveDevice = (
+  device: Readonly<Device>,
+  country: string
+): Device => ({
+  ...device,
+  country
+});
+```
+
+Reassigning `device.country` inside this function would be a type error. Returning a new object makes the change explicit.
+
+However, `Readonly` on this object is shallow:
+
+```ts
+const inspectDevice = (device: Readonly<Device>): void => {
+  device.metadata.labels.push("inspected");
+  // Allowed: the nested array is still mutable.
+};
+```
+
+It also does not freeze the object at runtime or prevent another mutable reference from changing it.
+
+For nested immutability, model nested properties as readonly too. For runtime enforcement, consider freezing where appropriate; `Object.freeze` itself is also shallow.
+
+### `Required<T>`: Describe a Fully Populated Shape
+
+Configuration often begins with optional overrides and ends with resolved values.
+
+```ts
+type ClientOptions = {
+  timeoutMs?: number;
+  retries?: number;
+};
+
+type ResolvedClientOptions = Required<ClientOptions>;
+
+const resolveClientOptions = (
+  options: ClientOptions
+): ResolvedClientOptions => ({
+  timeoutMs: options.timeoutMs ?? 3000,
+  retries: options.retries ?? 3
+});
+```
+
+`Required` removes the optional property markers. The function supplies the actual defaults.
+
+The distinction matters: changing a type does not fill missing values. It also does not validate that `timeoutMs` is positive or `retries` is an integer.
+
+Required properties are not automatically non-nullable. If a property's value type allows `null`, that remains a separate concern.
+
+### `Partial<T>`: Describe an Update With Optional Fields
+
+An update command usually changes only part of a model.
+
+First select the properties clients may edit. Then make those properties optional.
+
+```ts
+type DeviceUpdate = Partial<
+  Pick<Device, "country" | "firmwareVersion">
+>;
+
+const applyDeviceUpdate = (
+  device: Readonly<Device>,
+  update: Readonly<DeviceUpdate>
+): Device => ({
+  ...device,
+  ...(update.country !== undefined
+    ? { country: update.country }
+    : {}),
+  ...(update.firmwareVersion !== undefined
+    ? { firmwareVersion: update.firmwareVersion }
+    : {})
+});
+```
+
+Selecting editable fields keeps server-owned properties out of the declared update shape. The function also explicitly selects fields at runtime rather than blindly spreading an input object.
+
+Here, an absent or `undefined` value means “leave the existing value unchanged.” Clearing a field would need an explicit policy, such as a validated `null` value or a separate operation.
+
+`Partial` is shallow. If a selected property contains a nested object, making that property optional does not make the nested object's properties optional.
+
+It also permits an empty object:
+
+```ts
+const noChanges: DeviceUpdate = {};
+```
+
+If the endpoint requires at least one change, enforce that in the runtime contract, for example with JSON Schema's `minProperties: 1`.
+
+The compiler option `exactOptionalPropertyTypes` helps distinguish omission from explicitly assigning `undefined`. Runtime validation still needs its own rules for accepted update values.
+
+### Compose Types, Keep Runtime Work Explicit
+
+These utilities can be combined:
+
+```ts
+type PublicDevice = Readonly<
+  Pick<Device, "id" | "serialNumber" | "country">
+>;
+
+type DeviceDraft = Partial<
+  Omit<Device, "id" | "internalToken">
+>;
+
+type RoutingTable = Readonly<Record<Market, Region>>;
+```
+
+Each composition describes a relationship. It does not perform validation, projection, defaulting, or freezing.
+
+| Utility | Type-level effect | Typical backend use |
+| --- | --- | --- |
+| `Record<K, T>` | Maps keys to a value type | Routing and lookup tables |
+| `Omit<T, K>` | Excludes selected properties | Commands without server-owned fields |
+| `Pick<T, K>` | Selects existing properties | Focused response models |
+| `Readonly<T>` | Adds readonly property modifiers | Input references that reject reassignment |
+| `Required<T>` | Removes optional property markers | Resolved configuration |
+| `Partial<T>` | Makes properties optional | Drafts and update commands |
+
+Use these tools to express relationships inside the application. When a public API contract is authoritative, derive its boundary types from that contract and use utilities where they accurately describe internal models.
+
+That keeps type reuse aligned with the architecture instead of making every API shape depend on a database record.
+
+For the complete built-in definitions and reference examples, see the [TypeScript Utility Types documentation](https://www.typescriptlang.org/docs/handbook/utility-types.html).
+
 ## ⚙️ Generate Types, But Verify Them
 
 Code generation introduces another problem.
