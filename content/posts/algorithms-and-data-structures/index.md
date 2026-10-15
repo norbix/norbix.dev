@@ -1636,8 +1636,8 @@ Generate all subsets of [1,2,3].
 
 ```go
 func subsets(nums []int) [][]int {
-var result [][]int
-var current []int
+    var result [][]int
+    var current []int
 
 	var dfs func(int)
 	dfs = func(index int) {
@@ -1678,8 +1678,8 @@ Choose k elements from n.
 ```go
 
 func combinations(n, k int) [][]int {
-var result [][]int
-var current []int
+    var result [][]int
+    var current []int
 
 	var dfs func(int)
 
@@ -1697,6 +1697,7 @@ var current []int
 	}
 
 	dfs(1)
+	
 	return result
 }
 ```
@@ -1720,7 +1721,7 @@ Generate all possible orderings.
 
 ```go
 func permutations(nums []int) [][]int {
-var result [][]int
+    var result [][]int
 
 	var dfs func([]int, []int)
 
@@ -1739,6 +1740,7 @@ var result [][]int
 	}
 
 	dfs(nums, []int{})
+	
 	return result
 }
 ```
@@ -1773,7 +1775,7 @@ Common interview problems:
 
 ```go
 func maxSum(nums []int, k int) int {
-windowSum := 0
+    windowSum := 0
 
 	for i := 0; i < k; i++ {
 		windowSum += nums[i]
