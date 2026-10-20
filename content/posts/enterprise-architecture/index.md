@@ -1,6 +1,6 @@
 +++
 date = '2026-10-20T11:45:00+02:00'
-draft = true
+draft = false
 title = "Beyond Code — Connecting Business, Data, Application, and Technology Architecture"
 tags = ["enterprise-architecture", "business-architecture", "data-architecture", "application-architecture", "technology-architecture", "system-design", "software-engineering"]
 categories = ["software-engineering", "software-architecture"]
@@ -8,11 +8,11 @@ summary = "A practical look at the four domains of enterprise architecture, show
 comments = true
 ShowToc = true
 TocOpen = true
+image = "banner.png"
 weight = 39
 +++
 
 ![banner](banner.png)
-
 
 > Architecture becomes much more useful when we can trace a technical decision back to the business outcome it supports.
 
