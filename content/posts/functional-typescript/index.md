@@ -982,6 +982,181 @@ Runtime contracts handle another.
 
 Functional architecture keeps the pieces understandable.
 
+## How to contribute
+
+All committed code must be tested, linted, and formatted. Check `package.json` for available scripts.
+
+Code samples below reflect the project's `tsconfig` and linting rules.
+
+These are guidelines, not commandments. Feel free to contest them, propose alternatives, and discuss tradeoffs with the team — including linter rules.
+
+### 1. Keep it simple
+
+Write code readable at 3 AM. Use explicit `type`s. Avoid `any`, complex generics, and vague types.
+
+```ts
+// GOOD
+type Device = {
+  id: string
+  name: string
+}
+
+// BAD
+interface IDevice {
+  [key: string]: any
+}
+```
+
+### 2. Don't mutate arguments, don't optimise prematurely
+
+If not needed, don't optimise prematurely. Clarity beats performance until a profiler tells you otherwise.
+
+```ts
+// GOOD
+function addItem(items: readonly string[], item: string): string[] {
+  return [...items, item]
+}
+
+// BAD
+function addItem(items: string[], item: string): void {
+  items.push(item)
+}
+```
+
+### 3. Avoid types that cause boilerplate — use discriminated unions
+
+```ts
+// GOOD — each case is self-describing, and narrowing is trivial
+type Result =
+  | { statusCode: 200; result: number }
+  | { statusCode: 400; errorMessage: string }
+
+function handle(result: Result) {
+  if (result.statusCode === 200) {
+    // TypeScript knows result.result exists here
+    console.log(result.result)
+  }
+}
+
+// BAD — vague, everything is optional
+type Result = {
+  statusCode: 200 | 400
+  errorMessage?: string
+  result?: number
+}
+```
+
+### 4. Separate concerns
+
+For example: handlers decide HTTP responses. Business logic returns data or throws — it never picks status codes.
+
+```ts
+export async function handler(event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> {
+  const devices = await getDevicesByUser(event.pathParameters.userId)
+
+  if (devices.length === 0) {
+    return notFound({ message: "No devices found" })
+  }
+
+  return ok({ devices })
+}
+```
+
+### 5. Use async/await
+
+Avoid `new Promise` and callback nesting when an async alternative exists.
+
+```ts
+// GOOD
+async function fetchData(id: string): Promise<Data> {
+  const response = await client.get(id)
+  return response.data
+}
+
+// BAD
+function fetchData(id: string): Promise<Data> {
+  return new Promise((resolve, reject) => {
+    client.get(id, (err, res) => {
+      if (err) reject(err)
+      else resolve(res.data)
+    })
+  })
+}
+```
+
+### 6. Throw simple errors
+
+Use built-in errors first: `Error`, `TypeError`, `RangeError`, etc. If needed, extend `Error` with a single project-wide class. Don't invent error hierarchies prematurely. This is up to discussion.
+
+```ts
+throw new Error("Device not found")
+throw new RangeError("Offset must be non-negative")
+```
+
+### 7. Don't try/catch everything
+
+Only catch when the flow needs to change or you can enrich the error. Don't catch-and-rethrow without adding value.
+
+```ts
+// GOOD — catch changes the flow
+try {
+  await saveDevice(device)
+} catch (error) {
+  await notifyAdmin(device.id)
+  return serviceUnavailable({ message: "Save failed, admin notified" })
+}
+
+// BAD — pointless rethrow
+try {
+  await saveDevice(device)
+} catch (error) {
+  throw error
+}
+```
+
+### 8. Be explicit with null checks
+
+Avoid `!something` for null/undefined checks — it also catches `0`, `""`, and `false`, which leads to subtle bugs.
+
+```ts
+// GOOD — explicit, only catches null and undefined
+if (value == null) {
+  return
+}
+
+// BAD — also catches 0, empty string, false
+if (!value) {
+  return
+}
+```
+
+### 9. Think before adding dependencies
+
+First check if Node.js already provides what you need (e.g. `crypto`, `fs/promises`, `URL`, `structuredClone`). If you still need a library, check how much it weighs, whether it's maintained, secure, and ideally has no transitive dependencies. As obvious — less is more.
+
+### 10. Refer to primary sources
+
+When in doubt, refer to W3C, TypeScript documentation, MDN Web Docs, or Node.js docs rather than blog posts or Stack Overflow.
+
+### 11. Organize code into cohesive modules
+
+Don't be afraid to create files that group multiple related functions. Group things that belong together.
+
+```ts
+// src/device/resource.ts
+export function addDevice(payload: AddDevicePayload) { ... }
+export function deleteDevice(payload: DeleteDevicePayload) { ... }
+export function listDevices(payload: ListDevicesPayload) { ... }
+```
+
+### 12. Don't export internal functions for testing
+
+Internal functions stay internal. Tests exercise the public API (black-box testing). If you can't test behavior through the public interface, reconsider your design — not your export boundaries.
+
+### 13. Tests must not leak state
+
+Each test runs in isolation. Don't rely on execution order or shared mutable state between tests. If a test fails when run alone, it's broken.
+
 ## 🏁 Final Thoughts
 
 The most useful functional programming lessons I've learned from production TypeScript weren't about clever abstractions.
