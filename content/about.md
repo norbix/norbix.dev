@@ -77,8 +77,6 @@ Topics include:
 
 ## Work With Me
 
-I operate as **Software House NORBIX – Norbert Jakubczak**, an independent software business based in Poland, working with clients internationally.
-
 I offer three modes of cooperation:
 
 - **Individual Contributor:** hands-on software engineering as part of your team.
