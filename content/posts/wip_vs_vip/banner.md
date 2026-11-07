@@ -162,6 +162,61 @@ Some designs return region-specific CNAMEs; others return the selected VIP direc
 
 After resolution, the client connects to the selected VIP. HTTP traffic does not pass through the DNS server.
 
+## 🏗️ Architecture: Global DNS and Regional Traffic
+
+The diagrams below reconstruct the two-data-center architecture discussed above. They separate DNS resolution from application traffic: GSLB returns an address; the client then connects directly to that VIP.
+
+### Global Selection and Local Load Balancing
+
+```mermaid
+flowchart TD
+    C["Client: api.norbix.com"] -->|DNS query| R["Recursive DNS"]
+    R -->|Cache miss| G["F5 BIG-IP DNS: WIP"]
+    G -->|Selected VIP answer| R
+    R -->|Cached DNS answer| C
+    G -.->|Health checks| V1["DC1 Frankfurt: VIP1 / F5 LTM"]
+    G -.->|Health checks| V2["DC2 Warsaw: VIP2 / F5 LTM"]
+    C ==>|HTTPS if VIP1 selected| V1
+    C ==>|HTTPS if VIP2 selected| V2
+    V1 --> A1["DC1 application servers"]
+    V2 --> A2["DC2 application servers"]
+```
+
+The HTTPS arrows are alternatives: a connection targets the address selected by DNS. Health checks and policy determine which answers are eligible. The WIP does not forward the HTTPS connection.
+
+### Local Recursive DNS per Location
+
+This topology assumes each resolver's outbound DNS traffic exits near its users, and that the GeoIP data and topology rules map those addresses correctly.
+
+```mermaid
+flowchart TD
+    W["Warsaw clients"] --> RW["Warsaw recursive DNS"]
+    F["Frankfurt clients"] --> RF["Frankfurt recursive DNS"]
+    RW -->|Warsaw DNS egress| G["F5 GSLB: topology and health"]
+    RF -->|Frankfurt DNS egress| G
+    G -->|Answer for Warsaw resolver| V2["VIP2: DC2 Warsaw"]
+    G -->|Answer for Frankfurt resolver| V1["VIP1: DC1 Frankfurt"]
+```
+
+Arrows from GSLB to VIP boxes show **answer selection**, not application traffic. Without ECS, location is inferred from recursive egress. A local forwarder pointing to central corporate DNS does not satisfy this local-recursion assumption.
+
+### Central Corporate DNS: With and Without ECS
+
+```mermaid
+flowchart TD
+    W["Warsaw clients"] --> R["Central corporate recursive DNS: Frankfurt"]
+    F["Frankfurt clients"] --> R
+    R -->|No usable ECS| N["GSLB sees corporate DNS egress"]
+    R -->|Valid client prefix supplied| E["GSLB uses ECS and health"]
+    N -->|Frankfurt topology match| V1["VIP1: DC1 Frankfurt"]
+    E -->|Warsaw prefix match| V2["VIP2: DC2 Warsaw"]
+    E -->|Frankfurt prefix match| V1
+```
+
+These are alternative behaviors, not two simultaneous queries. Without ECS, both offices can receive the Frankfurt answer. With usable branch-specific prefixes and matching topology rules, GSLB can distinguish them. Enabling ECS centrally is insufficient unless the resolver actually knows and forwards a meaningful prefix for each branch.
+
+For **active–passive Global Availability**, replace the geographic preference with an ordered health policy: prefer VIP1, then use VIP2 when VIP1 is unavailable. In that policy, resolver location and ECS do not determine the preferred data center.
+
 ## 🧭 Whose Location Does GeoDNS Actually See?
 
 When a laptop resolves a name, it normally uses a **recursive resolver**. That resolver follows DNS delegations, or forwards the request to another recursive service, and caches the result. The authoritative server publishes answers for the domain; it does not normally receive the laptop's query directly.
@@ -214,9 +269,9 @@ A query with `+subnet=0.0.0.0/0` supplies zero client address bits and requests 
 
 ECS can improve endpoint selection when DNS and client locations differ. It also exposes some client network information and partitions DNS caches. Whether it improves latency must be measured; it does not directly increase bandwidth or change the Internet route to a fixed destination.
 
-## 🌐 How Accurate Is GeoDNS Through 8.8.8.8?
+## 🌐 How Accurate Is GeoDNS Through Public Recursive DNS?
 
-**There is no universal accuracy percentage.** Country, region, and city accuracy are different questions, and none guarantees the lowest network latency.
+**Public recursive DNS services, such as Google Public DNS (`8.8.8.8`), can affect the location signal available to GeoDNS.** There is no universal accuracy percentage: country, region, and city accuracy are different questions, and none guarantees the lowest network latency. Providers differ in their recursive egress topology and ECS policies; the Google-specific details below are an example, not a rule for every public resolver.
 
 `8.8.8.8` is Google's anycast service address. A query from Poland does not automatically travel to the United States because an IP database associates that address with Google. Network routing selects an anycast service location, and the address used for outbound recursion can be different again.
 
@@ -227,7 +282,7 @@ Google documents both its anycast service and the [outbound resolver ranges and 
 | Site-local recursion without ECS | Site's public DNS egress | Depends on NAT, routing, and GeoIP data |
 | ISP recursion without ECS | ISP resolver's outbound address | ISP may centralize recursion |
 | Central corporate DNS without ECS | Corporate DNS egress | Multiple offices can appear to be one location |
-| Google Public DNS without usable ECS | Google's outbound recursive address | Anycast ingress and recursive egress can differ |
+| Public recursive DNS without usable ECS, such as Google Public DNS (`8.8.8.8`) | Provider's outbound recursive address | Ingress and recursive egress can differ; topology varies by provider |
 | ECS-aware recursion and authority | Client network prefix | Still affected by prefix accuracy, VPNs, caches, and policy |
 
 Public DNS can provide good regional steering, particularly with usable ECS. It cannot guarantee city-level precision or the best-performing VIP for every user. Validate the selected VIP and actual connection latency from representative ISPs, offices, VPNs, and regions. A geographically closer data center may have a worse network path.
@@ -335,7 +390,8 @@ To confirm the remaining behavior, ask the ISP whether it adds ECS by default, w
 These are suggested follow-up commands, **not results from the recorded session**. Replace `api.example.com` with the real public service name:
 
 ```bash
-# Compare the ordinary answers and their remaining TTLs.
+# Compare ISP DNS with a public recursive resolver (Google Public DNS here).
+# Inspect the ordinary answers and their remaining TTLs.
 dig @45.131.35.6 api.example.com A +noall +answer
 dig @8.8.8.8 api.example.com A +noall +answer
 
@@ -402,9 +458,7 @@ A modern globally resilient architecture often uses this pattern:
 
    - Combined, they create a multi-layer failover strategy:
 
-    ```text
-    Client → DNS (WIP) → Regional VIP → Local Services
-    ```
+    DNS first selects a regional VIP; the client then connects to that VIP, which forwards traffic to local services.
 
     This ensures:
 
